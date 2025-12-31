@@ -1,0 +1,16 @@
+file name
+baiqa-visit-release-key.jk
+
+alias
+baiqa-visit-release-key-alias
+
+password
+baiqa-visit-release-key-password
+
+key info
+CN=Kamoliddin Soliev,
+OU=AMS,
+O=RealSoft AI,
+L=Tashkent,
+ST=Tashkent,
+C=UZ

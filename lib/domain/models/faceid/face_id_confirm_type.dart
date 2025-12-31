@@ -1,0 +1,4 @@
+enum FaceIdConfirmType {
+  forRegister,
+  forSingIn,
+}

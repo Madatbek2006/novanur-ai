@@ -1,0 +1,4 @@
+enum LogoutEvent {
+  onLogoutFromUI,
+  onTokenExpired,
+}
