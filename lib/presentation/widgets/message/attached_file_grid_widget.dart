@@ -1,12 +1,8 @@
 import 'dart:convert';
 
-import 'package:baiqavisit/core/extensions/text_extensions.dart';
-import 'package:baiqavisit/core/gen/assets/assets.gen.dart';
 import 'package:baiqavisit/presentation/widgets/image/rounded_cached_network_image_widget.dart';
-import 'package:baiqavisit/utils/extension/image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:photo_opener/photo_opener.dart';
 
 class AttachedFileGridWidget extends StatefulWidget {
   final List<String>? files;

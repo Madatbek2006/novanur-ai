@@ -33,19 +33,10 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
   WebSocketChannel? channel;
   final AudioPlayer _player = AudioPlayer();
 
-  onBackPress(){
-    stopProgress();
-  }
-
-
-
 
 
   Future<void> _setupAudio() async {
-    // Загрузка аудио из assets или сети
     await _player.setAsset('assets/song/progress_audio.mp3');
-
-    // Включение бесконечного повторения
     _player.setLoopMode(LoopMode.one);
 
   }

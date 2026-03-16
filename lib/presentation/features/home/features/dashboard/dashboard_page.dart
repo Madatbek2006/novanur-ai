@@ -2,16 +2,19 @@ import 'dart:convert';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:baiqavisit/core/enum/describe_img_type.dart';
+import 'package:baiqavisit/core/extensions/list_extensions.dart';
 import 'package:baiqavisit/core/extensions/text_extensions.dart';
 import 'package:baiqavisit/core/gen/assets/assets.gen.dart';
 import 'package:baiqavisit/core/gen/localization/strings.dart';
 import 'package:baiqavisit/domain/models/dashboard/dashboard_button_data.dart';
+import 'package:baiqavisit/presentation/application/manager/object_detection_manager.dart';
 import 'package:baiqavisit/presentation/features/common/barcode/barcode_page.dart';
 import 'package:baiqavisit/presentation/features/common/cameras/camera_view.dart';
 import 'package:baiqavisit/presentation/features/common/cameras/object_detection_camera.dart';
 import 'package:baiqavisit/presentation/router/app_router.dart';
 import 'package:baiqavisit/presentation/support/colors/static_colors.dart';
 import 'package:baiqavisit/presentation/support/cubit/base_page.dart';
+import 'package:baiqavisit/presentation/support/cubit/base_statefull_page.dart';
 import 'package:baiqavisit/presentation/support/extensions/color_extension.dart';
 import 'package:baiqavisit/presentation/support/extensions/compressing_exts.dart';
 import 'package:baiqavisit/presentation/widgets/action/dashboard_button.dart';
@@ -25,6 +28,7 @@ import 'package:baiqavisit/utils/extension/map_with_index.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_mlkit_object_detection/google_mlkit_object_detection.dart';
 import 'package:image/image.dart' as lokiimage;
 import 'package:image_cropper/image_cropper.dart';
 import 'package:logger/logger.dart';
@@ -32,31 +36,37 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'dashboard_cubit.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 @RoutePage()
 class DashboardPage
-    extends BasePage<DashboardCubit, DashboardState, DashboardEvent> {
+    extends BaseStatefulPage<DashboardCubit, DashboardState, DashboardEvent> {
   DashboardPage({super.key});
 
   @override
-  void onWidgetCreated(BuildContext context) {
-    cubit(context).setInitialData();
-  }
+  State<StatefulWidget> createState() => _DashboardState();
+
+
+}
+
+
+
+
+
+class _DashboardState extends BaseStatefulPageState<DashboardPage,DashboardCubit, DashboardState, DashboardEvent> {
+  CameraController? _controller;
+
+
+
 
   @override
-  void onEventEmitted(BuildContext context, DashboardEvent event) {
-    switch (event.type) {
-      case DashboardEventType.onShowTakenPhoto:
-        // _showTakenPhotoBottomSheet(context, cubit(context).states);
-      case DashboardEventType.openResultScreen:
-    }
+  void onWidgetCreated() {
+    // cubit().setInitialData();
   }
+
 
   @override
   Widget onWidgetBuild(BuildContext context, DashboardState state) {
-    // if(state.isSendingRequest){
-    //   showProgressDialog(context);
-    // }
     return Scaffold(
       backgroundColor: context.backgroundWhiteColor,
       body: Container(
@@ -67,16 +77,17 @@ class DashboardPage
   }
 
   Widget _buildBody(BuildContext context, DashboardState state) {
-    if (state.isCameraInitLoading) {
-      return _buildLoadingBlock();
-    } else if (state.isCameraInitFailed) {
-      return _buildErrorBlock(context, state);
-    } else if (state.isCameraVisible) {
+    // if (state.isCameraInitLoading) {
+    //   return _buildLoadingBlock();
+    // } else if (state.isCameraInitFailed) {
+    //   return _buildErrorBlock(context, state);
+    // } else if (state.isCameraVisible) {
       return _buildCameraViews(context, state);
-    } else {
-      return _buildErrorBlock(context, state);
-    }
+    // } else {
+    //   return _buildErrorBlock(context, state);
+    // }
   }
+
 
   Widget _buildLoadingBlock() {
     return Center(
@@ -107,7 +118,7 @@ class DashboardPage
               strokeColor: StaticColors.buttonColor,
               onPressed: () {
                 HapticFeedback.heavyImpact();
-                cubit(context).setupCamera();
+                cubit().setupCamera();
               },
             ),
             SizedBox(height: 20),
@@ -127,40 +138,17 @@ class DashboardPage
   }
 
   Widget _buildCameraViews(BuildContext context, DashboardState state) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-
-    final double rectangleWidth = screenWidth * 0.8;
-    final double rectangleHeight = rectangleWidth * 4 / 3;
-
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         children: [
           Align(
-            alignment: Alignment.topCenter,
-            child: switch(state.type){
-              // null => _buildDefCam(context,state),
-              //
-              // DashboardButtonType.objectRecognition => _buildObjDetectCam(context,state),
-              //
-              // DashboardButtonType.barcode => _buildBarCode(context,state),
-              //
-              // DashboardButtonType.imageDescription => _buildDefCam(context,state),
-              null =>  _buildDefCam(context,state),
-
-              DashboardButtonType.scanText => _buildDefCam(context,state),
-
-              DashboardButtonType.scanBarcode => _buildBarCode(context,state),
-
-              DashboardButtonType.describeScene => _buildDefCam(context,state),
-
-              DashboardButtonType.objectRecognition => _buildObjDetectCam(context,state),
-
-              DashboardButtonType.findObject => _buildDefCam(context,state),
-            }
+              alignment: Alignment.topCenter,
+              child:
+              cubit().states.type==DashboardButtonType.scanBarcode?_buildBarCode(context): _buildDefCam(context),
           ),
           Align(
-            alignment: Alignment.bottomCenter,
+              alignment: Alignment.bottomCenter,
               child: Padding(
                 padding: EdgeInsets.only(bottom: MediaQuery.viewPaddingOf(context).bottom+80),
                 child: _buildBottomSheet(context,state),
@@ -171,133 +159,32 @@ class DashboardPage
     );
   }
 
-  Widget _buildDefCam(BuildContext context,DashboardState state){
-    return  CameraView(
-      controller:state.cameraController,
-        onControllerReady: (CameraController controller) {
-          cubit(context).updateState((state)=>state.copyWith(cameraController: controller));
-        },
-    );
-  }
-
-  Widget _buildBarCode(BuildContext context,DashboardState state){
-    return BarcodePage();
-  }
-  Widget _buildObjDetectCam(BuildContext context,DashboardState state){
-    return ObjectDetectionCamera(
-          onControllerReady: (CameraController controller) {
-            cubit(context).updateState((state)=>state.copyWith(cameraController: controller));
-          },
-      // child: _buildBottomSheet(context,state)
-    );
-    // return  CameraView(controller:state.cameraController,
-    //     child: _buildBottomSheet(context,state)
-    // );
-  }
-
-
-  Widget _buildBottomSheet(BuildContext context, DashboardState state) {
-    return Align(
-        alignment: Alignment.bottomCenter,
-        child:
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              height: 128,
-              child: Container(
-                // color: context.appBarColor,
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: DashboardButtonType.values.map(
-                              (e)=>DashboardButton(
-                                      isClicked: state.type==e,
-                                      data: e,
-                                      onPressed: (data){
-                                        if(state.type!=data) {
-                                          cubit(context).setDashboardButtonType(data);
-                                        }else {
-                                          onClickDashboardButton(context, state.cameraController!, data);
-                                        }
-                                      },
-                                    )
-                      ).toList()
-                    ),
-                  ),
-
-
-
-                  // child: ListView.separated(
-                  //
-                  //   scrollDirection: Axis.horizontal,
-                  //   itemBuilder: (BuildContext context, int index) {
-                  //
-                  //     return DashboardButton(
-                  //       isClicked: state.type==DashboardButtonType.values[index],
-                  //       data: DashboardButtonType.values[index],
-                  //       onPressed: (data){
-                  //         if(state.type!=data) {
-                  //           cubit(context).setDashboardButtonType(data);
-                  //         }else {
-                  //           onClickDashboardButton(context, state.cameraController!, data);
-                  //         }
-                  //       },
-                  //     );
-                  //   },
-                  //   separatorBuilder: (BuildContext context, int index) {
-                  //     return SizedBox(width: 4);
-                  //   },
-                  //   itemCount: DashboardButtonType.values.length,
-                  // ),
-                ),
-              ),
-            )
-
-
-          ],
-        )
-
-    );
-  }
-
 
 
   void onClickDashboardButton(BuildContext context,CameraController cameraController,DashboardButtonType type){
+    Logger().d("TTT=>type: $type");
     switch(type){
 
-      // case DashboardButtonType.objectRecognition:
-      //   // context.router.push(ObjectDetectionRoute());
-      //   break;
-      //
-      // case DashboardButtonType.barcode:
-      //   // context.router.push(BarcodeRoute());
-      //   break;
-      // case DashboardButtonType.imageDescription:
-      //   _showDialog(context,cameraController);
-      //   break;
       case DashboardButtonType.scanText:
         _scanText(context,cameraController);
         break;
       case DashboardButtonType.scanBarcode:
-        // context.router.push(BarcodeRoute());
+      // context.router.push(BarcodeRoute());
+        break;
 
       case DashboardButtonType.describeScene:
         _showDialog(context,cameraController);
         break;
       case DashboardButtonType.objectRecognition:
-        context.router.push(ObjectDetectionRoute());
+      // context.router.push(ObjectDetectionRoute());
         break;
 
-      case DashboardButtonType.findObject:
+      // case DashboardButtonType.findObject:
 
 
     }
   }
+
 
 
   void _scanText(BuildContext context,CameraController cameraController)async {
@@ -312,14 +199,12 @@ class DashboardPage
 
   Future<XFile?> onTakePhoto(BuildContext context, CameraController cameraController,{bool isCompress=true}) async{
     HapticFeedback.heavyImpact();
-    // ProgressDialog.show(context);
     try {
       XFile photo = await cameraController.takePicture();
       if(isCompress) {
         photo = await photo.compressPhoto();
       }
-      cubit(context).setTakenPhoto(photo);
-      // ProgressDialog.hide(context);
+      cubit().setTakenPhoto(photo);
       Logger().d("TTT=>Success capturing image");
       return photo;
     } catch (e) {
@@ -345,14 +230,14 @@ class DashboardPage
             mainAxisSize: MainAxisSize.min,
             children: [
               ...DescribeImgType.values.map((type)=>
-              _buildAction(dialogContext, type.title,() async{
-                Navigator.of(dialogContext).pop();
-               var photo= await onTakePhoto(context,cameraController);
-                await cameraController.setFlashMode(FlashMode.off);
-                if(photo==null) return;
-                context.router.push(ChatRoute( photoFile: photo!, type: type));
+                  _buildAction(dialogContext, type.title,() async{
+                    Navigator.of(dialogContext).pop();
+                    var photo= await onTakePhoto(context,cameraController);
+                    await cameraController.setFlashMode(FlashMode.off);
+                    if(photo==null) return;
+                    context.router.push(ChatRoute( photoFile: photo!, type: type));
 
-              })
+                  })
               )
             ],
           ),
@@ -378,7 +263,82 @@ class DashboardPage
       ),
     );
   }
-  
-  
+
+
+  Widget _buildDefCam(BuildContext context){
+    return  CameraView(
+      controller:_controller,
+      isObjRec: cubit().states.type==DashboardButtonType.objectRecognition,
+      onControllerReady: (CameraController controller) {
+        _controller=controller;
+      },
+    );
+  }
+
+  Widget _buildBarCode(BuildContext context){
+    return MobileScanner(
+      onDetect: (capture) {
+        final List<Barcode> barcodes = capture.barcodes;
+        for (final barcode in barcodes) {
+          cubit().getProductData(barcode.rawValue);
+          Logger().d('TTT=>Найден код: ${barcode.rawValue}');
+        }
+      },
+    );
+  }
+  Widget _buildObjDetectCam(BuildContext context,DashboardState state){
+    return ObjectDetectionCamera(
+      onControllerReady: (CameraController controller) {
+        cubit().updateState((state)=>state.copyWith(cameraController: controller));
+      },
+    );
+  }
+
+
+  Widget _buildBottomSheet(BuildContext context, DashboardState state) {
+    return Align(
+        alignment: Alignment.bottomCenter,
+        child:
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              height: 128,
+              child: Container(
+                // color: context.appBarColor,
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: DashboardButtonType.values.map(
+                                (e)=>DashboardButton(
+                              isClicked: state.type==e,
+                              data: e,
+                              onPressed: (data){
+                                Logger().d("TTT=>data: $data");
+                                if(state.type!=data) {
+                                  cubit().setDashboardButtonType(data);
+                                }else {
+                                  onClickDashboardButton(context, _controller!, data);
+                                }
+                                setState(() {});
+                              },
+                            )
+                        ).toList()
+                    ),
+                  ),
+                ),
+              ),
+            )
+
+
+          ],
+        )
+
+    );
+  }
 
 }

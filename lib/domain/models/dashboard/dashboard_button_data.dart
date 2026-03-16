@@ -6,8 +6,8 @@ enum DashboardButtonType{
   scanText,
   scanBarcode,
   describeScene,
-  objectRecognition,
-  findObject;
+  objectRecognition;
+  // findObject;
 
 
 
@@ -25,8 +25,8 @@ enum DashboardButtonType{
       case DashboardButtonType.objectRecognition:
         return Strings.dashboardButtonTypeObjectRecognition;
 
-      case DashboardButtonType.findObject:
-        return Strings.dashboardButtonTypeFindObject;
+      // case DashboardButtonType.findObject:
+      //   return Strings.dashboardButtonTypeFindObject;
 
     }
   }
@@ -42,7 +42,7 @@ enum DashboardButtonType{
 
       DashboardButtonType.objectRecognition => Assets.images.bottomBar.carFront,
 
-      DashboardButtonType.findObject => Assets.images.bottomBar.box
+      // DashboardButtonType.findObject => Assets.images.bottomBar.box
     };
 
     return icon.svg(

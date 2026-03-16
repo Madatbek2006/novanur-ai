@@ -1,3 +1,4 @@
+import 'package:baiqavisit/core/gen/localization/strings.dart';
 import 'package:baiqavisit/data/datasource/network/dto/barcode/product_response.dart';
 import 'package:baiqavisit/data/datasource/network/dto/photo_analise_response/photo_analise_response.dart';
 import 'package:baiqavisit/data/datasource/network/services/photo_analysis_service.dart';
@@ -25,7 +26,7 @@ class PhotoAnalysisRepository {
   Future<String> getProductData(String barcode) async {
     var response = await _photoAnalysis.getProductData(barcode);
     Logger().d("TTT=> ${response.data}");
-    return ProductRootResponse.fromJson(response.data).product?.productName??"product not found";
+    return ProductRootResponse.fromJson(response.data).product?.productName??Strings.commonProductNotFound;
   }
 
 

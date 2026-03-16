@@ -20,7 +20,7 @@ extension GetItModuleApp on GetIt {
     // home
     registerFactory(() => HomeCubit());
 
-    registerFactory(() => DashboardCubit());
+    registerFactory(() => DashboardCubit(get()));
     registerFactory(
       () => ProfileCubit(get(), get(), get(), get(), get()),
     );

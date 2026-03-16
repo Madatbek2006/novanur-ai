@@ -2,23 +2,31 @@ import 'dart:async';
 
 import 'package:baiqavisit/core/enum/enums.dart';
 import 'package:baiqavisit/core/extensions/list_extensions.dart';
+import 'package:baiqavisit/core/handler/future_handler.dart';
+import 'package:baiqavisit/data/repositories/photo_analysis_repository.dart';
 import 'package:baiqavisit/domain/models/dashboard/dashboard_button_data.dart';
 import 'package:baiqavisit/presentation/support/cubit/base_cubit.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 part 'dashboard_cubit.freezed.dart';
 part 'dashboard_state.dart';
 
 @injectable
 class DashboardCubit extends BaseCubit<DashboardState, DashboardEvent> {
+  WebSocketChannel? channel;
+  bool _isSendingRequest = false;
+  final FlutterTts flutterTts = FlutterTts();
 
 
+  final PhotoAnalysisRepository _photoAnalysisRepository;
 
-  DashboardCubit(
-  ) : super(const DashboardState());
+
+  DashboardCubit(this._photoAnalysisRepository) : super(const DashboardState());
 
   @override
   Future<void> close() async {
@@ -90,31 +98,6 @@ class DashboardCubit extends BaseCubit<DashboardState, DashboardEvent> {
     await states.cameraController?.dispose();
   }
 
-  // void sendTakenAttendancePhoto() {
-  //   updateState((state)=>state.copyWith(
-  //     isSendingRequest: true
-  //   ));
-  //   logger.d("TTT=> ${states.takenPhotoFile==null}////${states.takenPhotoFile}");
-  //   _photoAnalysisRepository.fetchPhotoAnalysis(states.takenPhotoFile!,
-  //       aiImageDescriptionPrompt
-  //   )
-  //   .initFuture()
-  //   .onStart((){})
-  //   .onSuccess((data){
-  //     updateState((state)=>state.copyWith(
-  //         isSendingRequest: false
-  //     ));
-  //     logger.d("TTT=>${data}");
-  //     updateState((state) => state.copyWith(title: data??""));
-  //     emitEvent(DashboardEvent(DashboardEventType.openResultScreen));
-  //
-  //   })
-  //   .onError((error){
-  //     logger.d("TTT=> $error");
-  //   })
-  //   .onFinished((){})
-  //   .executeFuture();
-  // }
 
 
   void showPicture(bool isVisible) {
@@ -142,9 +125,28 @@ class DashboardCubit extends BaseCubit<DashboardState, DashboardEvent> {
 
       case DashboardButtonType.objectRecognition:
 
-      case DashboardButtonType.findObject:
+      // case DashboardButtonType.findObject:
 
     }
+  }
+
+  void getProductData(String? barcode) {
+    if(_isSendingRequest || barcode==null) return;
+    _isSendingRequest=true;
+    _photoAnalysisRepository.getProductData(barcode)
+        .initFuture()
+        .onStart(() {})
+        .onSuccess((data) {
+      flutterTts.speak(data);
+      Future.delayed(Duration(seconds: 5),(){
+        _isSendingRequest=false;
+      });
+    })
+        .onError((error) {
+      _isSendingRequest=false;
+    })
+        .onFinished(() {})
+        .executeFuture();
   }
 
 

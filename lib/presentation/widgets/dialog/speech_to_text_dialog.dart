@@ -5,10 +5,12 @@ import 'package:logger/logger.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class GoogleSpeechDialog extends StatefulWidget {
-  /// Возвращает распознанный текст
   final Function(String text) onResult;
 
-  const GoogleSpeechDialog({super.key, required this.onResult});
+  const GoogleSpeechDialog({
+    super.key,
+    required this.onResult,
+  });
 
   @override
   State<GoogleSpeechDialog> createState() => _GoogleSpeechDialogState();
@@ -16,11 +18,13 @@ class GoogleSpeechDialog extends StatefulWidget {
 
 class _GoogleSpeechDialogState extends State<GoogleSpeechDialog> {
   final stt.SpeechToText _speech = stt.SpeechToText();
+
   bool _isListening = false;
-  bool _isClosed = false; // флаг, чтобы onResult срабатывал 1 раз
+  bool _isFinished = false;
+
   String _text = '';
   double _level = 0.0;
-  String _localeId = 'en-US';
+  String _localeId = 'en_US';
 
   @override
   void initState() {
@@ -28,34 +32,44 @@ class _GoogleSpeechDialogState extends State<GoogleSpeechDialog> {
     _initSpeech();
   }
 
-  /// Универсальный вызов результата, с проверкой, закрыт ли диалог
-  void _handleResult(String result) {
-    if (_isClosed) return;
-    _isClosed = true;
-    widget.onResult(result);
-    Navigator.pop(context, true);
-    // if (mounted) Navigator.of(context).pop();
-  }
-
-  /// Инициализация SpeechToText и выбор языка по EasyLocalization
   Future<void> _initSpeech() async {
     final bool available = await _speech.initialize(
       onStatus: (status) {
-        if (status == 'notListening') _handleResult(_text);
+        Logger().e('VVV=>  onStatus: $status');
+        if (!mounted) return;
+
+        if (status == 'notListening' && !_isFinished) {
+          _finishRecognition();
+        }
       },
       onError: (error) {
-        Logger().e('Speech error: $error');
-        _handleResult(_text);
+        Logger().e('VVV=> onError: $error');
+        widget.onResult("");
+        // if (!mounted) return;
+        //
+        // Logger().e('Speech error: $error');
+
+        // _stopListening();
+
+        // if (!_isFinished) {
+        //   _finishRecognition();
+        // }
       },
     );
 
     if (!available) {
-      _handleResult(_text);
+      _finishRecognition();
       return;
     }
 
-    final locale = EasyLocalization.of(context)?.currentLocale ?? const Locale("en", "US");
-    final localeTag = '${locale.languageCode}_${locale.countryCode ?? locale.languageCode}';
+    final locale =
+        EasyLocalization.of(context)?.currentLocale ??
+            const Locale("en", "US");
+
+    final localeTag =
+        '${locale.languageCode}_${locale.countryCode ?? locale.languageCode}';
+
+    if (!mounted) return;
 
     setState(() {
       _localeId = localeTag;
@@ -64,34 +78,62 @@ class _GoogleSpeechDialogState extends State<GoogleSpeechDialog> {
     _startListening();
   }
 
-  /// Начинаем слушать
-  void _startListening() async {
+  Future<void> _startListening() async {
+    if (!mounted) return;
+
     setState(() => _isListening = true);
+
     await _speech.listen(
       localeId: _localeId,
-      onResult: (val) {
-        setState(() => _text = val.recognizedWords);
-        if (val.finalResult) _handleResult(val.recognizedWords);
+      listenMode: stt.ListenMode.confirmation,
+      pauseFor: const Duration(seconds: 4),
+      listenFor: const Duration(seconds: 30),
+      partialResults: true,
+      cancelOnError: false,
+      onResult: (result) {
+        if (!mounted) return;
+
+        setState(() {
+          _text = result.recognizedWords;
+        });
+
+        if (result.finalResult && !_isFinished) {
+          _finishRecognition();
+        }
       },
       onSoundLevelChange: (level) {
-        setState(() => _level = _level * 0.8 + level * 0.2);
+        if (!mounted) return;
+
+        setState(() {
+          _level = _level * 0.8 + level * 0.2;
+        });
       },
-      listenMode: stt.ListenMode.confirmation,
-      pauseFor: const Duration(seconds: 3),
-      partialResults: true,
     );
   }
 
-  /// Остановка прослушивания пользователем
-  void _stopListening() {
+  void _finishRecognition() {
+    if (_isFinished) return;
+    _isFinished = true;
+
     _speech.stop();
-    setState(() => _isListening = false);
-    _handleResult(_text.isNotEmpty ? _text : ""); // если текст есть, возвращаем его
+    _speech.cancel();
+
+    widget.onResult(_text);
+
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
+  }
+
+  void _stopListening() {
+    if (_isFinished) return;
+    _finishRecognition();
   }
 
   @override
   void dispose() {
     _speech.stop();
+    _speech.cancel();
     super.dispose();
   }
 
@@ -100,17 +142,21 @@ class _GoogleSpeechDialogState extends State<GoogleSpeechDialog> {
     final double waveSize = (_level * 3).clamp(0, 60);
 
     return PopScope(
-      canPop: false,
+      canPop: true,
       child: Dialog(
         backgroundColor: Colors.black.withOpacity(0.85),
         insetPadding: const EdgeInsets.all(24),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
+          padding: const EdgeInsets.symmetric(
+            vertical: 32,
+            horizontal: 24,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Волна вокруг микрофона
               AnimatedContainer(
                 duration: const Duration(milliseconds: 100),
                 height: 120 + waveSize,
@@ -127,25 +173,25 @@ class _GoogleSpeechDialogState extends State<GoogleSpeechDialog> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 24),
-
               Text(
                 _text.isEmpty ? 'Скажите что-нибудь…' : _text,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white, fontSize: 18),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                ),
               ),
-
               const SizedBox(height: 24),
-
               IconButton(
                 onPressed: _stopListening,
-                icon: const Icon(Icons.stop_circle, color: Colors.redAccent),
+                icon: const Icon(
+                  Icons.stop_circle,
+                  color: Colors.redAccent,
+                ),
                 iconSize: 48,
               ),
-
               const SizedBox(height: 8),
-
               Text(
                 'Язык: $_localeId',
                 style: TextStyle(

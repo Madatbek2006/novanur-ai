@@ -42,7 +42,7 @@ class ChatPage
   Widget onWidgetBuild(BuildContext context, ChatState state) {
     return PopScope(
       onPopInvokedWithResult: (bool didPop,result){
-        cubit(context).onBackPress();
+        cubit(context).stopProgress();
       },
       child: Scaffold(
         appBar: DefaultAppBar(titleText: 'Chat',onBackPressed: (){

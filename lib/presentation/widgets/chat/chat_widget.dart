@@ -1,4 +1,4 @@
-
+import 'package:baiqavisit/presentation/widgets/card/custom_card.dart';
 import 'package:baiqavisit/presentation/widgets/chat/chat_text_field.dart';
 import 'package:baiqavisit/presentation/widgets/message/image_message_widget.dart';
 import 'package:baiqavisit/presentation/widgets/message/text_message_item.dart';
@@ -11,7 +11,10 @@ class ChatWidget extends StatefulWidget {
   final String userUid;
   final List<types.AudioMessage> audioMessages;
   final List<types.Message> messages;
-  final Function(String msg,) onSend;
+  final Function(
+    String msg,
+  ) onSend;
+
   // final Function(String msg, types.Message? repliedMsg,List<XFile>? attachedFiles) onSendAudio;
   final Function(types.AudioMessage) onUpdateAudio;
   final Function() unSubRoom;
@@ -36,7 +39,6 @@ class ChatWidget extends StatefulWidget {
 
 class _ChatWidgetState extends State<ChatWidget> {
   List<XFile>? attachedFiles;
-
 
   final itemScrollController = ItemScrollController();
   final itemPositionsListener = ItemPositionsListener.create();
@@ -100,7 +102,7 @@ class _ChatWidgetState extends State<ChatWidget> {
         isSentByMe: isSentByMe,
         message: message,
         messageWidth: 300,
-        onClickRepliedMsg: (msg){
+        onClickRepliedMsg: (msg) {
           scrollToMessage(msg);
         },
       );
@@ -112,15 +114,15 @@ class _ChatWidgetState extends State<ChatWidget> {
       );
     }
     // else if (message is types.AudioMessage) {
-      // bubble = AudioMessageItem(
-      //   isSentByMe: isSentByMe,
-      //   audioMessage: item.message as types.AudioMessage,
-      //   messageWidth: 260,
-      //   onClickRepliedMsg: (msg){
-      //     scrollToMessage(msg);
-      //   },
-      //   onUpdateAudio: widget.onUpdateAudio,
-      // )
+    // bubble = AudioMessageItem(
+    //   isSentByMe: isSentByMe,
+    //   audioMessage: item.message as types.AudioMessage,
+    //   messageWidth: 260,
+    //   onClickRepliedMsg: (msg){
+    //     scrollToMessage(msg);
+    //   },
+    //   onUpdateAudio: widget.onUpdateAudio,
+    // )
     // }
     else {
       bubble = const SizedBox.shrink();
@@ -128,11 +130,9 @@ class _ChatWidgetState extends State<ChatWidget> {
 
     return Row(
       children: [
-        if (isSentByMe)
-         Spacer(),
+        if (isSentByMe) Spacer(),
         bubble,
-        if (!isSentByMe)
-          Spacer(),
+        if (!isSentByMe) Spacer(),
       ],
     );
   }
@@ -143,49 +143,34 @@ class _ChatWidgetState extends State<ChatWidget> {
       children: [
         Positioned.fill(
           child: ScrollablePositionedList.builder(
-            padding: EdgeInsets.only(bottom: 80,left: 16,right: 16),
+            padding: EdgeInsets.only(bottom: 80, left: 16, right: 16),
             reverse: true,
             itemScrollController: itemScrollController,
             itemPositionsListener: itemPositionsListener,
-            itemCount: widget.messages.length,
+            itemCount:
+                widget.messages.length + (widget.isSendingRequest ? 1 : 0),
             itemBuilder: (context, index) {
-              final message = widget.messages[index];
+              if (widget.isSendingRequest && index == 0) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: loadingBubble(),
+                );
+              }
+
+              final realIndex = widget.isSendingRequest ? index - 1 : index;
+
+              final message = widget.messages[realIndex];
+
               return KeyedSubtree(
                 key: ValueKey(message.id),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // if (item.showDateHeader)
-                    //   Center(
-                    //     child: Container(
-                    //       margin: const EdgeInsets.only(top: 12, bottom: 6),
-                    //       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                    //       decoration: BoxDecoration(
-                    //         color: Theme.of(context).brightness == Brightness.dark
-                    //             ? Colors.white24
-                    //             : Colors.black12,
-                    //         borderRadius: BorderRadius.circular(12),
-                    //       ),
-                    //       child: Text(item.formattedDate,
-                    //           style: TextStyle(
-                    //             color: Colors.white,
-                    //             fontSize: 13,
-                    //             fontWeight: FontWeight.w500,
-                    //           )),
-                    //     ),
-                    //   ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: buildMessage(message),
-                    ),
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: buildMessage(message),
                 ),
               );
             },
           ),
-
         ),
-
         Align(
           alignment: Alignment.bottomCenter,
           child: Column(
@@ -208,6 +193,69 @@ class _ChatWidgetState extends State<ChatWidget> {
     );
   }
 
+  Widget loadingBubble() {
+    return Row(
+      children: [
+        CustomCard(
+          padding: EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 2),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(8),
+            topRight: Radius.circular(8),
+            bottomLeft: Radius.circular( 0),
+            bottomRight: Radius.circular(8),
+          ),
+          child: SizedBox(
+            width: 32,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                  child: TypingDots()
+              )
+          ),
+        ),
 
+        const Spacer(),
+      ],
+    );
+  }
+}
 
+class TypingDots extends StatefulWidget {
+  const TypingDots({super.key});
+
+  @override
+  State<TypingDots> createState() => _TypingDotsState();
+}
+
+class _TypingDotsState extends State<TypingDots>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (_, __) {
+        final value = (_controller.value * 3).floor() + 1;
+        return Text(
+          '.' * value,
+          style: const TextStyle(fontSize: 24),
+        );
+      },
+    );
+  }
 }

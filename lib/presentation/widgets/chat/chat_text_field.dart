@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:baiqavisit/presentation/support/extensions/color_extension.dart';
 import 'package:baiqavisit/presentation/widgets/card/custom_card.dart';
+import 'package:baiqavisit/presentation/widgets/dialog/speech_to_text_dialog.dart';
 import 'package:baiqavisit/utils/service/photo_picker_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart';
@@ -50,12 +51,6 @@ class _CustomInputFieldState extends State<CustomInputField> {
   @override
   void initState() {
     super.initState();
-
-    // _sub = AudioRecorderService.onProgress.listen((d) {
-    //   setState(() => _recordTime = d);
-    // });
-    //
-    // AudioRecorderService.init();
   }
 
   @override
@@ -66,32 +61,6 @@ class _CustomInputFieldState extends State<CustomInputField> {
     super.dispose();
   }
 
-  Future<void> _startRecording() async {
-
-  }
-
-  Future<void> _stopRecording() async {
-    // if (!_isRecording) return;
-    //
-    // final path = await AudioRecorderService.stop();
-    //
-    // setState(() {
-    //   _isRecording = false;
-    //   _micScale = 1.0;
-    // });
-    //
-    // if (path == null) return;
-    //
-    // if (_recordTime < Duration(seconds: 1)) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     SnackBar(content: Text("Удерживай дольше для записи")),
-    //   );
-    //   File(path).delete();
-    //   return;
-    // }
-    //
-    // widget.onSendAudio(path);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -162,15 +131,15 @@ class _CustomInputFieldState extends State<CustomInputField> {
                         ),
                       ),
                       SizedBox(width: 16),
-                      IconButton(
-                        icon: Icon(Icons.attach_file, color: context.iconPrimary),
-                        onPressed: () async {
-                          var files=await PhotoPickerService.pickMultipleFromGallery(context);
-                          if(files!=null){
-                            widget.onAttached(files);
-                          }
-                        },
-                      ),
+                      // IconButton(
+                      //   icon: Icon(Icons.attach_file, color: context.iconPrimary),
+                      //   onPressed: () async {
+                      //     var files=await PhotoPickerService.pickMultipleFromGallery(context);
+                      //     if(files!=null){
+                      //       widget.onAttached(files);
+                      //     }
+                      //   },
+                      // ),
                     ],
                   ),
                 ),
@@ -182,20 +151,28 @@ class _CustomInputFieldState extends State<CustomInputField> {
                   builder: (context, value, child) {
                     final empty = value.text.isEmpty;
                     return empty?
-                    GestureDetector(
-                      onLongPressStart:  (_) => _startRecording(),
-                      onLongPressEnd: (_) => _stopRecording() ,
-                      child: AnimatedScale(
-                        scale: empty ? _micScale : 1,
-                        duration: Duration(milliseconds: 150),
-                        child: CustomCard(
-                          borderRadius: BorderRadius.circular(28),
-                          color: context.primaryLight,
-                          padding: EdgeInsets.all(8),
-                          child: Icon(
-                            Icons.mic,
-                            color: context.mainBg,
-                          ),
+                    InkWell(
+                      onTap: () {
+                        if (widget.isSendingRequest) return;
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext buildContext) {
+                            return GoogleSpeechDialog(onResult: (String text) {
+                              if (text.trim().isNotEmpty) {
+                                widget.onSend(PartialText(text: text));
+                              }
+                            });
+                          },
+                        );
+                      },
+
+                      child: CustomCard(
+                        borderRadius: BorderRadius.circular(28),
+                        color: context.primaryLight,
+                        padding: EdgeInsets.all(8),
+                        child: Icon(
+                          Icons.mic,
+                          color: context.mainBg,
                         ),
                       ),
                     ):InkWell(
