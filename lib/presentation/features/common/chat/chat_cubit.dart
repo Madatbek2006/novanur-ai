@@ -1,15 +1,16 @@
 import 'dart:convert';
 import 'dart:ui';
 
-import 'package:baiqavisit/core/enum/describe_img_type.dart';
-import 'package:baiqavisit/core/gen/localization/strings.dart';
-import 'package:baiqavisit/core/handler/future_handler.dart';
-import 'package:baiqavisit/data/datasource/network/constants/constants.dart';
-import 'package:baiqavisit/data/repositories/photo_analysis_repository.dart';
-import 'package:baiqavisit/domain/models/chat/sms.dart';
-import 'package:baiqavisit/presentation/support/cubit/base_cubit.dart';
-import 'package:baiqavisit/presentation/support/extensions/extension_message_exts.dart';
-import 'package:baiqavisit/utils/extension/image.dart';
+import 'package:nurnova_ai/core/enum/describe_img_type.dart';
+import 'package:nurnova_ai/core/gen/localization/strings.dart';
+import 'package:nurnova_ai/core/handler/future_handler.dart';
+import 'package:nurnova_ai/data/datasource/network/constants/constants.dart';
+import 'package:nurnova_ai/data/repositories/photo_analysis_repository.dart';
+import 'package:nurnova_ai/presentation/features/common/chat/chat_speaker.dart';
+import 'package:nurnova_ai/domain/models/chat/sms.dart';
+import 'package:nurnova_ai/presentation/support/cubit/base_cubit.dart';
+import 'package:nurnova_ai/presentation/support/extensions/extension_message_exts.dart';
+import 'package:nurnova_ai/utils/extension/image.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -17,7 +18,6 @@ import 'package:injectable/injectable.dart';
 import 'package:logger/logger.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-import 'package:flutter_tts/flutter_tts.dart';
 import 'package:just_audio/just_audio.dart';
 
 part 'chat_cubit.freezed.dart';
@@ -26,12 +26,16 @@ part 'chat_state.dart';
 
 @injectable
 class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
-  ChatCubit(this._photoAnalysisRepository) : super(ChatState()){
+  ChatCubit(this._photoAnalysisRepository, this._speaker) : super(ChatState()){
     _setupAudio();
     _player.setVolume(0.3);
   }
   WebSocketChannel? channel;
   final AudioPlayer _player = AudioPlayer();
+  final ChatSpeaker _speaker;
+
+  /// Язык, на котором пришёл запрос: на нём же читаем ответ вслух.
+  String _languageCode = 'en';
 
 
 
@@ -46,6 +50,7 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
   String aiImageDescriptionPrompt = "";
 
   void setFile(XFile file,Locale locale,{DescribeImgType? type}) async{
+    _languageCode = locale.languageCode;
     var base64 = base64Encode(await file.readAsBytes());
     Logger().d("TTT=> $base64");
     updateState((state) => state.copyWith(
@@ -79,6 +84,7 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
   }
 
   void sendSMS(String sms,Locale locale,{DescribeImgType? type}) {
+    _languageCode = locale.languageCode;
     Logger().d("TTT=> ${type?.name}");
     try {
       if (DescribeImgType.question.value == type?.value) return;
@@ -152,6 +158,7 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
                 ));
 
               stopProgress();
+              _speaker.speak(message?.toString() ?? '', _languageCode);
             }
           },
           onError: (error) {
@@ -175,6 +182,17 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
       logger.e("TTT=> Не удалось подключиться к WebSocket: $e");
     }
   }
+  /// Обрывает чтение вслух — например, когда уходят с экрана.
+  void stopSpeaking() {
+    _speaker.stop();
+  }
+
+  @override
+  Future<void> close() {
+    _speaker.dispose();
+    return super.close();
+  }
+
   void stopProgress(){
     _player.stop();
     logger.w("TTT=> stopProgress");

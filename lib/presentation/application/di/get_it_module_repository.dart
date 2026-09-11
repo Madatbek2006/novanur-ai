@@ -1,8 +1,9 @@
-import 'package:baiqavisit/data/repositories/language_repository.dart';
-import 'package:baiqavisit/data/repositories/logout_repository.dart';
-import 'package:baiqavisit/data/repositories/photo_analysis_repository.dart';
-import 'package:baiqavisit/data/repositories/pin_code_repository.dart';
-import 'package:baiqavisit/data/repositories/theme_mode_repository.dart';
+import 'package:nurnova_ai/data/repositories/language_repository.dart';
+import 'package:nurnova_ai/data/repositories/logout_repository.dart';
+import 'package:nurnova_ai/data/repositories/photo_analysis_repository.dart';
+import 'package:nurnova_ai/data/repositories/pin_code_repository.dart';
+import 'package:nurnova_ai/data/repositories/speech_repository.dart';
+import 'package:nurnova_ai/data/repositories/theme_mode_repository.dart';
 import 'package:get_it/get_it.dart';
 
 extension GetItModuleExtension on GetIt {
@@ -14,6 +15,7 @@ extension GetItModuleExtension on GetIt {
     );
     registerLazySingleton(() => ThemeModeRepository(get()));
     registerLazySingleton(() => PhotoAnalysisRepository(get()));
+    registerLazySingleton(() => SpeechRepository(get()));
 
     await allReady();
   }
