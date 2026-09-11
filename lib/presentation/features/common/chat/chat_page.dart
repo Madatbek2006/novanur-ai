@@ -68,6 +68,11 @@ class ChatPage
     return ChatWidget(
       topInset: MediaQuery.paddingOf(context).top + 64,
       messages: state.messages,
+      errorText: state.error,
+      onRetry: () => cubit(context).retry(),
+      speakingMessageId: state.speakingMessageId,
+      onMessageTap: (message) =>
+          cubit(context).toggleSpeech(message.id, message.text),
       onSend: (sms) {
         cubit(context).sendSMS(sms, local);
       },

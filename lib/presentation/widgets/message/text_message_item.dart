@@ -1,4 +1,5 @@
 import 'package:nurnova_ai/core/extensions/text_extensions.dart';
+import 'package:nurnova_ai/core/gen/localization/strings.dart';
 import 'package:nurnova_ai/presentation/support/extensions/color_extension.dart';
 import 'package:nurnova_ai/presentation/widgets/card/custom_card.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -23,23 +24,28 @@ class TextMessageItem extends StatelessWidget {
   final int messageWidth;
   final Function(Message message) onClickRepliedMsg;
 
+  /// Сообщение читается вслух прямо сейчас.
+  final bool isSpeaking;
+
+  /// Нажатие по пузырю: повторить чтение или остановить его.
+  /// null — если сообщение не озвучивается (свои реплики).
+  final VoidCallback? onTap;
+
   const TextMessageItem({
     super.key,
     required this.isSentByMe,
     required this.message,
     required this.messageWidth,
     required this.onClickRepliedMsg,
+    this.isSpeaking = false,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final onBubble = isSentByMe ? context.mainBg : context.textPrimary;
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (isSentByMe) const SizedBox(width: gutter),
-        CustomCard(
+    final bubble = CustomCard(
           margin: EdgeInsets.zero,
           padding: const EdgeInsets.symmetric(
             horizontal: cardHorizontalPadding,
@@ -75,10 +81,39 @@ class TextMessageItem extends StatelessWidget {
                       .w(500)
                       .c(onBubble.withOpacity(0.7)),
                 ],
+                if (onTap != null) ...[
+                  const SizedBox(width: 6),
+                  Icon(
+                    isSpeaking ? Icons.stop_rounded : Icons.volume_up_rounded,
+                    size: 16,
+                    color: onBubble.withOpacity(0.7),
+                  ),
+                ],
               ],
             ),
           ),
-        ),
+        );
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (isSentByMe) const SizedBox(width: gutter),
+        if (onTap == null)
+          bubble
+        else
+          // Весь пузырь — одна большая кнопка: попасть в неё легко и вслепую,
+          // а скринридер объявит, что именно произойдёт по нажатию.
+          Semantics(
+            button: true,
+            label: isSpeaking
+                ? Strings.chatStopSpeaking
+                : Strings.chatRepeatAnswer,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onTap,
+              child: bubble,
+            ),
+          ),
         if (!isSentByMe) const SizedBox(width: gutter),
       ],
     );

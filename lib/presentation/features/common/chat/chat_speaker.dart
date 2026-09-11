@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:nurnova_ai/data/repositories/speech_repository.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:logger/logger.dart';
@@ -16,7 +17,20 @@ import 'package:path_provider/path_provider.dart';
 ///
 /// Узбекского в движках телефонов нет вовсе, так что он идёт на сервер сразу.
 class ChatSpeaker {
-  ChatSpeaker(this._speech);
+  ChatSpeaker(this._speech) {
+    // Экран показывает, что именно читается сейчас, поэтому о завершении
+    // нужно узнать со всех сторон: движок мог договорить, его могли
+    // отменить или он мог упасть.
+    _tts.setCompletionHandler(_finish);
+    _tts.setCancelHandler(_finish);
+    _tts.setErrorHandler((_) => _finish());
+    _player.playerStateStream.listen((state) {
+      if (state.processingState == ProcessingState.completed) _finish();
+    });
+  }
+
+  /// Вызывается, когда чтение закончилось само или было прервано.
+  VoidCallback? onFinished;
 
   /// Языки, которые телефон в принципе умеет читать, и их коды для движка.
   static const _deviceVoices = {'ru': 'ru-RU', 'en': 'en-US'};
@@ -30,13 +44,27 @@ class ChatSpeaker {
   final AudioPlayer _player = AudioPlayer();
   final Logger _logger = Logger();
 
+  /// Читаем ли прямо сейчас. Нужен, чтобы обработчики завершения от
+  /// прерванного чтения не гасили то, которое только началось: speak()
+  /// сначала останавливает предыдущее, и движок на это отвечает отменой.
+  bool _speaking = false;
+
+  void _finish() {
+    if (!_speaking) return;
+    _speaking = false;
+    onFinished?.call();
+  }
+
   Future<void> speak(String text, String languageCode) async {
     if (text.trim().isEmpty) return;
 
-    await stop();
+    _speaking = false;
+    await _silence();
 
     try {
       final voice = _deviceVoices[languageCode];
+
+      _speaking = true;
 
       if (voice != null && await _isVoiceUsable(voice)) {
         await _speakOnDevice(text, voice);
@@ -47,6 +75,7 @@ class ChatSpeaker {
     } catch (error) {
       // Молчащая озвучка не должна ломать сам чат.
       _logger.e("TTS=> не удалось озвучить: $error");
+      _finish();
     }
   }
 
@@ -92,6 +121,14 @@ class ChatSpeaker {
   }
 
   Future<void> stop() async {
+    final wasSpeaking = _speaking;
+    _speaking = false;
+    await _silence();
+    if (wasSpeaking) onFinished?.call();
+  }
+
+  /// Глушит оба источника, никого не оповещая.
+  Future<void> _silence() async {
     await _tts.stop();
     await _player.stop();
   }

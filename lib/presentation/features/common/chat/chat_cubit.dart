@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
 
@@ -29,6 +30,8 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
   ChatCubit(this._photoAnalysisRepository, this._speaker) : super(ChatState()){
     _setupAudio();
     _player.setVolume(0.3);
+    _speaker.onFinished = () =>
+        updateState((state) => state.copyWith(speakingMessageId: null));
   }
   WebSocketChannel? channel;
   final AudioPlayer _player = AudioPlayer();
@@ -36,6 +39,21 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
 
   /// Язык, на котором пришёл запрос: на нём же читаем ответ вслух.
   String _languageCode = 'en';
+
+  /// Что повторить по кнопке «Повторить» после ошибки.
+  VoidCallback? _retryAction;
+
+  /// Сокет закрыли осознанно — переподключаться не нужно.
+  bool _closedByUser = false;
+
+  /// Держится ли соединение. Без него запрос уходит в никуда: sink принимает
+  /// сообщение и молча его теряет, а пользователь ждёт ответ, которого не будет.
+  bool _socketConnected = false;
+  int _reconnectAttempts = 0;
+  Timer? _reconnectTimer;
+
+  /// Сколько раз пробуем восстановить соединение, прежде чем сдаться.
+  static const _maxReconnectAttempts = 3;
 
 
 
@@ -51,6 +69,8 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
 
   void setFile(XFile file,Locale locale,{DescribeImgType? type}) async{
     _languageCode = locale.languageCode;
+    _retryAction = () => setFile(file, locale, type: type);
+    updateState((state) => state.copyWith(error: null));
     var base64 = base64Encode(await file.readAsBytes());
     Logger().d("TTT=> $base64");
     updateState((state) => state.copyWith(
@@ -75,9 +95,8 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
           sendSMS(Strings.commonDescribeImage,locale,type: type);
         })
         .onError((error) {
-          stopProgress();
           logger.d("TTT=> $error");
-
+          _failWith(Strings.chatErrorNoConnection);
         })
         .onFinished(() {})
         .executeFuture();
@@ -85,6 +104,8 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
 
   void sendSMS(String sms,Locale locale,{DescribeImgType? type}) {
     _languageCode = locale.languageCode;
+    _retryAction = () => sendSMS(sms, locale, type: type);
+    updateState((state) => state.copyWith(error: null));
     Logger().d("TTT=> ${type?.name}");
     try {
       if (DescribeImgType.question.value == type?.value) return;
@@ -121,10 +142,13 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
           "TTT=> ${states.takenPhotoFile == null}////${states.takenPhotoFile}");
     }catch(error){
       logger.d("TTTT=> ${error?.localizedMessage}///${error?.toString()}");
+      _failWith(Strings.chatErrorNoConnection);
     }
   }
 
   void startWebSocket() {
+    _closedByUser = false;
+    _reconnectTimer?.cancel();
     try {
       channel = WebSocketChannel.connect(
         Uri.parse('${Constants.baseUrlWs}ws/connect?chat_id=${states.uuid}'),
@@ -143,38 +167,42 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
                 "type": "pong"
               }));
             }else{
-            final message = data["data"]["message"];
-            updateState((state) => state.copyWith(
-                  messages: sortMessage(state.messages, TextMessage(
-                    author: User(id: "AI"),
-                    createdAt: DateTime.now().millisecondsSinceEpoch,
-                    id: DateTime.now().millisecondsSinceEpoch.toString(),
-                    text: message,
-                  )),
-                  // outgoingMessages: [
-                  //   ...state.outgoingMessages,
-                  //   SMS(message, DateTime.now(), 0, 0)
-                  // ],
-                ));
+              final text = data["data"]["message"]?.toString() ?? '';
+              // Один и тот же id у сообщения и у отметки «читается сейчас»:
+              // по нему кнопка на пузыре знает, что именно остановить.
+              final id = DateTime.now().millisecondsSinceEpoch.toString();
+
+              updateState((state) => state.copyWith(
+                    messages: sortMessage(state.messages, TextMessage(
+                      author: User(id: "AI"),
+                      createdAt: DateTime.now().millisecondsSinceEpoch,
+                      id: id,
+                      text: text,
+                    )),
+                    // ответ дошёл — значит связь жива
+                    error: null,
+                    speakingMessageId: id,
+                  ));
 
               stopProgress();
-              _speaker.speak(message?.toString() ?? '', _languageCode);
+              _reconnectAttempts = 0;
+              _speaker.speak(text, _languageCode);
             }
           },
           onError: (error) {
-
-
             logger.e("TTT=> Ошибка WebSocket: $error");
+            _scheduleReconnect();
           },
           onDone: () {
-            stopProgress();
             logger.w("TTT=> WebSocket соединение закрыто");
+            _scheduleReconnect();
           },
         );
       } catch (error) {
         stopProgress();
         logger.e("TTT=> Ошибка2 WebSocket: $error");
       }
+      _socketConnected = true;
       stopProgress();
       logger.i("TTT=>  подключились к WebSocket");
     } catch (e) {
@@ -182,13 +210,81 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
       logger.e("TTT=> Не удалось подключиться к WebSocket: $e");
     }
   }
+  /// Читает ответ заново, а если он читается прямо сейчас — останавливает.
+  /// Одна и та же кнопка на пузыре: ответ легко прослушать ещё раз или
+  /// прервать, не дожидаясь конца длинного описания.
+  void toggleSpeech(String messageId, String text) {
+    if (states.speakingMessageId == messageId) {
+      stopSpeaking();
+      return;
+    }
+    updateState((state) => state.copyWith(speakingMessageId: messageId));
+    _speaker.speak(text, _languageCode);
+  }
+
   /// Обрывает чтение вслух — например, когда уходят с экрана.
   void stopSpeaking() {
     _speaker.stop();
+    updateState((state) => state.copyWith(speakingMessageId: null));
+  }
+
+  /// Повторяет последний запрос после ошибки. Если связь до этого оборвалась
+  /// совсем, сокет сначала поднимается заново — иначе повтор уйдёт в мёртвый
+  /// канал и пользователь будет ждать ответ, который не придёт.
+  void retry() {
+    updateState((state) => state.copyWith(error: null));
+    _reconnectAttempts = 0;
+
+    if (!_socketConnected && states.uuid.isNotEmpty) {
+      startWebSocket();
+    }
+
+    _retryAction?.call();
+  }
+
+  /// Показывает ошибку и проговаривает её: без озвучки незрячий пользователь
+  /// не отличит сбой от «модель ещё думает».
+  void _failWith(String message) {
+    stopProgress();
+    updateState((state) => state.copyWith(error: message));
+    _speaker.speak(message, _languageCode);
+  }
+
+  /// Сокет рвётся сам по себе — на переключении сети, при уходе в фон.
+  /// Пробуем поднять его заново с нарастающей паузой, а когда попытки
+  /// кончились — говорим об этом вслух.
+  void _scheduleReconnect() {
+    _socketConnected = false;
+    if (_closedByUser || isClosed || states.uuid.isEmpty) return;
+
+    stopProgress();
+
+    if (_reconnectAttempts >= _maxReconnectAttempts) {
+      _failWith(Strings.chatErrorNoConnection);
+      return;
+    }
+
+    if (_reconnectAttempts == 0) {
+      updateState((state) => state.copyWith(error: Strings.chatReconnecting));
+    }
+
+    _reconnectAttempts++;
+    final delay = Duration(seconds: 1 << (_reconnectAttempts - 1));
+    logger.w("TTT=> переподключение через ${delay.inSeconds}с "
+        "(попытка $_reconnectAttempts из $_maxReconnectAttempts)");
+
+    _reconnectTimer?.cancel();
+    _reconnectTimer = Timer(delay, () {
+      if (_closedByUser || isClosed) return;
+      startWebSocket();
+    });
   }
 
   @override
   Future<void> close() {
+    _closedByUser = true;
+    _reconnectTimer?.cancel();
+    channel?.sink.close();
     _speaker.dispose();
     return super.close();
   }

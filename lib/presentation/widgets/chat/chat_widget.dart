@@ -1,3 +1,4 @@
+import 'package:nurnova_ai/core/gen/localization/strings.dart';
 import 'package:nurnova_ai/presentation/widgets/card/custom_card.dart';
 import 'package:nurnova_ai/presentation/widgets/chat/chat_text_field.dart';
 import 'package:nurnova_ai/presentation/widgets/message/image_message_widget.dart';
@@ -25,6 +26,17 @@ class ChatWidget extends StatefulWidget {
   /// translucent app bar that the list scrolls underneath.
   final double topInset;
 
+  /// Сообщение, которое читается вслух прямо сейчас: его пузырь предлагает
+  /// остановить чтение, остальные — повторить.
+  final String? speakingMessageId;
+
+  /// Нажатие на ответ ассистента — переключает чтение вслух.
+  final Function(types.TextMessage)? onMessageTap;
+
+  /// Текст ошибки. Пока он есть, над полем ввода висит полоса с повтором.
+  final String? errorText;
+  final VoidCallback? onRetry;
+
   const ChatWidget({
     super.key,
     required this.messages,
@@ -36,6 +48,10 @@ class ChatWidget extends StatefulWidget {
     required this.isSendingRequest,
     required this.onUpdateAudio,
     this.topInset = 0,
+    this.speakingMessageId,
+    this.onMessageTap,
+    this.errorText,
+    this.onRetry,
   });
 
   @override
@@ -120,6 +136,9 @@ class _ChatWidgetState extends State<ChatWidget> {
         isSentByMe: isSentByMe,
         message: message,
         messageWidth: contentWidth(TextMessageItem.chrome).round(),
+        isSpeaking: widget.speakingMessageId == message.id,
+        // Ответы читаются вслух, свои сообщения — нет.
+        onTap: isSentByMe ? null : () => widget.onMessageTap?.call(message),
         onClickRepliedMsg: (msg) {
           scrollToMessage(msg);
         },
@@ -197,6 +216,7 @@ class _ChatWidgetState extends State<ChatWidget> {
             },
           ),
         ),
+        if (widget.errorText != null) _errorBar(context, widget.errorText!),
         CustomInputField(
           isSendingRequest: widget.isSendingRequest,
           onSend: _handleSend,
@@ -208,6 +228,46 @@ class _ChatWidgetState extends State<ChatWidget> {
           },
         ),
       ],
+    );
+  }
+
+  /// Полоса с ошибкой и кнопкой повтора. Текст ошибки ещё и проговаривается
+  /// вслух — на экран здесь смотрят не все.
+  Widget _errorBar(BuildContext context, String text) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.fromLTRB(
+        listHorizontalPadding,
+        0,
+        listHorizontalPadding,
+        8,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: scheme.errorContainer,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.error_outline, size: 20, color: scheme.onErrorContainer),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(fontSize: 13, color: scheme.onErrorContainer),
+            ),
+          ),
+          if (widget.onRetry != null) ...[
+            const SizedBox(width: 8),
+            TextButton(
+              onPressed: widget.onRetry,
+              child: Text(Strings.chatErrorRetry),
+            ),
+          ],
+        ],
+      ),
     );
   }
 

@@ -9,7 +9,12 @@ class ChatState with _$ChatState {
     XFile? takenPhotoFile,
     @Default("") String takenPhotoInBase64,
     @Default([]) List<Message> messages,
-    @Default("") String uuid
+    @Default("") String uuid,
+    /// Текст последней ошибки: показывается в чате и проговаривается вслух.
+    String? error,
+    /// id сообщения, которое читается прямо сейчас, — по нему кнопка
+    /// на пузыре превращается из «повторить» в «остановить».
+    String? speakingMessageId,
 }) = _ChatState;
 }
 
