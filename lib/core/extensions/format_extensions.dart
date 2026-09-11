@@ -18,7 +18,7 @@ extension DoubleExtensions on double {
 
   String formatDecimal() {
     try {
-      final format = NumberFormat("0.##", Language.kazakhCyrill.getIdentifier());
+      final format = NumberFormat("0.##", Language.uzbekLatin.getIdentifier());
       return format.format(this);
     } catch (e) {
       return toString();

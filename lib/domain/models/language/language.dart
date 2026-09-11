@@ -3,15 +3,13 @@ import 'dart:ui';
 enum Language {
   uzbekLatin,
   englishUs,
-  russianRu,
-  kazakhCyrill;
+  russianRu;
 
   String getRestCode() {
     return switch (this) {
       Language.uzbekLatin => "uz",
       Language.englishUs => "en",
       Language.russianRu => "ru",
-      Language.kazakhCyrill => "kk",
     };
   }
 
@@ -20,7 +18,6 @@ enum Language {
       Language.uzbekLatin => "uz_UZ",
       Language.englishUs => "en_EN",
       Language.russianRu => "ru_RU",
-      Language.kazakhCyrill => "kk_KZ",
     };
   }
 
@@ -29,7 +26,6 @@ enum Language {
       Language.uzbekLatin => Locale('uz', 'UZ'),
       Language.englishUs => Locale('en', 'US'),
       Language.russianRu => Locale('ru', 'RU'),
-      Language.kazakhCyrill => Locale('kk', 'KZ'),
     };
   }
 
@@ -40,5 +36,5 @@ enum Language {
     );
   }
 
-  static Language get defaultLanguage => Language.kazakhCyrill;
+  static Language get defaultLanguage => Language.uzbekLatin;
 }
