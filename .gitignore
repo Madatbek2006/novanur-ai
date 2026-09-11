@@ -103,3 +103,6 @@ output.json
 obj/
 .externalNativeBuild
 /buyer/dev/release/*
+
+# Claude Code: общие настройки коммитим, личные — нет
+.claude/settings.local.json
