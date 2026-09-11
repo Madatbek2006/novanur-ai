@@ -1,4 +1,4 @@
-import 'package:baiqavisit/presentation/support/cubit/base_cubit.dart';
+import 'package:nurnova_ai/presentation/support/cubit/base_cubit.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 

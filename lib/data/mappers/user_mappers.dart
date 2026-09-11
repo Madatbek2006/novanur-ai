@@ -1,6 +1,6 @@
-import 'package:baiqavisit/data/datasource/floor/entities/user_entity.dart';
-import 'package:baiqavisit/data/datasource/network/dto/auth/user/user_response.dart';
-import 'package:baiqavisit/domain/models/user/user.dart';
+import 'package:nurnova_ai/data/datasource/floor/entities/user_entity.dart';
+import 'package:nurnova_ai/data/datasource/network/dto/auth/user/user_response.dart';
+import 'package:nurnova_ai/domain/models/user/user.dart';
 
 extension UserResponseMappers on UserResponse {
   UserEntity toEntity() {

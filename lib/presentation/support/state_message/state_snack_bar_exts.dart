@@ -1,10 +1,10 @@
 import 'package:elegant_notification/elegant_notification.dart';
 import 'package:elegant_notification/resources/arrays.dart';
 import 'package:flutter/material.dart';
-import 'package:baiqavisit/core/extensions/text_extensions.dart';
-import 'package:baiqavisit/presentation/support/colors/static_colors.dart';
-import 'package:baiqavisit/presentation/support/state_message/state_message.dart';
-import 'package:baiqavisit/presentation/support/state_message/state_message_type.dart';
+import 'package:nurnova_ai/core/extensions/text_extensions.dart';
+import 'package:nurnova_ai/presentation/support/colors/static_colors.dart';
+import 'package:nurnova_ai/presentation/support/state_message/state_message.dart';
+import 'package:nurnova_ai/presentation/support/state_message/state_message_type.dart';
 
 extension StateSnackBarExts on BuildContext {
   void showStateMessageSnackBar(StateMessage message) =>

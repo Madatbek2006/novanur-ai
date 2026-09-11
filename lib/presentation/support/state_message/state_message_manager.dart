@@ -1,4 +1,4 @@
-import 'package:baiqavisit/presentation/support/state_message/state_message.dart';
+import 'package:nurnova_ai/presentation/support/state_message/state_message.dart';
 
 abstract class StateMessageManager {
   void setListeners({

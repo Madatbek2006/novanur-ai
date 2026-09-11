@@ -1,4 +1,5 @@
-import 'package:baiqavisit/core/extensions/text_extensions.dart';
+import 'package:nurnova_ai/core/extensions/text_extensions.dart';
+import 'package:nurnova_ai/presentation/support/extensions/color_extension.dart';
 import 'package:flutter/material.dart';
 
 class BottomSheetTitle extends StatelessWidget {
@@ -13,30 +14,30 @@ class BottomSheetTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
+        const SizedBox(height: 12),
+        Center(
           child: Container(
-            width: 50,
-            height: 5,
+            width: 44,
+            height: 4,
             decoration: BoxDecoration(
-              color: Colors.grey[400],
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(100),
+              gradient: LinearGradient(
+                colors: [
+                  context.primaryLight.withOpacity(0.6),
+                  context.primaryLight.withOpacity(0.2),
+                ],
+              ),
             ),
           ),
         ),
-        SizedBox(height: 8),
-        Row(
-          children: [
-            SizedBox(width: 16),
-            Expanded(
-              child: title.s(18).w(600).copyWith(
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-            ),
-            SizedBox(width: 16),
-          ],
+        const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: title.s(18).w(700).copyWith(
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
         ),
       ],
     );

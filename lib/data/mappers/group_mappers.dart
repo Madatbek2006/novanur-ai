@@ -1,8 +1,8 @@
-import 'package:baiqavisit/data/datasource/floor/entities/group_entity.dart';
-import 'package:baiqavisit/data/datasource/network/dto/group/group_att_stats_response.dart';
-import 'package:baiqavisit/data/datasource/network/dto/group/group_response.dart';
-import 'package:baiqavisit/domain/models/group/group.dart';
-import 'package:baiqavisit/domain/models/group/group_att_stats.dart';
+import 'package:nurnova_ai/data/datasource/floor/entities/group_entity.dart';
+import 'package:nurnova_ai/data/datasource/network/dto/group/group_att_stats_response.dart';
+import 'package:nurnova_ai/data/datasource/network/dto/group/group_response.dart';
+import 'package:nurnova_ai/domain/models/group/group.dart';
+import 'package:nurnova_ai/domain/models/group/group_att_stats.dart';
 
 extension GroupAttStatsResponseMapper on GroupAttStatsResponse {
   GroupEntity toEntity() {

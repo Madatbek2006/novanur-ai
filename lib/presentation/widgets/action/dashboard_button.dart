@@ -1,59 +1,81 @@
-
-import 'package:baiqavisit/core/extensions/text_extensions.dart';
-import 'package:baiqavisit/core/gen/assets/assets.gen.dart';
-import 'package:baiqavisit/domain/models/dashboard/dashboard_button_data.dart';
-import 'package:baiqavisit/presentation/support/extensions/color_extension.dart';
-import 'package:baiqavisit/presentation/widgets/card/custom_card.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:nurnova_ai/core/extensions/text_extensions.dart';
+import 'package:nurnova_ai/domain/models/dashboard/dashboard_button_data.dart';
+import 'package:nurnova_ai/presentation/support/extensions/color_extension.dart';
+import 'package:nurnova_ai/presentation/support/theme/app_glass.dart';
 
-class DashboardButton extends StatelessWidget{
- final DashboardButtonType data;
- final bool isClicked;
+/// Mode tile on the dashboard — a frosted chip over the live camera.
+class DashboardButton extends StatelessWidget {
+  const DashboardButton({
+    super.key,
+    required this.data,
+    required this.isClicked,
+    this.onPressed,
+  });
 
+  final DashboardButtonType data;
+  final bool isClicked;
   final Function(DashboardButtonType)? onPressed;
 
-  const DashboardButton({super.key, required this.data, this.onPressed, required this.isClicked});
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(12),
-      onTap: (){onPressed?.call(data);},
-      child: SizedBox(
-        width: 100,
+    final iconColor = isClicked
+        ? (context.isDarkMode ? Colors.white : context.primaryLight)
+        : context.textPrimary.withOpacity(0.85);
+
+    return SizedBox(
+      width: 96,
+      child: Semantics(
+        button: true,
+        selected: isClicked,
+        label: data.title,
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            CustomCard(
-              borderRadius: BorderRadius.circular(12),
-              color: context.appBarColor,
-              child: CustomCard(
-                color: isClicked?context.primaryLight.withValues(alpha: 0.5):context.appBarColor,
-                  borderRadius: BorderRadius.circular(12),
-                  padding: EdgeInsets.all(6),
-                  border: Border.all(
-                      width:3,
-                      color: context.iconPrimary
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: data.icon(context),
-                  )
+            AnimatedScale(
+              scale: isClicked ? 1.0 : 0.94,
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutCubic,
+              child: GlassSurface(
+                width: 76,
+                height: 76,
+                blur: AppGlass.blurChip,
+                borderRadius: AppGlass.chipAll,
+                isAccented: isClicked,
+                onTap: () => onPressed?.call(data),
+                child: Center(child: data.icon(context, color: iconColor)),
               ),
             ),
-            SizedBox(height: 4),
-            data.title.s(10).w(600).copyWith(
-              overflow: TextOverflow.ellipsis,
+            const SizedBox(height: 8),
+            // The label sits directly on the camera feed, so it carries its own
+            // shadow — otherwise it disappears over a bright frame.
+            Text(
+              data.title,
               maxLines: 2,
               textAlign: TextAlign.center,
-
-            )
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 11,
+                height: 1.25,
+                fontWeight: isClicked ? FontWeight.w700 : FontWeight.w600,
+                color: isClicked ? context.primaryLight : context.textPrimary,
+                shadows: [
+                  Shadow(
+                    color: (context.isDarkMode ? Colors.black : Colors.white)
+                        .withOpacity(0.85),
+                    blurRadius: 6,
+                  ),
+                  Shadow(
+                    color: (context.isDarkMode ? Colors.black : Colors.white)
+                        .withOpacity(0.65),
+                    blurRadius: 14,
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
-
 }

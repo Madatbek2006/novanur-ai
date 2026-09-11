@@ -1,15 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:baiqavisit/core/enum/enums.dart';
-import 'package:baiqavisit/core/extensions/list_extensions.dart';
-import 'package:baiqavisit/core/handler/future_handler.dart';
-import 'package:baiqavisit/data/repositories/photo_analysis_repository.dart';
-import 'package:baiqavisit/domain/models/chat/sms.dart';
-import 'package:baiqavisit/domain/models/takephoto/taken_photo.dart';
-import 'package:baiqavisit/domain/stream_controllers/take_photo_result_stream_controller.dart';
-import 'package:baiqavisit/presentation/support/cubit/base_cubit.dart';
-import 'package:baiqavisit/presentation/widgets/chat/chat_widget.dart';
+import 'package:nurnova_ai/core/enum/enums.dart';
+import 'package:nurnova_ai/core/extensions/list_extensions.dart';
+import 'package:nurnova_ai/core/handler/future_handler.dart';
+import 'package:nurnova_ai/data/repositories/photo_analysis_repository.dart';
+import 'package:nurnova_ai/domain/models/chat/sms.dart';
+import 'package:nurnova_ai/domain/models/takephoto/taken_photo.dart';
+import 'package:nurnova_ai/presentation/support/cubit/base_cubit.dart';
+import 'package:nurnova_ai/presentation/widgets/chat/chat_widget.dart';
 import 'package:camera/camera.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';

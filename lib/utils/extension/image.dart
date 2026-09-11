@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:baiqavisit/core/gen/assets/assets.gen.dart';
+import 'package:nurnova_ai/core/gen/assets/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_svg/flutter_svg.dart';

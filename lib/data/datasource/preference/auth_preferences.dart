@@ -1,5 +1,5 @@
-import 'package:baiqavisit/data/datasource/preference/preferences_extensions.dart';
-import 'package:baiqavisit/data/datasource/preference/token_holder.dart';
+import 'package:nurnova_ai/data/datasource/preference/preferences_extensions.dart';
+import 'package:nurnova_ai/data/datasource/preference/token_holder.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

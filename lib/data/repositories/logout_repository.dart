@@ -1,12 +1,12 @@
 import 'dart:async';
 
-import 'package:baiqavisit/data/datasource/floor/dao/tenant_entity_dao.dart';
-import 'package:baiqavisit/data/datasource/floor/dao/user_entity_dao.dart';
-import 'package:baiqavisit/data/datasource/preference/auth_preferences.dart';
-import 'package:baiqavisit/data/datasource/preference/fcm_token_preferences.dart';
-import 'package:baiqavisit/data/datasource/preference/pin_code_preferences.dart';
-import 'package:baiqavisit/data/datasource/preference/tenant_preferences.dart';
-import 'package:baiqavisit/data/datasource/preference/user_preferences.dart';
+import 'package:nurnova_ai/data/datasource/floor/dao/tenant_entity_dao.dart';
+import 'package:nurnova_ai/data/datasource/floor/dao/user_entity_dao.dart';
+import 'package:nurnova_ai/data/datasource/preference/auth_preferences.dart';
+import 'package:nurnova_ai/data/datasource/preference/fcm_token_preferences.dart';
+import 'package:nurnova_ai/data/datasource/preference/pin_code_preferences.dart';
+import 'package:nurnova_ai/data/datasource/preference/tenant_preferences.dart';
+import 'package:nurnova_ai/data/datasource/preference/user_preferences.dart';
 
 class LogoutRepository {
   final AuthPreferences _authPreferences;

@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:baiqavisit/presentation/support/cubit/base_state.dart';
+import 'package:nurnova_ai/presentation/support/cubit/base_state.dart';
 
 // ignore: must_be_immutable
 class BaseBuilder<Cubit extends StateStreamable<BaseState<STATE, EVENT>>, STATE,

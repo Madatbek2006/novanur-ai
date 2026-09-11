@@ -1,4 +1,4 @@
-import 'package:baiqavisit/data/datasource/device/device_info_holder.dart';
+import 'package:nurnova_ai/data/datasource/device/device_info_holder.dart';
 import 'package:dio/dio.dart';
 
 class CommonInterceptor extends QueuedInterceptor {

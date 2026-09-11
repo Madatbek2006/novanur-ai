@@ -1,7 +1,7 @@
-import 'package:baiqavisit/core/extensions/date_extensions.dart';
-import 'package:baiqavisit/core/extensions/string_extensions.dart';
-import 'package:baiqavisit/core/extensions/text_extensions.dart';
-import 'package:baiqavisit/presentation/support/extensions/color_extension.dart';
+import 'package:nurnova_ai/core/extensions/date_extensions.dart';
+import 'package:nurnova_ai/core/extensions/string_extensions.dart';
+import 'package:nurnova_ai/core/extensions/text_extensions.dart';
+import 'package:nurnova_ai/presentation/support/extensions/color_extension.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

@@ -1,4 +1,4 @@
-import 'package:baiqavisit/domain/models/language/language.dart';
+import 'package:nurnova_ai/domain/models/language/language.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 extension DoubleExtensions on double {

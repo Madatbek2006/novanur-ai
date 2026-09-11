@@ -1,7 +1,7 @@
-import 'package:baiqavisit/core/gen/localization/strings.dart';
-import 'package:baiqavisit/data/datasource/network/dto/barcode/product_response.dart';
-import 'package:baiqavisit/data/datasource/network/dto/photo_analise_response/photo_analise_response.dart';
-import 'package:baiqavisit/data/datasource/network/services/photo_analysis_service.dart';
+import 'package:nurnova_ai/core/gen/localization/strings.dart';
+import 'package:nurnova_ai/data/datasource/network/dto/barcode/product_response.dart';
+import 'package:nurnova_ai/data/datasource/network/dto/photo_analise_response/photo_analise_response.dart';
+import 'package:nurnova_ai/data/datasource/network/services/photo_analysis_service.dart';
 import 'package:camera/camera.dart';
 import 'package:logger/logger.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:logger/logger.dart';
-import 'package:baiqavisit/presentation/support/extensions/xfile_exts.dart';
+import 'package:nurnova_ai/presentation/support/extensions/xfile_exts.dart';
 import 'package:path/path.dart' as path;
 
 extension XFileCompressingExts on XFile {

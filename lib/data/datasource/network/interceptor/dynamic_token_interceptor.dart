@@ -1,4 +1,4 @@
-import 'package:baiqavisit/data/datasource/preference/auth_preferences.dart';
+import 'package:nurnova_ai/data/datasource/preference/auth_preferences.dart';
 import 'package:dio/dio.dart';
 
 class DynamicTokenInterceptor extends Interceptor {

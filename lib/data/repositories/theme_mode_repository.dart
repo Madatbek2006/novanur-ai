@@ -1,5 +1,5 @@
-import 'package:baiqavisit/data/datasource/preference/theme_mode_preferences.dart';
-import 'package:baiqavisit/domain/models/theme/app_theme_mode.dart';
+import 'package:nurnova_ai/data/datasource/preference/theme_mode_preferences.dart';
+import 'package:nurnova_ai/domain/models/theme/app_theme_mode.dart';
 
 class ThemeModeRepository {
   final ThemeModePreferences _themeModePreferences;

@@ -1,5 +1,5 @@
-import 'package:baiqavisit/data/datasource/network/dto/default/default_error_response.dart';
-import 'package:baiqavisit/data/mappers/dio_error_mappers.dart';
+import 'package:nurnova_ai/data/datasource/network/dto/default/default_error_response.dart';
+import 'package:nurnova_ai/data/mappers/dio_error_mappers.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:logger/logger.dart';

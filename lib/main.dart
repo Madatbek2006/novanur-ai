@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:io';
 
 
-import 'package:baiqavisit/domain/models/language/language.dart';
-import 'package:baiqavisit/firebase_options.dart';
-import 'package:baiqavisit/presentation/application/di/get_it_injection.dart';
+import 'package:nurnova_ai/domain/models/language/language.dart';
+import 'package:nurnova_ai/firebase_options.dart';
+import 'package:nurnova_ai/presentation/application/di/get_it_injection.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:easy_localization_loader/easy_localization_loader.dart';

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:baiqavisit/domain/models/group/group_att_stats.dart';
+import 'package:nurnova_ai/domain/models/group/group_att_stats.dart';
 import 'package:camera/camera.dart';
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';

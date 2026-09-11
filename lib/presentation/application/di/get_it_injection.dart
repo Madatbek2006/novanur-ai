@@ -1,10 +1,10 @@
 import 'package:get_it/get_it.dart';
-import 'package:baiqavisit/presentation/application/di/get_it_module_cubit.dart';
-import 'package:baiqavisit/presentation/application/di/get_it_module_database.dart';
-import 'package:baiqavisit/presentation/application/di/get_it_module_network.dart';
-import 'package:baiqavisit/presentation/application/di/get_it_module_preference.dart';
-import 'package:baiqavisit/presentation/application/di/get_it_module_repository.dart';
-import 'package:baiqavisit/presentation/application/di/get_it_module_stream_controllers.dart';
+import 'package:nurnova_ai/presentation/application/di/get_it_module_cubit.dart';
+import 'package:nurnova_ai/presentation/application/di/get_it_module_database.dart';
+import 'package:nurnova_ai/presentation/application/di/get_it_module_network.dart';
+import 'package:nurnova_ai/presentation/application/di/get_it_module_preference.dart';
+import 'package:nurnova_ai/presentation/application/di/get_it_module_repository.dart';
+import 'package:nurnova_ai/presentation/application/di/get_it_module_stream_controllers.dart';
 
 final getIt = GetIt.instance;
 

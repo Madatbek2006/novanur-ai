@@ -1,13 +1,13 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:baiqavisit/core/enum/describe_img_type.dart';
-import 'package:baiqavisit/presentation/features/common/barcode/barcode_page.dart';
-import 'package:baiqavisit/presentation/features/common/chat/chat_page.dart';
-import 'package:baiqavisit/presentation/features/common/object_detection/object_detection_page.dart';
-import 'package:baiqavisit/presentation/features/common/scan_text/scan_text_page.dart';
-import 'package:baiqavisit/presentation/features/common/takephoto/take_photo_page.dart';
-import 'package:baiqavisit/presentation/features/home/features/dashboard/dashboard_page.dart';
-import 'package:baiqavisit/presentation/features/home/features/profile/profile_page.dart';
-import 'package:baiqavisit/presentation/features/home/home_page.dart';
+import 'package:nurnova_ai/core/enum/describe_img_type.dart';
+import 'package:nurnova_ai/presentation/features/common/barcode/barcode_page.dart';
+import 'package:nurnova_ai/presentation/features/common/chat/chat_page.dart';
+import 'package:nurnova_ai/presentation/features/common/object_detection/object_detection_page.dart';
+import 'package:nurnova_ai/presentation/features/common/scan_text/scan_text_page.dart';
+import 'package:nurnova_ai/presentation/features/common/takephoto/take_photo_page.dart';
+import 'package:nurnova_ai/presentation/features/home/features/dashboard/dashboard_page.dart';
+import 'package:nurnova_ai/presentation/features/home/features/profile/profile_page.dart';
+import 'package:nurnova_ai/presentation/features/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 

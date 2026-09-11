@@ -23,7 +23,7 @@ android {
     namespace = "uz.nova.ai"
     compileSdk = 36
     // ndkVersion = flutter.ndkVersion
-    ndkVersion = "27.0.12077973"
+    ndkVersion = "28.2.13676358"
     configurations {
         all {
             exclude(group = "com.google.firebase", module = "firebase-iid")
@@ -85,7 +85,12 @@ flutter {
 }
 
 dependencies {
-//    implementation("com.google.firebase:firebase-messaging:23.4.1")
+    implementation("com.google.firebase:firebase-messaging:23.4.1")
+    implementation("com.google.mlkit:text-recognition:16.0.0")
+    implementation("com.google.mlkit:text-recognition-chinese:16.0.0")
+    implementation("com.google.mlkit:text-recognition-japanese:16.0.0")
+    implementation("com.google.mlkit:text-recognition-korean:16.0.0")
+    implementation("com.google.mlkit:text-recognition-devanagari:16.0.0")
     implementation("androidx.core:core:1.12.0")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }

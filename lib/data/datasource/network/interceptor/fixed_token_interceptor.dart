@@ -1,4 +1,4 @@
-import 'package:baiqavisit/data/datasource/preference/token_holder.dart';
+import 'package:nurnova_ai/data/datasource/preference/token_holder.dart';
 import 'package:dio/dio.dart';
 
 class FixedTokenInterceptor extends Interceptor {

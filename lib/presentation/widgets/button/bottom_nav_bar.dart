@@ -1,15 +1,13 @@
-import 'package:baiqavisit/core/extensions/text_extensions.dart';
-import 'package:baiqavisit/presentation/support/extensions/color_extension.dart';
-import 'package:baiqavisit/presentation/widgets/button/bottom_nav_item.dart';
-import 'package:baiqavisit/presentation/widgets/card/custom_card.dart';
-import 'package:baiqavisit/utils/extension/image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:nurnova_ai/core/extensions/text_extensions.dart';
+import 'package:nurnova_ai/presentation/support/extensions/color_extension.dart';
+import 'package:nurnova_ai/presentation/support/theme/app_glass.dart';
+import 'package:nurnova_ai/presentation/widgets/button/bottom_nav_item.dart';
+import 'package:nurnova_ai/utils/extension/image.dart';
 
+/// Floating frosted navigation pill.
 class BottomNavBar extends StatelessWidget {
-  final int currentIndex;
-  final List<BottomNavItem> items;
-  final ValueChanged<int> onTap;
-
   const BottomNavBar({
     super.key,
     required this.currentIndex,
@@ -17,93 +15,103 @@ class BottomNavBar extends StatelessWidget {
     required this.onTap,
   });
 
+  final int currentIndex;
+  final List<BottomNavItem> items;
+  final ValueChanged<int> onTap;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Material(
-        borderRadius: BorderRadius.circular(32),
-        child: CustomCard(
-          color: context.appBarColor,
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-          borderRadius: BorderRadius.circular(32),
-          height: 64,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final double totalWidth = constraints.maxWidth;
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: GlassSurface(
+        height: 70,
+        blur: AppGlass.blurPanel,
+        borderRadius: BorderRadius.circular(AppGlass.radiusPill),
+        padding: const EdgeInsets.all(7),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final itemWidth = constraints.maxWidth / items.length;
 
-
-
-              final double itemWidth = (totalWidth-12) / items.length;
-
-              final double indicatorWidth = itemWidth + 12;
-
-              final double indicatorLeft =currentIndex*itemWidth;
-
-              return Stack(
-                children: [
-                  AnimatedPositioned(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOutCubic,
-                    left: indicatorLeft,
-                    width: indicatorWidth,
-                    top: 0,
-                    bottom: 0,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: context.primaryLight.withValues(alpha: 0.18),
-                        borderRadius: BorderRadius.circular(30),
+            return Stack(
+              children: [
+                // Selection pill slides between destinations.
+                AnimatedPositioned(
+                  duration: const Duration(milliseconds: 320),
+                  curve: Curves.easeOutCubic,
+                  left: currentIndex * itemWidth,
+                  width: itemWidth,
+                  top: 0,
+                  bottom: 0,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius:
+                          BorderRadius.circular(AppGlass.radiusPill),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: AppGlass.accentFill(context),
+                      ),
+                      border: Border.all(
+                        color: AppGlass.accentBorderColor(context),
+                        width: AppGlass.borderWidth,
                       ),
                     ),
                   ),
+                ),
+                Row(
+                  children: items.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final item = entry.value;
+                    final isSelected = currentIndex == index;
 
-                  // Элементы навигации
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                    child: Row(
-                      children: items.asMap().entries.map((entry) {
-                        final int index = entry.key;
-                        final BottomNavItem item = entry.value;
-
-                        return Expanded(
-                          child: GestureDetector(
-                            onTap: () => onTap(index),
-                            behavior: HitTestBehavior.opaque,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 4),
-                              child: Center(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    item.svgIcon.svgCustom(
-                                      color: currentIndex == index
-                                          ? context.bottomSelectColor
-                                          : context.bottomUnSelectColor,
-                                      width: 24,
-                                      height: 24,
-                                    ),
-                                    const SizedBox(height: 4),
-                              item.title.s(12).w(600).c( currentIndex == index
-                                  ? context.bottomSelectColor
-                                  : context.bottomUnSelectColor,)
-                              .copyWith(
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1
-                              )
-                                  ],
+                    return Expanded(
+                      child: Semantics(
+                        button: true,
+                        selected: isSelected,
+                        label: item.title,
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () {
+                            if (isSelected) return;
+                            HapticFeedback.selectionClick();
+                            onTap(index);
+                          },
+                          child: AnimatedScale(
+                            scale: isSelected ? 1.0 : 0.92,
+                            duration: const Duration(milliseconds: 220),
+                            curve: Curves.easeOutCubic,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                item.svgIcon.svgCustom(
+                                  color: isSelected
+                                      ? context.bottomSelectColor
+                                      : context.bottomUnSelectColor,
+                                  width: 22,
+                                  height: 22,
                                 ),
-                              ),
+                                const SizedBox(height: 4),
+                                item.title
+                                    .s(11)
+                                    .w(isSelected ? 700 : 500)
+                                    .c(isSelected
+                                        ? context.bottomSelectColor
+                                        : context.bottomUnSelectColor)
+                                    .copyWith(
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
+                              ],
                             ),
                           ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

@@ -1,6 +1,6 @@
-import 'package:baiqavisit/data/datasource/network/dto/identity/employee_response.dart';
-import 'package:baiqavisit/data/datasource/network/dto/identity/student_response.dart';
-import 'package:baiqavisit/domain/models/identity/identity.dart';
+import 'package:nurnova_ai/data/datasource/network/dto/identity/employee_response.dart';
+import 'package:nurnova_ai/data/datasource/network/dto/identity/student_response.dart';
+import 'package:nurnova_ai/domain/models/identity/identity.dart';
 
 extension EmployeeResponseMappers on EmployeeResponse {
   Identity toModel() {

@@ -1,4 +1,4 @@
-import 'package:baiqavisit/data/error/app_exception.dart';
+import 'package:nurnova_ai/data/error/app_exception.dart';
 
 abstract class AppNetworkException extends AppException {
   @override

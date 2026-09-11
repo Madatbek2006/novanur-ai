@@ -1,49 +1,48 @@
-
 import 'package:auto_route/auto_route.dart';
-import 'package:baiqavisit/presentation/support/cubit/base_page.dart';
-import 'package:baiqavisit/presentation/widgets/app_bar/default_app_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:nurnova_ai/presentation/features/common/cameras/app_camera_controller.dart';
+import 'package:nurnova_ai/presentation/features/common/cameras/app_camera_view.dart';
+import 'package:nurnova_ai/presentation/support/cubit/base_statefull_page.dart';
 
 import 'barcode_cubit.dart';
 
 @RoutePage()
 class BarcodePage
-    extends BasePage<BarcodeCubit, BarcodeState, BarcodeEvent> {
-   BarcodePage({super.key,this.child,});
-   final Widget? child;
+    extends BaseStatefulPage<BarcodeCubit, BarcodeState, BarcodeEvent> {
+  const BarcodePage({super.key, this.child});
+
+  /// Drawn over the preview, pinned to the bottom.
+  final Widget? child;
 
   @override
-  void onWidgetCreated(BuildContext context) {
+  State<StatefulWidget> createState() => _BarcodePageState();
+}
+
+class _BarcodePageState extends BaseStatefulPageState<BarcodePage, BarcodeCubit,
+    BarcodeState, BarcodeEvent> {
+  late final AppCameraController _camera;
+
+  @override
+  void onWidgetCreated() {
+    _camera = AppCameraController(
+      onBarcode: (value) => cubit().getProductData(value),
+    );
+    _camera.initialize(analysis: CameraAnalysis.barcode);
   }
 
+  @override
+  void dispose() {
+    _camera.dispose();
+    super.dispose();
+  }
 
   @override
   Widget onWidgetBuild(BuildContext context, BarcodeState state) {
-    return _buildBody(context, state);
-  }
-
-  Widget _buildBody(BuildContext context, BarcodeState state) {
-    return Stack(
-      children: [
-        MobileScanner(
-          onDetect: (capture) {
-            final List<Barcode> barcodes = capture.barcodes;
-            for (final barcode in barcodes) {
-              cubit(context).getProductData(barcode.rawValue);
-              Logger().d('TTT=>Найден код: ${barcode.rawValue}');
-            }
-          },
-        ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: child
-        )
-      ],
+    return AppCameraView(
+      controller: _camera,
+      overlay: widget.child == null
+          ? null
+          : Align(alignment: Alignment.bottomCenter, child: widget.child),
     );
   }
-
 }
-
-

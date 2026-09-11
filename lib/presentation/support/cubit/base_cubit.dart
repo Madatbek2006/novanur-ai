@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
-import 'package:baiqavisit/presentation/application/di/get_it_injection.dart';
-import 'package:baiqavisit/presentation/support/cubit/base_state.dart';
-import 'package:baiqavisit/presentation/support/state_message/state_message_manager.dart';
+import 'package:nurnova_ai/presentation/application/di/get_it_injection.dart';
+import 'package:nurnova_ai/presentation/support/cubit/base_state.dart';
+import 'package:nurnova_ai/presentation/support/state_message/state_message_manager.dart';
 
 abstract class BaseCubit<STATE, EVENT> extends Cubit<BaseState<STATE, EVENT>> {
   late STATE states;

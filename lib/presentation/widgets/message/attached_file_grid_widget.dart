@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:baiqavisit/presentation/widgets/image/rounded_cached_network_image_widget.dart';
+import 'package:nurnova_ai/presentation/widgets/image/rounded_cached_network_image_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

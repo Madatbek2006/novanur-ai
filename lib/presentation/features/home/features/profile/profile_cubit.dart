@@ -1,17 +1,17 @@
 import 'dart:async';
 
-import 'package:baiqavisit/core/gen/localization/strings.dart';
-import 'package:baiqavisit/data/repositories/language_repository.dart';
-import 'package:baiqavisit/data/repositories/theme_mode_repository.dart';
-import 'package:baiqavisit/domain/models/language/language.dart';
-import 'package:baiqavisit/domain/models/logout/logout_event.dart';
-import 'package:baiqavisit/domain/models/tenant/tenant.dart';
-import 'package:baiqavisit/domain/models/theme/app_theme_mode.dart';
-import 'package:baiqavisit/domain/models/user/user.dart';
-import 'package:baiqavisit/domain/stream_controllers/app_theme_mode_stream_controller.dart';
-import 'package:baiqavisit/domain/stream_controllers/language_selection_stream_controller.dart';
-import 'package:baiqavisit/domain/stream_controllers/logout_event_stream_controller.dart';
-import 'package:baiqavisit/presentation/support/cubit/base_cubit.dart';
+import 'package:nurnova_ai/core/gen/localization/strings.dart';
+import 'package:nurnova_ai/data/repositories/language_repository.dart';
+import 'package:nurnova_ai/data/repositories/theme_mode_repository.dart';
+import 'package:nurnova_ai/domain/models/language/language.dart';
+import 'package:nurnova_ai/domain/models/logout/logout_event.dart';
+import 'package:nurnova_ai/domain/models/tenant/tenant.dart';
+import 'package:nurnova_ai/domain/models/theme/app_theme_mode.dart';
+import 'package:nurnova_ai/domain/models/user/user.dart';
+import 'package:nurnova_ai/domain/stream_controllers/app_theme_mode_stream_controller.dart';
+import 'package:nurnova_ai/domain/stream_controllers/language_selection_stream_controller.dart';
+import 'package:nurnova_ai/domain/stream_controllers/logout_event_stream_controller.dart';
+import 'package:nurnova_ai/presentation/support/cubit/base_cubit.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'profile_cubit.freezed.dart';

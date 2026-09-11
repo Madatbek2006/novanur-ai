@@ -1,4 +1,4 @@
-import 'package:baiqavisit/core/gen/assets/assets.gen.dart';
+import 'package:nurnova_ai/core/gen/assets/assets.gen.dart';
 import 'package:flutter/cupertino.dart';
 
 class BottomNavItem  {

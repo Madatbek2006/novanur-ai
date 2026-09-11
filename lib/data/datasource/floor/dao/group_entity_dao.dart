@@ -1,4 +1,4 @@
-import 'package:baiqavisit/data/datasource/floor/entities/group_entity.dart';
+import 'package:nurnova_ai/data/datasource/floor/entities/group_entity.dart';
 import 'package:floor/floor.dart';
 
 @dao
