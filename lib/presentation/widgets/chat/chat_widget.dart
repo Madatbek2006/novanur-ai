@@ -1,7 +1,7 @@
-import 'package:baiqavisit/presentation/widgets/card/custom_card.dart';
-import 'package:baiqavisit/presentation/widgets/chat/chat_text_field.dart';
-import 'package:baiqavisit/presentation/widgets/message/image_message_widget.dart';
-import 'package:baiqavisit/presentation/widgets/message/text_message_item.dart';
+import 'package:nurnova_ai/presentation/widgets/card/custom_card.dart';
+import 'package:nurnova_ai/presentation/widgets/chat/chat_text_field.dart';
+import 'package:nurnova_ai/presentation/widgets/message/image_message_widget.dart';
+import 'package:nurnova_ai/presentation/widgets/message/text_message_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -21,6 +21,10 @@ class ChatWidget extends StatefulWidget {
   final Function() subRoom;
   final bool isSendingRequest;
 
+  /// Space kept clear at the top so the first messages are not hidden by a
+  /// translucent app bar that the list scrolls underneath.
+  final double topInset;
+
   const ChatWidget({
     super.key,
     required this.messages,
@@ -31,6 +35,7 @@ class ChatWidget extends StatefulWidget {
     required this.audioMessages,
     required this.isSendingRequest,
     required this.onUpdateAudio,
+    this.topInset = 0,
   });
 
   @override
@@ -87,6 +92,9 @@ class _ChatWidgetState extends State<ChatWidget> {
     // });
   }
 
+  /// Горизонтальный паддинг списка сообщений.
+  static const double listHorizontalPadding = 16;
+
   Widget buildMessage(types.Message message) {
     final isSentByMe = message.author.id == widget.userUid;
 
@@ -97,11 +105,21 @@ class _ChatWidgetState extends State<ChatWidget> {
     // );
     Widget bubble;
 
+    // messageWidth — это ширина СОДЕРЖИМОГО, а пузырь занимает ещё и обвязку:
+    // отступ с дальней стороны плюс паддинг карточки. У текста она 40+12*2=64,
+    // у картинки 40+5*2=50, поэтому одно общее число неизбежно врёт для одного
+    // из типов (раньше вычиталось 50, и текстовый пузырь вылезал ровно на 14).
+    // Считаем по константам самих виджетов, чтобы значения не разъезжались.
+    final rowWidth =
+        MediaQuery.sizeOf(context).width - listHorizontalPadding * 2;
+    double contentWidth(double chrome) =>
+        (rowWidth - chrome).clamp(160.0, 320.0).toDouble();
+
     if (message is types.TextMessage) {
       bubble = TextMessageItem(
         isSentByMe: isSentByMe,
         message: message,
-        messageWidth: 300,
+        messageWidth: contentWidth(TextMessageItem.chrome).round(),
         onClickRepliedMsg: (msg) {
           scrollToMessage(msg);
         },
@@ -110,7 +128,7 @@ class _ChatWidgetState extends State<ChatWidget> {
       bubble = ImageMessageWidget(
         isSentByMe: isSentByMe,
         message: message,
-        messageWidth: 300,
+        messageWidth: contentWidth(ImageMessageWidget.chrome).round(),
       );
     }
     // else if (message is types.AudioMessage) {
@@ -139,11 +157,19 @@ class _ChatWidgetState extends State<ChatWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    // The composer used to float in a Stack while the list guessed its height
+    // with a hardcoded `bottom: 80`. A Column gives the list exactly the room
+    // that is left, so nothing hides behind the bar and no magic number drifts.
+    return Column(
       children: [
-        Positioned.fill(
+        Expanded(
           child: ScrollablePositionedList.builder(
-            padding: EdgeInsets.only(bottom: 80, left: 16, right: 16),
+            padding: EdgeInsets.fromLTRB(
+                listHorizontalPadding,
+                widget.topInset + 8,
+                listHorizontalPadding,
+                8,
+              ),
             reverse: true,
             itemScrollController: itemScrollController,
             itemPositionsListener: itemPositionsListener,
@@ -152,7 +178,7 @@ class _ChatWidgetState extends State<ChatWidget> {
             itemBuilder: (context, index) {
               if (widget.isSendingRequest && index == 0) {
                 return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  padding: const EdgeInsets.symmetric(vertical: 3),
                   child: loadingBubble(),
                 );
               }
@@ -164,30 +190,22 @@ class _ChatWidgetState extends State<ChatWidget> {
               return KeyedSubtree(
                 key: ValueKey(message.id),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  padding: const EdgeInsets.symmetric(vertical: 3),
                   child: buildMessage(message),
                 ),
               );
             },
           ),
         ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CustomInputField(
-                isSendingRequest: widget.isSendingRequest,
-                onSend: _handleSend,
-                onSendAudio: _handleSendAudio,
-                onAttached: (files) {
-                  setState(() {
-                    attachedFiles = files;
-                  });
-                },
-              ),
-            ],
-          ),
+        CustomInputField(
+          isSendingRequest: widget.isSendingRequest,
+          onSend: _handleSend,
+          onSendAudio: _handleSendAudio,
+          onAttached: (files) {
+            setState(() {
+              attachedFiles = files;
+            });
+          },
         ),
       ],
     );
@@ -197,19 +215,21 @@ class _ChatWidgetState extends State<ChatWidget> {
     return Row(
       children: [
         CustomCard(
-          padding: EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 2),
-          borderRadius: BorderRadius.only(
+          margin: EdgeInsets.zero,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(8),
             topRight: Radius.circular(8),
-            bottomLeft: Radius.circular( 0),
+            bottomLeft: Radius.circular(0),
             bottomRight: Radius.circular(8),
           ),
-          child: SizedBox(
-            width: 32,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                  child: TypingDots()
-              )
+          child: const SizedBox(
+            width: 26,
+            height: 18,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: TypingDots(),
+            ),
           ),
         ),
 
@@ -253,7 +273,7 @@ class _TypingDotsState extends State<TypingDots>
         final value = (_controller.value * 3).floor() + 1;
         return Text(
           '.' * value,
-          style: const TextStyle(fontSize: 24),
+          style: const TextStyle(fontSize: 18, height: 1),
         );
       },
     );
