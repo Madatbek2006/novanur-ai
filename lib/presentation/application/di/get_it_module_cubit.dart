@@ -23,13 +23,13 @@ extension GetItModuleApp on GetIt {
 
     registerFactory(() => DashboardCubit(get()));
     registerFactory(
-      () => ProfileCubit(get(), get(), get(), get(), get()),
+      () => ProfileCubit(get(), get(), get(), get(), get(), get()),
     );
 
 
     // take photo
     registerFactory(() => TakePhotoCubit());
-    registerFactory(() => ChatSpeaker(get()));
+    registerFactory(() => ChatSpeaker(get(), get()));
     registerFactory(() => ChatCubit(get(), get()));
     registerFactory(() => BarcodeCubit(get()));
     registerFactory(() => ObjectDetectionCubit(get()));

@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:nurnova_ai/core/extensions/text_extensions.dart';
 import 'package:nurnova_ai/core/gen/assets/assets.gen.dart';
 import 'package:nurnova_ai/core/gen/localization/strings.dart';
+import 'package:nurnova_ai/data/datasource/preference/speech_rate_preferences.dart';
 import 'package:nurnova_ai/domain/models/language/language.dart';
 import 'package:nurnova_ai/domain/models/theme/app_theme_mode.dart';
 import 'package:nurnova_ai/presentation/support/cubit/base_page.dart';
@@ -110,8 +111,51 @@ class ProfilePage extends BasePage<ProfileCubit, ProfileState, ProfileEvent> {
           ProfileItemWidget(
             name: Strings.profileDarkMode,
             icon: Assets.images.icProfileDarkMode,
-            bottomRadius: AppGlass.radiusCard,
             onClicked: () => _showThemeModeBottomSheet(context, state),
+          ),
+          CustomDivider(height: 1, startIndent: 68, endIndent: 16),
+          _buildSpeechRate(context, state),
+        ],
+      ),
+    );
+  }
+
+  /// Скорость чтения ответов вслух. Слайдер, а не список вариантов: комфортный
+  /// темп у каждого свой, а привыкшие к скринридерам слушают заметно быстрее
+  /// обычного.
+  Widget _buildSpeechRate(BuildContext context, ProfileState state) {
+    // В шкале flutter_tts обычная скорость — 0.5, поэтому на экране
+    // показываем привычный множитель.
+    final multiplier = state.speechRate / SpeechRatePreferences.normal;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                Strings.profileSpeechRate,
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+              ),
+              Text(
+                "${multiplier.toStringAsFixed(1)}\u00d7",
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              ),
+            ],
+          ),
+          Slider(
+            value: state.speechRate,
+            min: SpeechRatePreferences.min,
+            max: SpeechRatePreferences.max,
+            // Шаг в 0.05 даёт 0.5x, 0.6x, ... 2.0x — попасть пальцем реально.
+            divisions:
+                ((SpeechRatePreferences.max - SpeechRatePreferences.min) / 0.05)
+                    .round(),
+            label: "${multiplier.toStringAsFixed(1)}\u00d7",
+            onChanged: (value) => cubit(context).setSpeechRate(value),
           ),
         ],
       ),

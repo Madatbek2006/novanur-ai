@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:nurnova_ai/data/datasource/preference/speech_rate_preferences.dart';
+import 'package:nurnova_ai/data/repositories/speech_rate_repository.dart';
 import 'package:nurnova_ai/data/repositories/speech_repository.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -17,7 +19,7 @@ import 'package:path_provider/path_provider.dart';
 ///
 /// Узбекского в движках телефонов нет вовсе, так что он идёт на сервер сразу.
 class ChatSpeaker {
-  ChatSpeaker(this._speech) {
+  ChatSpeaker(this._speech, this._speechRate) {
     // Экран показывает, что именно читается сейчас, поэтому о завершении
     // нужно узнать со всех сторон: движок мог договорить, его могли
     // отменить или он мог упасть.
@@ -35,11 +37,13 @@ class ChatSpeaker {
   /// Языки, которые телефон в принципе умеет читать, и их коды для движка.
   static const _deviceVoices = {'ru': 'ru-RU', 'en': 'en-US'};
 
-  /// Чем озвучивает сервер. Всё, кроме русского и узбекского, бэкенд
-  /// отвечает по-английски — значит и читать это надо по-английски.
-  static const _serverLanguages = {'ru': 'ru', 'uz': 'uz'};
+  /// Чем озвучивает сервер. Узбекского и казахского нет в движках телефонов,
+  /// русский нужен запасным вариантом. Остальное бэкенд отвечает
+  /// по-английски — значит и читать это надо по-английски.
+  static const _serverLanguages = {'ru': 'ru', 'uz': 'uz', 'kk': 'kk'};
 
   final SpeechRepository _speech;
+  final SpeechRateRepository _speechRate;
   final FlutterTts _tts = FlutterTts();
   final AudioPlayer _player = AudioPlayer();
   final Logger _logger = Logger();
@@ -103,6 +107,7 @@ class ChatSpeaker {
 
   Future<void> _speakOnDevice(String text, String voice) async {
     await _tts.setLanguage(voice);
+    await _tts.setSpeechRate(_speechRate.getSpeechRate());
     await _tts.speak(text);
   }
 
@@ -116,6 +121,12 @@ class ChatSpeaker {
     await file.writeAsBytes(audio, flush: true);
 
     await _player.setFilePath(file.path);
+    // Серверная озвучка идёт готовым файлом, поэтому выбранную скорость
+    // применяем к воспроизведению — иначе настройка работала бы только
+    // для языков, которые читает сам телефон.
+    await _player.setSpeed(
+      _speechRate.getSpeechRate() / SpeechRatePreferences.normal,
+    );
     // play() ждёт конца воспроизведения, а вызывающему ждать незачем.
     unawaited(_player.play());
   }

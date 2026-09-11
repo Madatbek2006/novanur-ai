@@ -133,7 +133,7 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
             .toString(),
         "data": {
           "lang": locale.languageCode,
-          "max_new_tokens": 100,
+          "max_tokens": 100,
           "message": sms
         }
       }
