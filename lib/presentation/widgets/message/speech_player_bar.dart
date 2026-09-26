@@ -42,6 +42,7 @@ class SpeechPlayerBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final loading = playback.status == SpeechStatus.loading;
     final playing = playback.status == SpeechStatus.playing;
+    final idle = playback.status == SpeechStatus.idle;
 
     return ConstrainedBox(
       constraints: BoxConstraints(
@@ -57,7 +58,7 @@ class SpeechPlayerBar extends StatelessWidget {
             _button(loading: loading, playing: playing),
             if (playback.seekable) ...[
               const SizedBox(width: 10),
-              Expanded(child: _progress(loading: loading)),
+              Expanded(child: _progress(loading: loading, idle: idle)),
             ],
           ],
         ),
@@ -108,7 +109,12 @@ class SpeechPlayerBar extends StatelessWidget {
 
   /// Столбики и время. Подписан на позицию отдельно от всего остального,
   /// чтобы тик позиции перерисовывал только эту часть, а не список сообщений.
-  Widget _progress({required bool loading}) {
+  ///
+  /// В покое позиция не показывается вовсе: играть будем с начала, а часы
+  /// сообщают, сколько звучания впереди, — так же ведут себя голосовые
+  /// сообщения в мессенджерах. Заодно это отвязывает полосу от того, куда
+  /// плеер отмотал свою дорожку: он один на весь чат, а полос много.
+  Widget _progress({required bool loading, required bool idle}) {
     if (loading) {
       return Align(
         alignment: Alignment.centerLeft,
@@ -120,11 +126,11 @@ class SpeechPlayerBar extends StatelessWidget {
     }
 
     return StreamBuilder<Duration>(
-      stream: positionStream,
+      stream: idle ? const Stream<Duration>.empty() : positionStream,
       initialData: Duration.zero,
       builder: (context, snapshot) {
-        final position = snapshot.data ?? Duration.zero;
         final total = playback.duration;
+        final position = idle ? Duration.zero : (snapshot.data ?? Duration.zero);
         final progress = total > Duration.zero
             ? (position.inMilliseconds / total.inMilliseconds).clamp(0.0, 1.0)
             : 0.0;
@@ -134,7 +140,7 @@ class SpeechPlayerBar extends StatelessWidget {
             Expanded(child: _waveform(progress, total)),
             const SizedBox(width: 8),
             Text(
-              _clock(position),
+              _clock(idle ? total : position),
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w500,

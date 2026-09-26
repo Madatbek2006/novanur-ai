@@ -31,6 +31,7 @@
   "change_password_title": "Change password",
   "chat_error_no_connection": "Could not reach the server. Check your connection and try again.",
   "chat_error_retry": "Retry",
+  "chat_message_hint": "Message...",
   "chat_reconnecting": "Connection lost, reconnecting",
   "chat_repeat_answer": "Repeat the answer",
   "chat_speech_loading": "Preparing",

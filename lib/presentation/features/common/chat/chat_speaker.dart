@@ -69,6 +69,13 @@ class ChatSpeaker {
   /// Файлы, синтезированные за этот сеанс, — чтобы подчистить за собой.
   final Set<String> _files = {};
 
+  /// Готовые озвучки: всё, что известно о звуке каждого сообщения.
+  /// Экран берёт отсюда полосу для ответов, которые сейчас не звучат.
+  final Map<String, SpeechPlayback> _clips = {};
+
+  /// Что известно об озвучке каждого сообщения — для полос, которые молчат.
+  Map<String, SpeechPlayback> get clips => Map.unmodifiable(_clips);
+
   SpeechPlayback? _playback;
 
   /// Читаем ли прямо сейчас. Нужен, чтобы обработчики завершения от
@@ -84,7 +91,22 @@ class ChatSpeaker {
   void _finish() {
     if (!_speaking) return;
     _speaking = false;
-    _emit(null);
+    _emit(_rested(_playback));
+  }
+
+  /// Переводит озвучку в молчаливое состояние, сохраняя полосу.
+  ///
+  /// У движка телефона сохранять нечего: файла нет, перематывать нечего,
+  /// поэтому для него по-прежнему возвращается тишина и остаётся одна
+  /// кнопка — это честнее, чем рисовать мёртвую полосу.
+  SpeechPlayback? _rested(SpeechPlayback? playback) {
+    if (playback == null || !playback.seekable) return null;
+
+    // Позицию плеера здесь не трогаем: полоса в покое её и не показывает,
+    // а повторное прослушивание всё равно заново открывает файл.
+    final clip = playback.copyWith(status: SpeechStatus.idle);
+    _clips[playback.messageId] = clip;
+    return clip;
   }
 
   /// Проговаривает служебный текст — например, сообщение об ошибке.
@@ -200,13 +222,19 @@ class ChatSpeaker {
     if (!_speaking) return;
 
     if (messageId != null) {
-      _emit(SpeechPlayback(
+      final playing = SpeechPlayback(
         messageId: messageId,
         status: SpeechStatus.playing,
         seekable: true,
         duration: duration ?? Duration.zero,
         peaks: _peaks[messageId] ?? const <double>[],
-      ));
+      );
+
+      // Запоминаем сразу, а не по окончании: пользователь может переключиться
+      // на другой ответ, не дослушав, и тогда конца воспроизведения не будет
+      // вовсе — а полоса у этого сообщения остаться обязана.
+      _clips[messageId] = playing.copyWith(status: SpeechStatus.idle);
+      _emit(playing);
     }
 
     // play() ждёт конца воспроизведения, а вызывающему ждать незачем.
@@ -264,6 +292,7 @@ class ChatSpeaker {
     unawaited(_player.play());
   }
 
+
   Future<void> seek(Duration position) async {
     if (_playback?.seekable != true) return;
     await _player.seek(position);
@@ -273,7 +302,7 @@ class ChatSpeaker {
     final wasSpeaking = _speaking;
     _speaking = false;
     await _silence();
-    if (wasSpeaking) _emit(null);
+    if (wasSpeaking) _emit(_rested(_playback));
   }
 
   /// Глушит оба источника, никого не оповещая.
@@ -297,5 +326,6 @@ class ChatSpeaker {
     }
     _files.clear();
     _peaks.clear();
+    _clips.clear();
   }
 }

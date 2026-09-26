@@ -31,8 +31,12 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
   ChatCubit(this._photoAnalysisRepository, this._speaker) : super(ChatState()){
     _setupAudio();
     _player.setVolume(0.3);
-    _speaker.onPlayback = (playback) =>
-        updateState((state) => state.copyWith(playback: playback));
+    _speaker.onPlayback = (playback) => updateState(
+          (state) => state.copyWith(
+            playback: playback,
+            speechClips: _speaker.clips,
+          ),
+        );
   }
   WebSocketChannel? channel;
   final AudioPlayer _player = AudioPlayer();
@@ -161,34 +165,19 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
         channel?.stream.listen(
           (event) {
             logger.d("TTT=> Сообщение: $event");
-            final data = jsonDecode(event);
-            if(data["type"]=="ping"){
-              Logger().d("TTT=> ping");
-              _send(jsonEncode({
-                "type": "pong"
-              }));
-            }else{
-              final text = data["data"]["message"]?.toString() ?? '';
-              // Один и тот же id у сообщения и у отметки «читается сейчас»:
-              // по нему кнопка на пузыре знает, что именно остановить.
-              final id = DateTime.now().millisecondsSinceEpoch.toString();
+            // Любой кадр от сервера доказывает, что связь жива. Снимать
+            // баннер обрыва надо именно здесь: WebSocketChannel.connect
+            // возвращается сразу и сам по себе ничего не подтверждает.
+            _onLinkAlive();
 
-              updateState((state) => state.copyWith(
-                    messages: sortMessage(state.messages, TextMessage(
-                      author: User(id: "AI"),
-                      createdAt: DateTime.now().millisecondsSinceEpoch,
-                      id: id,
-                      text: text,
-                    )),
-                    // ответ дошёл — значит связь жива
-                    error: null,
-                  ));
-
-              stopProgress();
-              _reconnectAttempts = 0;
-              // Состояние озвучки дальше ведёт сам спикер: он знает,
-              // синтезируется звук или уже играет.
-              _speaker.speak(id, text, _languageCode);
+            try {
+              _handleFrame(event);
+            } catch (error, stack) {
+              // Испорченный кадр не повод рвать связь. Исключение отсюда
+              // ушло бы в onError, тот дёрнул бы переподключение — и
+              // соединение падало бы на ровном месте.
+              logger.e("TTT=> не разобрал кадр: $error",
+                  error: error, stackTrace: stack);
             }
           },
           onError: (error) {
@@ -236,6 +225,10 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
           // Звук ещё синтезируется — нажатие отменяет ожидание.
           stopSpeaking();
           return;
+        case SpeechStatus.idle:
+          // Дослушали или прервали — играем заново. В сеть при этом не идём:
+          // файл и огибающая уже лежат на устройстве.
+          break;
       }
     }
 
@@ -251,8 +244,10 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
 
   /// Обрывает чтение вслух — например, когда уходят с экрана.
   void stopSpeaking() {
+    // Состояние не трогаем: спикер сам сообщит, чем кончилось. Он теперь
+    // возвращает не тишину, а «звук готов, но молчит», и затирать это
+    // здесь значило бы снова прятать полосу.
     _speaker.stop();
-    updateState((state) => state.copyWith(playback: null));
   }
 
   /// Повторяет последний запрос после ошибки. Если связь до этого оборвалась
@@ -275,6 +270,68 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
     stopProgress();
     updateState((state) => state.copyWith(error: message));
     _speaker.announce(message, _languageCode);
+  }
+
+  /// Разбирает один кадр из сокета.
+  ///
+  /// По этому каналу приходят не только ответы: пинги, подтверждение приёма
+  /// запроса (`status: queued`), предупреждения и ошибки. Раньше всё, что не
+  /// пинг, считалось ответом и читалось как `data["data"]["message"]` —
+  /// на любом другом кадре это падало с NoSuchMethodError, исключение уходило
+  /// в onError, и сокет переподключался. То есть связь рвалась на каждом
+  /// запросе, а пользователь видел красный баннер об обрыве.
+  void _handleFrame(dynamic event) {
+    final decoded = jsonDecode(event as String);
+    if (decoded is! Map) return;
+
+    if (decoded["type"] == "ping") {
+      _send(jsonEncode({"type": "pong"}));
+      return;
+    }
+
+    // Ответ — единственный кадр, у которого текст лежит внутри data.
+    // Остальное служебное: связь подтверждает, а показывать нечего.
+    final data = decoded["data"];
+    final text = data is Map ? data["message"]?.toString() ?? '' : '';
+    if (text.isEmpty) return;
+
+    // Один и тот же id у сообщения и у отметки «читается сейчас»:
+    // по нему кнопка на пузыре знает, что именно остановить.
+    final id = DateTime.now().millisecondsSinceEpoch.toString();
+
+    updateState((state) => state.copyWith(
+          messages: sortMessage(state.messages, TextMessage(
+            author: User(id: "AI"),
+            createdAt: DateTime.now().millisecondsSinceEpoch,
+            id: id,
+            text: text,
+          )),
+          // ответ дошёл — значит связь жива
+          error: null,
+        ));
+
+    stopProgress();
+    _reconnectAttempts = 0;
+    // Состояние озвучки дальше ведёт сам спикер: он знает,
+    // синтезируется звук или уже играет.
+    _speaker.speak(id, text, _languageCode);
+  }
+
+  /// Связь подтверждена живым кадром от сервера.
+  ///
+  /// Без этого баннер «связь оборвалась» висел поверх уже восстановленного
+  /// соединения до самого конца сеанса: переподключение молча удавалось,
+  /// а сказать об этом было некому. Незрячему пользователю такой баннер
+  /// врёт о состоянии приложения — хуже, чем не показывать ничего.
+  void _onLinkAlive() {
+    _socketConnected = true;
+    _reconnectAttempts = 0;
+    // Гасим только собственный баннер обрыва. Ошибка загрузки фото к
+    // состоянию связи отношения не имеет, и её кнопку «Повторить»
+    // забирать у пользователя нельзя.
+    if (states.error == Strings.chatReconnecting) {
+      updateState((state) => state.copyWith(error: null));
+    }
   }
 
   /// Сокет рвётся сам по себе — на переключении сети, при уходе в фон.

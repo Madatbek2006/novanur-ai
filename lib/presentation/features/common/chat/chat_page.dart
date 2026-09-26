@@ -71,6 +71,7 @@ class ChatPage
       errorText: state.error,
       onRetry: () => cubit(context).retry(),
       playback: state.playback,
+      speechClips: state.speechClips,
       positionStream: cubit(context).speechPositionStream,
       onMessageTap: (message) =>
           cubit(context).toggleSpeech(message.id, message.text),

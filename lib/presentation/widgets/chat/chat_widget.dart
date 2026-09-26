@@ -31,6 +31,10 @@ class ChatWidget extends StatefulWidget {
   /// ли оно. Плеер рисуется у того сообщения, чей id здесь.
   final SpeechPlayback? playback;
 
+  /// Что известно об озвучке каждого сообщения. Из этого рисуется полоса
+  /// у ответов, которые сейчас молчат.
+  final Map<String, SpeechPlayback> speechClips;
+
   /// Позиция воспроизведения отдельным потоком: её тики перерисовывают
   /// только полоску плеера, а не список сообщений.
   final Stream<Duration>? positionStream;
@@ -57,6 +61,7 @@ class ChatWidget extends StatefulWidget {
     required this.onUpdateAudio,
     this.topInset = 0,
     this.playback,
+    this.speechClips = const {},
     this.positionStream,
     this.onMessageTap,
     this.onSeek,
@@ -142,16 +147,21 @@ class _ChatWidgetState extends State<ChatWidget> {
         (rowWidth - chrome).clamp(160.0, 320.0).toDouble();
 
     if (message is types.TextMessage) {
+      // Не «звучит», а «выбрано»: озвучка может и молчать, оставаясь на
+      // этом сообщении.
+      final isCurrent = widget.playback?.messageId == message.id;
+
       bubble = TextMessageItem(
         isSentByMe: isSentByMe,
         message: message,
         messageWidth: contentWidth(TextMessageItem.chrome).round(),
-        // Плеер принадлежит только тому сообщению, которое сейчас звучит;
-        // у остальных он в покое и показывает одну кнопку.
-        playback: widget.playback?.messageId == message.id
-            ? widget.playback
-            : null,
-        positionStream: widget.positionStream,
+        // Звучать может только одно сообщение; остальным отдаём то, что о
+        // их звуке уже известно, — чтобы полоса с огибающей осталась на
+        // месте и переслушать их можно было с перемоткой.
+        playback: isCurrent ? widget.playback : widget.speechClips[message.id],
+        // Позицию слышит только то сообщение, которое звучит. Молчащая
+        // полоса обязана стоять на нуле, а не повторять чужой отсчёт.
+        positionStream: isCurrent ? widget.positionStream : null,
         // Ответы читаются вслух, свои сообщения — нет.
         onTap: isSentByMe ? null : () => widget.onMessageTap?.call(message),
         onSeek: widget.onSeek,

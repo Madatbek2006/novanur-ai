@@ -31,6 +31,7 @@
   "change_password_title": "Parolni o‘zgartirish",
   "chat_error_no_connection": "Server bilan bog'lanib bo'lmadi. Ulanishni tekshirib, qayta urinib ko'ring.",
   "chat_error_retry": "Qayta urinish",
+  "chat_message_hint": "Xabar...",
   "chat_reconnecting": "Ulanish uzildi, qayta ulanmoqda",
   "chat_repeat_answer": "Javobni takrorlash",
   "chat_speech_loading": "Tayyorlanmoqda",

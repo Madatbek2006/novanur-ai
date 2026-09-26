@@ -31,6 +31,7 @@
   "change_password_title": "Cмена пароля",
   "chat_error_no_connection": "Не удалось связаться с сервером. Проверьте подключение и попробуйте снова.",
   "chat_error_retry": "Повторить",
+  "chat_message_hint": "Сообщение...",
   "chat_reconnecting": "Соединение прервано, восстанавливаю",
   "chat_repeat_answer": "Повторить ответ",
   "chat_speech_loading": "Готовится",

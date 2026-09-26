@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:nurnova_ai/presentation/support/extensions/color_extension.dart';
 import 'package:nurnova_ai/presentation/support/theme/app_glass.dart';
 import 'package:nurnova_ai/presentation/widgets/dialog/speech_to_text_dialog.dart';
+import 'package:nurnova_ai/core/gen/localization/strings.dart';
 
 /// Height of the input pill and the send button. Everything else in the
 /// composer is derived from it, so the bar stays compact.
@@ -109,7 +110,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
                   ),
                   decoration: InputDecoration(
                     isDense: true,
-                    hintText: "Сообщение...",
+                    hintText: Strings.chatMessageHint,
                     hintStyle: TextStyle(
                       color: context.textPrimary.withOpacity(0.45),
                       fontSize: 15,

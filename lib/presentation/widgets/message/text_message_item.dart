@@ -26,7 +26,8 @@ class TextMessageItem extends StatelessWidget {
   final int messageWidth;
   final Function(Message message) onClickRepliedMsg;
 
-  /// Состояние озвучки этого сообщения. null — оно сейчас не звучит.
+  /// Что известно об озвучке этого сообщения: звучит ли оно, синтезируется
+  /// или просто лежит готовым. null — про звук неизвестно ничего.
   final SpeechPlayback? playback;
 
   /// Позиция воспроизведения. Приходит отдельным потоком, чтобы её тики
@@ -103,10 +104,13 @@ class TextMessageItem extends StatelessWidget {
             if (onTap != null) ...[
               const SizedBox(height: 4),
               SpeechPlayerBar(
+                // Запасной вариант — для ответа, который ещё ни разу не
+                // звучал: о его звуке пока ничего не известно, поэтому одна
+                // кнопка без полосы.
                 playback: playback ??
                     SpeechPlayback(
                       messageId: message.id,
-                      status: SpeechStatus.paused,
+                      status: SpeechStatus.idle,
                     ),
                 positionStream: positionStream ?? const Stream<Duration>.empty(),
                 onToggle: onTap!,
