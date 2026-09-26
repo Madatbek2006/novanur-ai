@@ -34,6 +34,9 @@ class PhotoAnalysisService {
       options: Options(
         headers: {
           'User-Agent': 'insomnia/11.4.0', // если нужно
+          // Options здесь перекрывает общие заголовки Dio, поэтому
+          // обход заставки ngrok приходится повторить и тут.
+          'ngrok-skip-browser-warning': 'true',
         },
       ),
     );

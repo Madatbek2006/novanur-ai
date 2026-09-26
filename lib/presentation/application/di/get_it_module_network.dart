@@ -159,6 +159,10 @@ Dio provideDio({List<Interceptor> interceptors = const []}) {
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json; charset=UTF-8',
+      // Бесплатный ngrok показывает браузерную заставку вместо ответа,
+      // если не сказать ему, что клиент не браузер. На обычном сервере
+      // заголовок просто игнорируется.
+      'ngrok-skip-browser-warning': 'true',
     },
   );
   dio.options = options

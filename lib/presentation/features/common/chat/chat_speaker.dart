@@ -1,23 +1,29 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:nurnova_ai/core/audio/wav_peaks.dart';
 import 'package:nurnova_ai/data/datasource/preference/speech_rate_preferences.dart';
 import 'package:nurnova_ai/data/repositories/speech_rate_repository.dart';
 import 'package:nurnova_ai/data/repositories/speech_repository.dart';
+import 'package:nurnova_ai/domain/models/chat/speech_playback.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
-/// Читает вслух ответы ассистента.
+/// Читает вслух ответы ассистента и управляет их воспроизведением.
 ///
-/// Сначала пробуем движок самого телефона: это мгновенно, офлайн и бесплатно.
-/// Но полагаться на него вслепую нельзя — движок может заявлять язык, не имея
+/// Звук приходит двумя разными путями, и это определяет, что можно показать
+/// на экране. Русский и английский читает движок телефона — мгновенно, офлайн
+/// и бесплатно, но он говорит прямо в динамик: файла нет, а значит нет ни
+/// длительности, ни позиции, ни перемотки. Узбекский синтезирует бэкенд и
+/// присылает WAV — вот у него есть всё, включая огибающую для столбиков.
+///
+/// Полагаться на движок вслепую нельзя: он может заявлять язык, не имея
 /// скачанного голоса, и тогда `speak` молча ничего не произносит. Поэтому
-/// перед чтением проверяем голос, а если его нет — просим озвучку у бэкенда.
-///
-/// Узбекского в движках телефонов нет вовсе, так что он идёт на сервер сразу.
+/// голос проверяется, а при его отсутствии озвучку берём с сервера.
 class ChatSpeaker {
   ChatSpeaker(this._speech, this._speechRate) {
     // Экран показывает, что именно читается сейчас, поэтому о завершении
@@ -31,8 +37,13 @@ class ChatSpeaker {
     });
   }
 
-  /// Вызывается, когда чтение закончилось само или было прервано.
-  VoidCallback? onFinished;
+  /// Состояние озвучки изменилось. null означает тишину.
+  void Function(SpeechPlayback? playback)? onPlayback;
+
+  /// Позиция воспроизведения. Идёт отдельным потоком мимо состояния чата:
+  /// она тикает десятки раз в секунду, а состояние сравнивается целиком,
+  /// так что каждый тик перерисовывал бы весь список сообщений.
+  Stream<Duration> get positionStream => _player.positionStream;
 
   /// Языки, которые телефон в принципе умеет читать, и их коды для движка.
   static const _deviceVoices = {'ru': 'ru-RU', 'en': 'en-US'};
@@ -42,24 +53,50 @@ class ChatSpeaker {
   /// и читать это надо по-английски.
   static const _serverLanguages = {'ru': 'ru', 'uz': 'uz'};
 
+  /// Сколько столбиков рисуем. Больше в ширину пузыря всё равно не влезает.
+  static const _waveformBars = 48;
+
   final SpeechRepository _speech;
   final SpeechRateRepository _speechRate;
   final FlutterTts _tts = FlutterTts();
   final AudioPlayer _player = AudioPlayer();
   final Logger _logger = Logger();
 
+  /// Огибающие уже озвученных сообщений: повторное прослушивание не должно
+  /// заново считать их из файла.
+  final Map<String, List<double>> _peaks = {};
+
+  /// Файлы, синтезированные за этот сеанс, — чтобы подчистить за собой.
+  final Set<String> _files = {};
+
+  SpeechPlayback? _playback;
+
   /// Читаем ли прямо сейчас. Нужен, чтобы обработчики завершения от
   /// прерванного чтения не гасили то, которое только началось: speak()
   /// сначала останавливает предыдущее, и движок на это отвечает отменой.
   bool _speaking = false;
 
+  void _emit(SpeechPlayback? playback) {
+    _playback = playback;
+    onPlayback?.call(playback);
+  }
+
   void _finish() {
     if (!_speaking) return;
     _speaking = false;
-    onFinished?.call();
+    _emit(null);
   }
 
-  Future<void> speak(String text, String languageCode) async {
+  /// Проговаривает служебный текст — например, сообщение об ошибке.
+  ///
+  /// Плеер для него не появляется: это не ответ ассистента, переслушивать
+  /// и перематывать там нечего.
+  Future<void> announce(String text, String languageCode) =>
+      speak(null, text, languageCode);
+
+  /// Начинает читать сообщение заново — с начала.
+  /// [messageId] равен null для служебных объявлений, у которых нет пузыря.
+  Future<void> speak(String? messageId, String text, String languageCode) async {
     if (text.trim().isEmpty) return;
 
     _speaking = false;
@@ -71,11 +108,15 @@ class ChatSpeaker {
       _speaking = true;
 
       if (voice != null && await _isVoiceUsable(voice)) {
-        await _speakOnDevice(text, voice);
+        await _speakOnDevice(messageId, text, voice);
         return;
       }
 
-      await _speakFromServer(text, _serverLanguages[languageCode] ?? 'en');
+      await _speakFromServer(
+        messageId,
+        text,
+        _serverLanguages[languageCode] ?? 'en',
+      );
     } catch (error) {
       // Молчащая озвучка не должна ломать сам чат.
       _logger.e("TTS=> не удалось озвучить: $error");
@@ -105,37 +146,134 @@ class ChatSpeaker {
     }
   }
 
-  Future<void> _speakOnDevice(String text, String voice) async {
+  Future<void> _speakOnDevice(String? messageId, String text, String voice) async {
+    // У движка нет ни файла, ни длительности — перематывать нечего,
+    // поэтому экран покажет для него одну кнопку без полосы.
+    if (messageId != null) {
+      _emit(SpeechPlayback(
+        messageId: messageId,
+        status: SpeechStatus.playing,
+      ));
+    }
+
     await _tts.setLanguage(voice);
     await _tts.setSpeechRate(_speechRate.getSpeechRate());
     await _tts.speak(text);
   }
 
-  Future<void> _speakFromServer(String text, String languageCode) async {
-    final audio = await _speech.synthesize(text: text, lang: languageCode);
-    if (audio.isEmpty) return;
+  Future<void> _speakFromServer(
+    String? messageId,
+    String text,
+    String languageCode,
+  ) async {
+    // Служебное объявление не кэшируем: оно одноразовое.
+    final cached = messageId == null ? null : await _cachedFile(messageId);
 
-    // just_audio читает источник с диска, поэтому кладём WAV во временный файл.
-    final directory = await getTemporaryDirectory();
-    final file = File('${directory.path}/chat_speech.wav');
-    await file.writeAsBytes(audio, flush: true);
+    if (cached == null && messageId != null) {
+      // Синтез занимает заметное время, и пользователь должен видеть, что
+      // происходит, а не гадать, почему тишина.
+      _emit(SpeechPlayback(
+        messageId: messageId,
+        status: SpeechStatus.loading,
+        seekable: true,
+      ));
+    }
 
-    await _player.setFilePath(file.path);
+    final file =
+        cached ?? await _synthesizeToFile(messageId, text, languageCode);
+    if (file == null) {
+      // Выйти молча нельзя: без этого состояние залипнет на «читается»,
+      // и пузырь навсегда останется с кнопкой «стоп».
+      _finish();
+      return;
+    }
+
+    final duration = await _player.setFilePath(file.path);
+
     // Серверная озвучка идёт готовым файлом, поэтому выбранную скорость
     // применяем к воспроизведению — иначе настройка работала бы только
     // для языков, которые читает сам телефон.
     await _player.setSpeed(
       _speechRate.getSpeechRate() / SpeechRatePreferences.normal,
     );
+
+    if (!_speaking) return;
+
+    if (messageId != null) {
+      _emit(SpeechPlayback(
+        messageId: messageId,
+        status: SpeechStatus.playing,
+        seekable: true,
+        duration: duration ?? Duration.zero,
+        peaks: _peaks[messageId] ?? const <double>[],
+      ));
+    }
+
     // play() ждёт конца воспроизведения, а вызывающему ждать незачем.
     unawaited(_player.play());
+  }
+
+  /// Уже синтезированный файл этого сообщения, если он есть: повторное
+  /// прослушивание не должно снова ходить в сеть.
+  Future<File?> _cachedFile(String messageId) async {
+    final file = File(await _pathFor(messageId));
+    return await file.exists() ? file : null;
+  }
+
+  Future<File?> _synthesizeToFile(
+    String? messageId,
+    String text,
+    String languageCode,
+  ) async {
+    final Uint8List audio =
+        await _speech.synthesize(text: text, lang: languageCode);
+    if (audio.isEmpty) return null;
+
+    final file = File(await _pathFor(messageId ?? 'announcement'));
+    await file.writeAsBytes(audio, flush: true);
+    _files.add(file.path);
+
+    // Считаем огибающую один раз, при получении: на повторе она берётся
+    // из кэша, а на чужих форматах вернётся пустой список, и полоса
+    // нарисуется без столбиков.
+    if (messageId != null) {
+      _peaks[messageId] = peaksFromWav(audio, bars: _waveformBars);
+    }
+
+    return file;
+  }
+
+  Future<String> _pathFor(String messageId) async {
+    final directory = await getTemporaryDirectory();
+    // Файл на сообщение, а не один общий: иначе новый ответ затирает
+    // предыдущий и переслушать его уже нельзя.
+    return '${directory.path}/chat_speech_$messageId.wav';
+  }
+
+  Future<void> pause() async {
+    if (_playback?.status != SpeechStatus.playing || !_playback!.seekable) {
+      return;
+    }
+    await _player.pause();
+    _emit(_playback!.copyWith(status: SpeechStatus.paused));
+  }
+
+  Future<void> resume() async {
+    if (_playback?.status != SpeechStatus.paused) return;
+    _emit(_playback!.copyWith(status: SpeechStatus.playing));
+    unawaited(_player.play());
+  }
+
+  Future<void> seek(Duration position) async {
+    if (_playback?.seekable != true) return;
+    await _player.seek(position);
   }
 
   Future<void> stop() async {
     final wasSpeaking = _speaking;
     _speaking = false;
     await _silence();
-    if (wasSpeaking) onFinished?.call();
+    if (wasSpeaking) _emit(null);
   }
 
   /// Глушит оба источника, никого не оповещая.
@@ -147,5 +285,17 @@ class ChatSpeaker {
   Future<void> dispose() async {
     await stop();
     await _player.dispose();
+
+    // Временные файлы сеанса за собой убираем: их размер — сотни килобайт
+    // на сообщение, а пережить сеанс им незачем.
+    for (final path in _files) {
+      try {
+        await File(path).delete();
+      } catch (_) {
+        // Файл мог исчезнуть сам — системе виднее.
+      }
+    }
+    _files.clear();
+    _peaks.clear();
   }
 }

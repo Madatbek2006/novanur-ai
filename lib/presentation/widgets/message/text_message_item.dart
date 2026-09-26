@@ -1,6 +1,8 @@
 import 'package:nurnova_ai/core/extensions/text_extensions.dart';
 import 'package:nurnova_ai/core/gen/localization/strings.dart';
+import 'package:nurnova_ai/domain/models/chat/speech_playback.dart';
 import 'package:nurnova_ai/presentation/support/extensions/color_extension.dart';
+import 'package:nurnova_ai/presentation/widgets/message/speech_player_bar.dart';
 import 'package:nurnova_ai/presentation/widgets/card/custom_card.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -24,12 +26,19 @@ class TextMessageItem extends StatelessWidget {
   final int messageWidth;
   final Function(Message message) onClickRepliedMsg;
 
-  /// Сообщение читается вслух прямо сейчас.
-  final bool isSpeaking;
+  /// Состояние озвучки этого сообщения. null — оно сейчас не звучит.
+  final SpeechPlayback? playback;
 
-  /// Нажатие по пузырю: повторить чтение или остановить его.
+  /// Позиция воспроизведения. Приходит отдельным потоком, чтобы её тики
+  /// перерисовывали только полоску, а не весь список сообщений.
+  final Stream<Duration>? positionStream;
+
+  /// Нажатие по пузырю или по кнопке плеера.
   /// null — если сообщение не озвучивается (свои реплики).
   final VoidCallback? onTap;
+
+  /// Перемотка. Работает только там, где звук — это файл.
+  final ValueChanged<Duration>? onSeek;
 
   const TextMessageItem({
     super.key,
@@ -37,9 +46,13 @@ class TextMessageItem extends StatelessWidget {
     required this.message,
     required this.messageWidth,
     required this.onClickRepliedMsg,
-    this.isSpeaking = false,
+    this.playback,
+    this.positionStream,
     this.onTap,
+    this.onSeek,
   });
+
+  bool get _isSpeaking => playback?.status == SpeechStatus.playing;
 
   @override
   Widget build(BuildContext context) {
@@ -60,9 +73,13 @@ class TextMessageItem extends StatelessWidget {
           color: isSentByMe ? context.primaryLight : context.borderStroke,
           child: ConstrainedBox(
             constraints: BoxConstraints(maxWidth: messageWidth.toDouble()),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
             // Timestamp rides on the last line's baseline instead of taking a
             // row of its own — that alone was costing every bubble ~16px.
-            child: Row(
+            Row(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
@@ -81,14 +98,23 @@ class TextMessageItem extends StatelessWidget {
                       .w(500)
                       .c(onBubble.withOpacity(0.7)),
                 ],
-                if (onTap != null) ...[
-                  const SizedBox(width: 6),
-                  Icon(
-                    isSpeaking ? Icons.stop_rounded : Icons.volume_up_rounded,
-                    size: 16,
-                    color: onBubble.withOpacity(0.7),
-                  ),
-                ],
+              ],
+            ),
+            if (onTap != null) ...[
+              const SizedBox(height: 4),
+              SpeechPlayerBar(
+                playback: playback ??
+                    SpeechPlayback(
+                      messageId: message.id,
+                      status: SpeechStatus.paused,
+                    ),
+                positionStream: positionStream ?? const Stream<Duration>.empty(),
+                onToggle: onTap!,
+                onSeek: onSeek ?? (_) {},
+                color: onBubble,
+                maxWidth: messageWidth.toDouble(),
+              ),
+            ],
               ],
             ),
           ),
@@ -105,7 +131,7 @@ class TextMessageItem extends StatelessWidget {
           // а скринридер объявит, что именно произойдёт по нажатию.
           Semantics(
             button: true,
-            label: isSpeaking
+            label: _isSpeaking
                 ? Strings.chatStopSpeaking
                 : Strings.chatRepeatAnswer,
             child: GestureDetector(

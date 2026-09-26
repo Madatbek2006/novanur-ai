@@ -1,4 +1,5 @@
 import 'package:nurnova_ai/core/gen/localization/strings.dart';
+import 'package:nurnova_ai/domain/models/chat/speech_playback.dart';
 import 'package:nurnova_ai/presentation/widgets/card/custom_card.dart';
 import 'package:nurnova_ai/presentation/widgets/chat/chat_text_field.dart';
 import 'package:nurnova_ai/presentation/widgets/message/image_message_widget.dart';
@@ -26,12 +27,19 @@ class ChatWidget extends StatefulWidget {
   /// translucent app bar that the list scrolls underneath.
   final double topInset;
 
-  /// Сообщение, которое читается вслух прямо сейчас: его пузырь предлагает
-  /// остановить чтение, остальные — повторить.
-  final String? speakingMessageId;
+  /// Что сейчас с озвучкой: какое сообщение, на какой стадии и перематывается
+  /// ли оно. Плеер рисуется у того сообщения, чей id здесь.
+  final SpeechPlayback? playback;
+
+  /// Позиция воспроизведения отдельным потоком: её тики перерисовывают
+  /// только полоску плеера, а не список сообщений.
+  final Stream<Duration>? positionStream;
 
   /// Нажатие на ответ ассистента — переключает чтение вслух.
   final Function(types.TextMessage)? onMessageTap;
+
+  /// Перемотка внутри ответа.
+  final ValueChanged<Duration>? onSeek;
 
   /// Текст ошибки. Пока он есть, над полем ввода висит полоса с повтором.
   final String? errorText;
@@ -48,8 +56,10 @@ class ChatWidget extends StatefulWidget {
     required this.isSendingRequest,
     required this.onUpdateAudio,
     this.topInset = 0,
-    this.speakingMessageId,
+    this.playback,
+    this.positionStream,
     this.onMessageTap,
+    this.onSeek,
     this.errorText,
     this.onRetry,
   });
@@ -136,9 +146,15 @@ class _ChatWidgetState extends State<ChatWidget> {
         isSentByMe: isSentByMe,
         message: message,
         messageWidth: contentWidth(TextMessageItem.chrome).round(),
-        isSpeaking: widget.speakingMessageId == message.id,
+        // Плеер принадлежит только тому сообщению, которое сейчас звучит;
+        // у остальных он в покое и показывает одну кнопку.
+        playback: widget.playback?.messageId == message.id
+            ? widget.playback
+            : null,
+        positionStream: widget.positionStream,
         // Ответы читаются вслух, свои сообщения — нет.
         onTap: isSentByMe ? null : () => widget.onMessageTap?.call(message),
+        onSeek: widget.onSeek,
         onClickRepliedMsg: (msg) {
           scrollToMessage(msg);
         },

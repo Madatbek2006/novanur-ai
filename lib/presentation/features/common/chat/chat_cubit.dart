@@ -9,6 +9,7 @@ import 'package:nurnova_ai/data/datasource/network/constants/constants.dart';
 import 'package:nurnova_ai/data/repositories/photo_analysis_repository.dart';
 import 'package:nurnova_ai/presentation/features/common/chat/chat_speaker.dart';
 import 'package:nurnova_ai/domain/models/chat/sms.dart';
+import 'package:nurnova_ai/domain/models/chat/speech_playback.dart';
 import 'package:nurnova_ai/presentation/support/cubit/base_cubit.dart';
 import 'package:nurnova_ai/presentation/support/extensions/extension_message_exts.dart';
 import 'package:nurnova_ai/utils/extension/image.dart';
@@ -30,8 +31,8 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
   ChatCubit(this._photoAnalysisRepository, this._speaker) : super(ChatState()){
     _setupAudio();
     _player.setVolume(0.3);
-    _speaker.onFinished = () =>
-        updateState((state) => state.copyWith(speakingMessageId: null));
+    _speaker.onPlayback = (playback) =>
+        updateState((state) => state.copyWith(playback: playback));
   }
   WebSocketChannel? channel;
   final AudioPlayer _player = AudioPlayer();
@@ -181,12 +182,13 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
                     )),
                     // ответ дошёл — значит связь жива
                     error: null,
-                    speakingMessageId: id,
                   ));
 
               stopProgress();
               _reconnectAttempts = 0;
-              _speaker.speak(text, _languageCode);
+              // Состояние озвучки дальше ведёт сам спикер: он знает,
+              // синтезируется звук или уже играет.
+              _speaker.speak(id, text, _languageCode);
             }
           },
           onError: (error) {
@@ -210,22 +212,47 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
       logger.e("TTT=> Не удалось подключиться к WebSocket: $e");
     }
   }
-  /// Читает ответ заново, а если он читается прямо сейчас — останавливает.
-  /// Одна и та же кнопка на пузыре: ответ легко прослушать ещё раз или
-  /// прервать, не дожидаясь конца длинного описания.
+  /// Одна кнопка на все состояния озвучки.
+  ///
+  /// Для серверного звука это пауза и продолжение — файл никуда не делся,
+  /// возвращаться к началу незачем. Для движка телефона паузы не существует,
+  /// поэтому повторное нажатие просто обрывает чтение.
   void toggleSpeech(String messageId, String text) {
-    if (states.speakingMessageId == messageId) {
-      stopSpeaking();
-      return;
+    final playback = states.playback;
+
+    if (playback?.messageId == messageId) {
+      switch (playback!.status) {
+        case SpeechStatus.playing:
+          if (playback.seekable) {
+            _speaker.pause();
+          } else {
+            stopSpeaking();
+          }
+          return;
+        case SpeechStatus.paused:
+          _speaker.resume();
+          return;
+        case SpeechStatus.loading:
+          // Звук ещё синтезируется — нажатие отменяет ожидание.
+          stopSpeaking();
+          return;
+      }
     }
-    updateState((state) => state.copyWith(speakingMessageId: messageId));
-    _speaker.speak(text, _languageCode);
+
+    _speaker.speak(messageId, text, _languageCode);
   }
+
+  /// Перемотка. Работает только там, где звук — это файл.
+  void seekSpeech(Duration position) => _speaker.seek(position);
+
+  /// Позиция воспроизведения. Отдаётся потоком, а не через состояние:
+  /// иначе каждый её тик перерисовывал бы весь список сообщений.
+  Stream<Duration> get speechPositionStream => _speaker.positionStream;
 
   /// Обрывает чтение вслух — например, когда уходят с экрана.
   void stopSpeaking() {
     _speaker.stop();
-    updateState((state) => state.copyWith(speakingMessageId: null));
+    updateState((state) => state.copyWith(playback: null));
   }
 
   /// Повторяет последний запрос после ошибки. Если связь до этого оборвалась
@@ -247,7 +274,7 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
   void _failWith(String message) {
     stopProgress();
     updateState((state) => state.copyWith(error: message));
-    _speaker.speak(message, _languageCode);
+    _speaker.announce(message, _languageCode);
   }
 
   /// Сокет рвётся сам по себе — на переключении сети, при уходе в фон.

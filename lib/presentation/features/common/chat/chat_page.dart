@@ -70,9 +70,11 @@ class ChatPage
       messages: state.messages,
       errorText: state.error,
       onRetry: () => cubit(context).retry(),
-      speakingMessageId: state.speakingMessageId,
+      playback: state.playback,
+      positionStream: cubit(context).speechPositionStream,
       onMessageTap: (message) =>
           cubit(context).toggleSpeech(message.id, message.text),
+      onSeek: (position) => cubit(context).seekSpeech(position),
       onSend: (sms) {
         cubit(context).sendSMS(sms, local);
       },
