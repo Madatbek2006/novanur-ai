@@ -145,6 +145,10 @@ class SpeechPlayerBar extends StatelessWidget {
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
                 color: color.withOpacity(0.7),
+                // Моноширинные цифры. В обычном начертании «1» уже «0»,
+                // поэтому ширина часов менялась на каждой секунде и двигала
+                // волну, которая стоит рядом в Expanded.
+                fontFeatures: const [FontFeature.tabularFigures()],
               ),
             ),
           ],

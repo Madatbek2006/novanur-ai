@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:nurnova_ai/presentation/widgets/image/rounded_cached_network_image_widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -17,6 +18,18 @@ class AttachedFileGridWidget extends StatefulWidget {
 }
 
 class _AttachedFileGridWidgetState extends State<AttachedFileGridWidget> {
+  /// Раскодированные картинки этого пузыря.
+  ///
+  /// base64Decode на каждой перерисовке отдаёт новый массив байт, а
+  /// MemoryImage сравнивает картинки по самому массиву, а не по его
+  /// содержимому. Кэш от этого промахивался, картинка декодировалась заново
+  /// и на кадр пропадала — пузырь мигал от любого чужого обновления экрана,
+  /// вплоть до нажатия play на плеере соседнего сообщения.
+  final Map<String, Uint8List> _decoded = {};
+
+  Uint8List _bytes(String base64) =>
+      _decoded.putIfAbsent(base64, () => base64Decode(base64));
+
   @override
   Widget build(BuildContext context) {
     var size=widget.size-16;
@@ -156,10 +169,12 @@ class _AttachedFileGridWidgetState extends State<AttachedFileGridWidget> {
     return (image is String)?ClipRRect(
       borderRadius: BorderRadius.circular(4),
       child: Image.memory(
-        base64Decode(image),
+        _bytes(image),
         fit: BoxFit.cover,
         height: height,
         width: width,
+        // Пока новый кадр декодируется, показываем предыдущий, а не пустоту.
+        gaplessPlayback: true,
       ),
     ):(image is String?ClipRRect(
         borderRadius: BorderRadius.circular(4),
