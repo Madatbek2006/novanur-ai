@@ -62,6 +62,15 @@ android {
     buildTypes {
         getByName("release") {
             signingConfig = signingConfigs.getByName("release")
+
+            // R8 для релиза включён и так, но ресурсы он не трогает, пока
+            // об этом не попросишь явно.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
     applicationVariants.all {
@@ -71,8 +80,17 @@ android {
             val buildTypeName = variant.buildType.name
             val versionName = variant.versionName
 
+            // Имя обязано включать архитектуру. Без этого сборка с
+            // --split-per-abi пишет все варианты в один файл, задачи упаковки
+            // дерутся за него и сборка падает с "Failed to create ...apk".
+            val abi = output.filters
+                .firstOrNull { it.filterType == "ABI" }
+                ?.identifier
+                ?.let { "-$it" }
+                .orEmpty()
+
             if (output.outputFile.name.endsWith(".apk")) {
-                output.outputFileName = "NurNova AI $buildTypeName-$versionName.apk"
+                output.outputFileName = "NurNova AI $buildTypeName-$versionName$abi.apk"
             } else if (output.outputFile.name.endsWith(".aab")) {
                 output.outputFileName = "NurNova AI $buildTypeName-$versionName.aab"
             }
@@ -86,11 +104,10 @@ flutter {
 
 dependencies {
     implementation("com.google.firebase:firebase-messaging:23.4.1")
+    // Только латиница: приложение просит TextRecognitionScript.latin и
+    // никогда ничего другого (scan_text_page.dart). Пакеты китайского,
+    // японского, корейского и деванагари лежали мёртвым грузом.
     implementation("com.google.mlkit:text-recognition:16.0.0")
-    implementation("com.google.mlkit:text-recognition-chinese:16.0.0")
-    implementation("com.google.mlkit:text-recognition-japanese:16.0.0")
-    implementation("com.google.mlkit:text-recognition-korean:16.0.0")
-    implementation("com.google.mlkit:text-recognition-devanagari:16.0.0")
     implementation("androidx.core:core:1.12.0")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }
