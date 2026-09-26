@@ -15,11 +15,14 @@ import 'package:path_provider/path_provider.dart';
 
 /// Читает вслух ответы ассистента и управляет их воспроизведением.
 ///
-/// Звук приходит двумя разными путями, и это определяет, что можно показать
-/// на экране. Русский и английский читает движок телефона — мгновенно, офлайн
-/// и бесплатно, но он говорит прямо в динамик: файла нет, а значит нет ни
-/// длительности, ни позиции, ни перемотки. Узбекский синтезирует бэкенд и
-/// присылает WAV — вот у него есть всё, включая огибающую для столбиков.
+/// Звук приходит двумя путями, но на экране выглядит одинаково. Русский и
+/// английский записывает в файл движок телефона — офлайн и бесплатно.
+/// Узбекский синтезирует бэкенд и присылает WAV: своего голоса для него в
+/// телефонах нет. И там и там на выходе файл, а значит есть длительность,
+/// огибающая и перемотка.
+///
+/// Прямо в динамик читаем только там, где файла добиться не вышло: не всякий
+/// движок умеет писать, а остаться без озвучки хуже, чем без полосы.
 ///
 /// Полагаться на движок вслепую нельзя: он может заявлять язык, не имея
 /// скачанного голоса, и тогда `speak` молча ничего не произносит. Поэтому
@@ -83,22 +86,31 @@ class ChatSpeaker {
   /// сначала останавливает предыдущее, и движок на это отвечает отменой.
   bool _speaking = false;
 
+  /// Идёт запись речи в файл.
+  ///
+  /// Плагин зовёт один и тот же обработчик и на конец чтения вслух, и на
+  /// конец записи в файл (synth.onComplete там ведёт в completionHandler).
+  /// Для нас это противоположные события: запись только закончилась, играть
+  /// ещё даже не начали. Без этого флага озвучка гасла ровно в тот момент,
+  /// когда файл был готов, и на экране оставалась полоса без волны и с 00:00.
+  bool _rendering = false;
+
   void _emit(SpeechPlayback? playback) {
     _playback = playback;
     onPlayback?.call(playback);
   }
 
   void _finish() {
-    if (!_speaking) return;
+    if (_rendering || !_speaking) return;
     _speaking = false;
     _emit(_rested(_playback));
   }
 
   /// Переводит озвучку в молчаливое состояние, сохраняя полосу.
   ///
-  /// У движка телефона сохранять нечего: файла нет, перематывать нечего,
-  /// поэтому для него по-прежнему возвращается тишина и остаётся одна
-  /// кнопка — это честнее, чем рисовать мёртвую полосу.
+  /// Там, где файла нет — движок читал напрямую в динамик, — сохранять
+  /// нечего: возвращается тишина и остаётся одна кнопка. Это честнее,
+  /// чем рисовать мёртвую полосу.
   SpeechPlayback? _rested(SpeechPlayback? playback) {
     if (playback == null || !playback.seekable) return null;
 
@@ -168,19 +180,112 @@ class ChatSpeaker {
     }
   }
 
+  /// Читает ответ голосом телефона — через файл, а не прямо в динамик.
+  ///
+  /// Движок умеет и то и другое, но говорящий в динамик не отдаёт ни
+  /// длительности, ни позиции: под русским и английским ответом оставалась
+  /// одна кнопка, без полосы и перемотки, тогда как под узбекским была
+  /// полноценная волна. Записанный файл выравнивает их и при этом не стоит
+  /// ни трафика, ни ожидания сети — всё считает сам телефон.
   Future<void> _speakOnDevice(String? messageId, String text, String voice) async {
-    // У движка нет ни файла, ни длительности — перематывать нечего,
-    // поэтому экран покажет для него одну кнопку без полосы.
+    await _tts.setLanguage(voice);
+
+    if (messageId != null) {
+      final file =
+          await _cachedFile(messageId) ?? await _renderOnDevice(messageId, text);
+      if (file != null) {
+        await _playFile(messageId, file);
+        return;
+      }
+    }
+
+    // Либо это служебное объявление без пузыря, либо движок не смог записать
+    // файл. Читаем прямо в динамик, как раньше: полосы не будет, но ответ
+    // прозвучит — молчать здесь хуже всего.
+    await _tts.setSpeechRate(_speechRate.getSpeechRate());
     if (messageId != null) {
       _emit(SpeechPlayback(
         messageId: messageId,
         status: SpeechStatus.playing,
       ));
     }
-
-    await _tts.setLanguage(voice);
-    await _tts.setSpeechRate(_speechRate.getSpeechRate());
     await _tts.speak(text);
+  }
+
+  /// Просит движок записать речь в файл. null — если он этого не умеет.
+  Future<File?> _renderOnDevice(String messageId, String text) async {
+    // На длинном ответе запись занимает заметное время, и пользователь
+    // должен видеть работу, а не гадать, почему тишина.
+    _emit(SpeechPlayback(
+      messageId: messageId,
+      status: SpeechStatus.loading,
+      seekable: true,
+    ));
+
+    _rendering = true;
+    try {
+      // Без этого synthesizeToFile возвращается раньше, чем файл дописан,
+      // и открывать было бы нечего.
+      await _tts.awaitSynthCompletion(true);
+
+      // Скорость в файл не запекаем — её применит плеер. Иначе смена
+      // настройки требовала бы синтезировать всё заново.
+      await _tts.setSpeechRate(SpeechRatePreferences.normal);
+
+      final path = await _pathFor(messageId);
+      await _tts.synthesizeToFile(text, path, true);
+
+      final file = File(path);
+      if (!await file.exists() || await file.length() == 0) {
+        _logger.w("TTS=> движок не записал файл, читаем вслух напрямую");
+        return null;
+      }
+
+      _files.add(path);
+      // Огибающую считаем один раз, при записи: на повторе берётся из кэша.
+      _peaks[messageId] =
+          peaksFromWav(await file.readAsBytes(), bars: _waveformBars);
+
+      return file;
+    } catch (error) {
+      _logger.w("TTS=> запись в файл не удалась ($error), читаем вслух напрямую");
+      return null;
+    } finally {
+      _rendering = false;
+    }
+  }
+
+  /// Проигрывает готовый файл — всё равно, записал его движок или прислал
+  /// сервер. Отсюда и берутся полоса, перемотка и часы.
+  Future<void> _playFile(String? messageId, File file) async {
+    final duration = await _player.setFilePath(file.path);
+
+    // Скорость применяем к воспроизведению: тогда её смена слышна сразу и
+    // не требует записывать файл заново.
+    await _player.setSpeed(
+      _speechRate.getSpeechRate() / SpeechRatePreferences.normal,
+    );
+
+    if (!_speaking) return;
+
+    if (messageId != null) {
+      final playing = SpeechPlayback(
+        messageId: messageId,
+        status: SpeechStatus.playing,
+        seekable: true,
+        duration: duration ?? Duration.zero,
+        peaks: _peaks[messageId] ?? const <double>[],
+      );
+
+      // Запоминаем сразу, а не по окончании: пользователь может переключиться
+      // на другой ответ, не дослушав, и тогда конца воспроизведения не будет
+      // вовсе — а полоса у этого сообщения остаться обязана.
+      _clips[messageId] = playing.copyWith(status: SpeechStatus.idle);
+      _emit(playing);
+    }
+
+    // play() ждёт конца воспроизведения, а вызывающему ждать незачем.
+    unawaited(_player.play());
   }
 
   Future<void> _speakFromServer(
@@ -210,35 +315,7 @@ class ChatSpeaker {
       return;
     }
 
-    final duration = await _player.setFilePath(file.path);
-
-    // Серверная озвучка идёт готовым файлом, поэтому выбранную скорость
-    // применяем к воспроизведению — иначе настройка работала бы только
-    // для языков, которые читает сам телефон.
-    await _player.setSpeed(
-      _speechRate.getSpeechRate() / SpeechRatePreferences.normal,
-    );
-
-    if (!_speaking) return;
-
-    if (messageId != null) {
-      final playing = SpeechPlayback(
-        messageId: messageId,
-        status: SpeechStatus.playing,
-        seekable: true,
-        duration: duration ?? Duration.zero,
-        peaks: _peaks[messageId] ?? const <double>[],
-      );
-
-      // Запоминаем сразу, а не по окончании: пользователь может переключиться
-      // на другой ответ, не дослушав, и тогда конца воспроизведения не будет
-      // вовсе — а полоса у этого сообщения остаться обязана.
-      _clips[messageId] = playing.copyWith(status: SpeechStatus.idle);
-      _emit(playing);
-    }
-
-    // play() ждёт конца воспроизведения, а вызывающему ждать незачем.
-    unawaited(_player.play());
+    await _playFile(messageId, file);
   }
 
   /// Уже синтезированный файл этого сообщения, если он есть: повторное
