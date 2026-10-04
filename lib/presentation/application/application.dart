@@ -129,10 +129,13 @@ class _ApplicationState extends State<Application> {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      // Browser tab title; Flutter clears the one from index.html otherwise.
+      title: 'NurNova AI',
       home: Stack(
         children: [
           MaterialApp.router(
             debugShowCheckedModeBanner: false,
+            title: 'NurNova AI',
             theme: ThemeData(
               fontFamily: 'Inter',
               useMaterial3: false,

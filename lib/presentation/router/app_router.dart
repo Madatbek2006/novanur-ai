@@ -8,6 +8,8 @@ import 'package:baiqavisit/presentation/features/common/takephoto/take_photo_pag
 import 'package:baiqavisit/presentation/features/home/features/dashboard/dashboard_page.dart';
 import 'package:baiqavisit/presentation/features/home/features/profile/profile_page.dart';
 import 'package:baiqavisit/presentation/features/home/home_page.dart';
+import 'package:baiqavisit/presentation/features/web/dashboard/web_dashboard_page.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
@@ -30,12 +32,19 @@ class AppRouter extends _$AppRouter {
               page: TakePhotoRoute.page,
               path: 'take_photo',
             ),
-            AutoRoute(
-              page: DashboardRoute.page,
-              path: 'dashboard',
-              // maintainState: true,
-              // keepHistory: true,
-            ),
+            // ML Kit doesn't run in browsers; the web build has its own dashboard.
+            if (kIsWeb)
+              AutoRoute(
+                page: WebDashboardRoute.page,
+                path: 'dashboard',
+              )
+            else
+              AutoRoute(
+                page: DashboardRoute.page,
+                path: 'dashboard',
+                // maintainState: true,
+                // keepHistory: true,
+              ),
             AutoRoute(
               page: ProfileRoute.page,
               path: 'profile',

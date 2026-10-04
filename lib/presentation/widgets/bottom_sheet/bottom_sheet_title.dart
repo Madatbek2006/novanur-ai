@@ -5,26 +5,31 @@ class BottomSheetTitle extends StatelessWidget {
   const BottomSheetTitle({
     super.key,
     required this.title,
+    this.showHandle = true,
   });
 
   final String title;
+
+  /// The drag handle only makes sense on a bottom sheet, not in a dialog.
+  final bool showHandle;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            width: 50,
-            height: 5,
-            decoration: BoxDecoration(
-              color: Colors.grey[400],
-              borderRadius: BorderRadius.circular(10),
+        if (showHandle)
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              width: 50,
+              height: 5,
+              decoration: BoxDecoration(
+                color: Colors.grey[400],
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
           ),
-        ),
-        SizedBox(height: 8),
+        SizedBox(height: showHandle ? 8 : 16),
         Row(
           children: [
             SizedBox(width: 16),

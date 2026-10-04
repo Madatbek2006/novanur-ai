@@ -40,5 +40,9 @@ enum Language {
     );
   }
 
-  static Language get defaultLanguage => Language.kazakhCyrill;
+  /// Languages that have a file in assets/localization. Offering any other
+  /// locale makes EasyLocalization show raw keys.
+  static const List<Language> translated = [uzbekLatin, englishUs, russianRu];
+
+  static Language get defaultLanguage => Language.uzbekLatin;
 }

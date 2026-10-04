@@ -4,6 +4,7 @@ import 'package:baiqavisit/core/gen/assets/assets.gen.dart';
 import 'package:baiqavisit/core/gen/localization/strings.dart';
 import 'package:baiqavisit/domain/models/language/language.dart';
 import 'package:baiqavisit/domain/models/theme/app_theme_mode.dart';
+import 'package:baiqavisit/presentation/features/web/widgets/web_ui.dart';
 import 'package:baiqavisit/presentation/router/app_router.dart';
 import 'package:baiqavisit/presentation/support/cubit/base_page.dart';
 import 'package:baiqavisit/presentation/support/extensions/color_extension.dart';
@@ -15,6 +16,7 @@ import 'package:baiqavisit/presentation/widgets/divider/custom_divider.dart';
 import 'package:baiqavisit/presentation/widgets/image/circle_cached_network_image_widget.dart';
 import 'package:baiqavisit/presentation/widgets/profile/profile_item_widget.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -49,44 +51,50 @@ class ProfilePage extends BasePage<ProfileCubit, ProfileState, ProfileEvent> {
       backgroundColor: context.backgroundGreyColor,
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(height: 20),
-            // _buildProfileHeader(state),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Strings.profileMainBlock.s(14).w(400),
-              ),
+        // Browser windows are wide; keep the settings list readable.
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: kIsWeb ? 720 : double.infinity),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(height: 20),
+                // _buildProfileHeader(state),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Strings.profileMainBlock.s(14).w(400),
+                  ),
+                ),
+                SizedBox(height: 4),
+                ..._buildMainBlock(context, state),
+                SizedBox(height: 12),
+                // Padding(
+                //   padding: const EdgeInsets.symmetric(horizontal: 16),
+                //   child: Align(
+                //     alignment: Alignment.centerLeft,
+                //     child: Strings.profileSecurityBlock.s(14).w(400),
+                //   ),
+                // ),
+                // SizedBox(height: 4),
+                // ..._buildSecurityBlock(context, state),
+                // SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Strings.profileControlBlock.s(14).w(400),
+                  ),
+                ),
+                SizedBox(height: 4),
+                ..._buildControlBlock(context, state),
+                SizedBox(height: 12),
+                _buildAppVersionBlock(),
+              ],
             ),
-            SizedBox(height: 4),
-            ..._buildMainBlock(context, state),
-            SizedBox(height: 12),
-            // Padding(
-            //   padding: const EdgeInsets.symmetric(horizontal: 16),
-            //   child: Align(
-            //     alignment: Alignment.centerLeft,
-            //     child: Strings.profileSecurityBlock.s(14).w(400),
-            //   ),
-            // ),
-            // SizedBox(height: 4),
-            // ..._buildSecurityBlock(context, state),
-            // SizedBox(height: 12),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Strings.profileControlBlock.s(14).w(400),
-              ),
-            ),
-            SizedBox(height: 4),
-            ..._buildControlBlock(context, state),
-            SizedBox(height: 12),
-            _buildAppVersionBlock(),
-          ],
+          ),
         ),
       ),
     );
@@ -294,14 +302,42 @@ class ProfilePage extends BasePage<ProfileCubit, ProfileState, ProfileEvent> {
 
   /// Bottom sheet showing methods
 
+  /// A centered dialog fits wide browser windows better than a bottom sheet.
+  bool _useDialog(BuildContext context) => kIsWeb && WebBreakpoints.isWide(context);
+
+  void _showOptions(BuildContext context, WidgetBuilder builder) {
+    if (_useDialog(context)) {
+      showDialog(
+        context: context,
+        // The router's navigator: the app theme applies and context.router.pop() closes it.
+        useRootNavigator: false,
+        builder: (dialogContext) => Dialog(
+          clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 420),
+            child: builder(dialogContext),
+          ),
+        ),
+      );
+      return;
+    }
+    showCupertinoModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: builder,
+    );
+  }
+
   void _showChangeLanguageBottomSheet(
     BuildContext context,
     ProfileState state,
   ) {
-    showCupertinoModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext modalContext) {
+    // The language in use, which may come from the device rather than a saved choice.
+    final current = context.locale.languageCode;
+    _showOptions(
+      context,
+      (BuildContext modalContext) {
         return Material(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -309,12 +345,15 @@ class ProfilePage extends BasePage<ProfileCubit, ProfileState, ProfileEvent> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               SizedBox(height: 12),
-              BottomSheetTitle(title: Strings.languageTitle),
+              BottomSheetTitle(
+                title: Strings.languageTitle,
+                showHandle: !_useDialog(modalContext),
+              ),
               SizedBox(height: 14),
               SelectionListItem(
                 item: Language.uzbekLatin,
                 title: Strings.languageUzbekLatin,
-                isSelected: state.language == Language.uzbekLatin,
+                isSelected: current == Language.uzbekLatin.getRestCode(),
                 onClicked: (item) {
                   _saveSelectedLanguage(context, item);
                   context.router.pop();
@@ -324,7 +363,7 @@ class ProfilePage extends BasePage<ProfileCubit, ProfileState, ProfileEvent> {
               SelectionListItem(
                 item: Language.englishUs,
                 title: Strings.languageEnglishUs,
-                isSelected: state.language == Language.englishUs,
+                isSelected: current == Language.englishUs.getRestCode(),
                 onClicked: (item) {
                   _saveSelectedLanguage(context, item);
                   context.router.pop();
@@ -334,7 +373,7 @@ class ProfilePage extends BasePage<ProfileCubit, ProfileState, ProfileEvent> {
               SelectionListItem(
                 item: Language.russianRu,
                 title: Strings.languageRussianRu,
-                isSelected: state.language == Language.russianRu,
+                isSelected: current == Language.russianRu.getRestCode(),
                 onClicked: (item) {
                   _saveSelectedLanguage(context, item);
                   context.router.pop();
@@ -352,10 +391,9 @@ class ProfilePage extends BasePage<ProfileCubit, ProfileState, ProfileEvent> {
     BuildContext context,
     ProfileState state,
   ) {
-    showCupertinoModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext modalContext) {
+    _showOptions(
+      context,
+      (BuildContext modalContext) {
         return Material(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -363,7 +401,10 @@ class ProfilePage extends BasePage<ProfileCubit, ProfileState, ProfileEvent> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               SizedBox(height: 12),
-              BottomSheetTitle(title: Strings.profileDarkMode),
+              BottomSheetTitle(
+                title: Strings.profileDarkMode,
+                showHandle: !_useDialog(modalContext),
+              ),
               SizedBox(height: 14),
               SelectionListItem(
                 item: AppThemeMode.darkMode,

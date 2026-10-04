@@ -29,6 +29,13 @@ class PhotoAnalysisRepository {
     return ProductRootResponse.fromJson(response.data).product?.productName??Strings.commonProductNotFound;
   }
 
+  /// Full product card, or null when Open Food Facts doesn't know the code.
+  Future<ProductResponse?> getProduct(String barcode) async {
+    var response = await _photoAnalysis.getProductData(barcode);
+    final root = ProductRootResponse.fromJson(response.data);
+    return root.status == 1 ? root.product : null;
+  }
+
 
 
 

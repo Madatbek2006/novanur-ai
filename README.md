@@ -54,3 +54,54 @@ flutter pub run build_runner clean
 ```bash
 rm -rf .dart_tool .packages build pubspec.lock
 ```
+
+## 🌐 Web version
+
+The browser build has its own dashboard (`lib/presentation/features/web`) with the
+same four tools. The picture can come from the camera, the file picker,
+drag-and-drop or Ctrl+V, so it also works on computers without a camera.
+
+| Tool | Phone app | Web |
+|---|---|---|
+| Scan text | ML Kit | Tesseract.js (Uzbek, Russian, English) |
+| Scan barcode | mobile_scanner | Browser `BarcodeDetector` or ZXing, product from Open Food Facts; digits can also be typed in |
+| Describe scene | AI chat (backend) | the same chat, next to the image |
+| Object recognition | ML Kit | MediaPipe EfficientDet-Lite0 (80 COCO classes, names in uz/ru/en) |
+
+The browser-side code is `web/vision/nurnova_vision.js`; Dart talks to it through
+`lib/utils/web/browser_vision.dart`.
+
+```bash
+# run locally (localhost counts as secure, so the camera works)
+flutter run -d chrome
+
+# static site in build/web
+flutter build web --release
+```
+
+### Before publishing
+
+- **HTTPS.** Browsers only give the camera to `https://` pages (and localhost), and
+  an `https://` page may not call `http://` or `ws://` addresses. The AI server
+  (`http://81.17.102.235:8000`) therefore needs HTTPS/WSS, for example behind nginx
+  with a certificate. Then point the build at it:
+  ```bash
+  flutter build web --release \
+    --dart-define=API_BASE_URL=https://api.example.com/ \
+    --dart-define=WS_BASE_URL=wss://api.example.com/
+  ```
+  Without `WS_BASE_URL` the WebSocket address is derived from `API_BASE_URL`.
+- **CORS.** The AI server must allow the site's origin (`Access-Control-Allow-Origin`;
+  with FastAPI that is `CORSMiddleware`). The web build sends no custom headers, so
+  no preflight rules are needed.
+- **Recognition libraries.** On first use the browser downloads Tesseract.js, ZXing and
+  MediaPipe from jsDelivr and the object model from Google Storage (roughly 10 MB for
+  text and 20 MB for objects, cached afterwards). To host them yourself, define
+  `window.NURNOVA_VISION_CONFIG` in `web/index.html`; the keys are listed at the top of
+  `web/vision/nurnova_vision.js`.
+
+After pulling these changes, regenerate code (new route and state classes):
+```bash
+dart run build_runner build --delete-conflicting-outputs
+dart lib/core/scripts/generate_strings_script.dart
+```

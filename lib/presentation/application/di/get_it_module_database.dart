@@ -1,11 +1,21 @@
 import 'package:baiqavisit/data/datasource/floor/dao/group_entity_dao.dart';
+import 'package:baiqavisit/data/datasource/floor/dao/memory_entity_daos.dart';
 import 'package:baiqavisit/data/datasource/floor/dao/tenant_entity_dao.dart';
 import 'package:baiqavisit/data/datasource/floor/dao/user_entity_dao.dart';
 import 'package:baiqavisit/data/datasource/floor/database/app_database.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 
 extension GetItModuleDatabase on GetIt {
   Future<void> databaseModule() async {
+    if (kIsWeb) {
+      // sqflite has no browser implementation.
+      registerSingleton<GroupEntityDao>(MemoryGroupEntityDao());
+      registerSingleton<TenantEntityDao>(MemoryTenantEntityDao());
+      registerSingleton<UserEntityDao>(MemoryUserEntityDao());
+      return;
+    }
+
     registerSingletonAsync<AppDatabase>(
       () async => await AppDatabase.initializeDatabase(),
     );

@@ -6,6 +6,7 @@ import 'package:baiqavisit/presentation/features/common/takephoto/take_photo_cub
 import 'package:baiqavisit/presentation/features/home/features/dashboard/dashboard_cubit.dart';
 import 'package:baiqavisit/presentation/features/home/features/profile/profile_cubit.dart';
 import 'package:baiqavisit/presentation/features/home/home_cubit.dart';
+import 'package:baiqavisit/presentation/features/web/dashboard/web_dashboard_cubit.dart';
 import 'package:baiqavisit/presentation/support/state_message/state_message_manager.dart';
 import 'package:baiqavisit/presentation/support/state_message/state_message_manager_impl.dart';
 import 'package:get_it/get_it.dart';
@@ -32,6 +33,9 @@ extension GetItModuleApp on GetIt {
     registerFactory(() => BarcodeCubit(get()));
     registerFactory(() => ObjectDetectionCubit(get()));
     registerFactory(() => ScanTextCubit());
+
+    // web
+    registerFactory(() => WebDashboardCubit(get()));
 
 
     await allReady();

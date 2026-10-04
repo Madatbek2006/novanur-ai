@@ -11,7 +11,9 @@ import 'package:easy_localization_loader/easy_localization_loader.dart';
 // import 'package:firebase_core/firebase_core.dart';
 // import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 // import 'package:firebase_remote_config/firebase_remote_config.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:logger/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -26,11 +28,15 @@ Future<void> main() async {
   runZonedGuarded<Future<void>>(() async {
     WidgetsFlutterBinding.ensureInitialized();
 
-    await Permission.notification.isDenied.then((value) {
-      if (value) {
-        Permission.notification.request();
-      }
-    });
+    // The web build sends no notifications, and browsers penalize permission
+    // prompts that are not triggered by the user.
+    if (!kIsWeb) {
+      await Permission.notification.isDenied.then((value) {
+        if (value) {
+          Permission.notification.request();
+        }
+      });
+    }
 
     // await initializeFirebase();
     // await FirebaseMessagingService.init();
@@ -41,9 +47,15 @@ Future<void> main() async {
 
     await _prepareDeviceInfoHolder();
 
+    if (kIsWeb) {
+      // Without this, browser screen readers see nothing until the user finds
+      // Flutter's hidden "Enable accessibility" button.
+      SemanticsBinding.instance.ensureSemantics();
+    }
+
     runApp(
       EasyLocalization(
-        supportedLocales: Language.values.map((e) => e.getLocale()).toList(),
+        supportedLocales: Language.translated.map((e) => e.getLocale()).toList(),
         path: 'assets/localization',
         fallbackLocale: Language.defaultLanguage.getLocale(),
         child: Application(),
@@ -139,7 +151,13 @@ Future<void> _prepareDeviceInfoHolder() async {
       appSource = "Unknown";
     }
 
-    if (Platform.isAndroid) {
+    if (kIsWeb) {
+      // dart:io's Platform throws in the browser.
+      WebBrowserInfo info = await deviceInfo.webBrowserInfo;
+      deviceName = info.browserName.name;
+      mobileOS = "Web ${info.platform ?? ""}".trim();
+      appSource = "Web";
+    } else if (Platform.isAndroid) {
       AndroidDeviceInfo info = await deviceInfo.androidInfo;
       deviceName = "${info.manufacturer} ${info.model}";
       mobileOS = "Android ${info.version.release}";

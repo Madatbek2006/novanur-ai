@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="NurNova AI reads text, recognizes barcodes and objects, and describes pictures with AI. Works with a camera or with any image.">
+  <meta name="theme-color" content="#020b1f">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="NurNova AI">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>NurNova AI</title>
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    html, body { margin: 0; height: 100%; background: #020b1f; }
+    #splash {
+      position: fixed; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 28px;
+      background: #020b1f; transition: opacity .3s ease;
+    }
+    #splash img { width: 112px; height: 112px; border-radius: 24px; }
+    #splash .spinner {
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 3px solid rgba(67, 147, 199, .25); border-top-color: #4393c7;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { #splash .spinner { animation-duration: 3s; } }
+  </style>
+
+  <!--
+    Text, barcode and object recognition for the browser. Its libraries come
+    from jsDelivr / Google Storage on first use; to self-host them, define
+    window.NURNOVA_VISION_CONFIG here (keys are listed in that file).
+  -->
+  <script src="vision/nurnova_vision.js" defer></script>
+</head>
+<body>
+  <div id="splash" aria-hidden="true">
+    <img src="icons/Icon-192.png" alt="">
+    <div class="spinner"></div>
+  </div>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

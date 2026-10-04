@@ -1,0 +1,35 @@
+{
+    "name": "NurNova AI",
+    "short_name": "NurNova AI",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#020b1f",
+    "theme_color": "#020b1f",
+    "description": "Reads text, recognizes barcodes and objects, and describes pictures with AI. Works with a camera or with any image.",
+    "orientation": "any",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/Icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}

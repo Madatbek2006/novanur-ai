@@ -1,10 +1,6 @@
-import 'dart:io';
-
-import 'package:baiqavisit/domain/models/group/group_att_stats.dart';
 import 'package:camera/camera.dart';
 import 'package:dio/dio.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:logger/logger.dart';
+import 'package:flutter/foundation.dart';
 
 class PhotoAnalysisService {
   final Dio _dio;
@@ -22,19 +18,29 @@ class PhotoAnalysisService {
 
   Future<Response> fetchPhotoAnalysis(XFile file) async {
     final formData = FormData.fromMap({
-      'file': await MultipartFile.fromFile(
-        file.path,
-        filename: file.name, // чтобы сервер видел имя файла
-      ),
+      // Browsers expose no file paths, so the web build uploads the bytes.
+      'file': kIsWeb
+          ? MultipartFile.fromBytes(
+              await file.readAsBytes(),
+              filename: file.name.isNotEmpty ? file.name : 'photo.jpg',
+              contentType: DioMediaType.parse(file.mimeType ?? 'image/jpeg'),
+            )
+          : await MultipartFile.fromFile(
+              file.path,
+              filename: file.name, // чтобы сервер видел имя файла
+            ),
     });
 
     return _dio.post(
       "api/create/chat",
       data: formData,
       options: Options(
-        headers: {
-          'User-Agent': 'insomnia/11.4.0', // если нужно
-        },
+        // Browsers refuse to override User-Agent.
+        headers: kIsWeb
+            ? null
+            : {
+                'User-Agent': 'insomnia/11.4.0', // если нужно
+              },
       ),
     );
   }

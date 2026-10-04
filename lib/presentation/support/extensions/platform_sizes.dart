@@ -1,5 +1,8 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 
-final double bottomBarHeight = Platform.isIOS ? 106 : 80;
+// dart:io's Platform is unavailable in the browser, so read the target platform.
+final bool _isIOS = !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
 
-final double defaultBottomPadding = Platform.isIOS ? 36 : 24;
+final double bottomBarHeight = _isIOS ? 106 : 80;
+
+final double defaultBottomPadding = _isIOS ? 36 : 24;

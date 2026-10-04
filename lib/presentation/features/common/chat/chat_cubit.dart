@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
 
@@ -31,7 +32,16 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
     _player.setVolume(0.3);
   }
   WebSocketChannel? channel;
+  StreamSubscription? _channelSubscription;
   final AudioPlayer _player = AudioPlayer();
+
+  @override
+  Future<void> close() async {
+    await _channelSubscription?.cancel();
+    await channel?.sink.close();
+    await _player.dispose();
+    return super.close();
+  }
 
 
 
@@ -70,9 +80,8 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
           sendSMS(Strings.commonDescribeImage,locale,type: type);
         })
         .onError((error) {
-          stopProgress();
           logger.d("TTT=> $error");
-
+          _showError(error.localizedMessage);
         })
         .onFinished(() {})
         .executeFuture();
@@ -127,7 +136,7 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
 
       logger.i("TTT=> Попытка подключения к WebSocket...   ${states.uuid}");
       try {
-        channel?.stream.listen(
+        _channelSubscription = channel?.stream.listen(
           (event) {
             logger.d("TTT=> Сообщение: $event");
             final data = jsonDecode(event);
@@ -160,7 +169,13 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
             logger.e("TTT=> Ошибка WebSocket: $error");
           },
           onDone: () {
-            stopProgress();
+            // Closed while an answer was still expected: say so instead of
+            // leaving the user with a silent chat.
+            if (states.isSendingRequest) {
+              _showError(Strings.messageConnectionError);
+            } else {
+              stopProgress();
+            }
             logger.w("TTT=> WebSocket соединение закрыто");
           },
         );
@@ -171,10 +186,24 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
       stopProgress();
       logger.i("TTT=>  подключились к WebSocket");
     } catch (e) {
-      stopProgress();
       logger.e("TTT=> Не удалось подключиться к WebSocket: $e");
+      _showError(Strings.messageConnectionError);
     }
   }
+
+  void _showError(String message) {
+    _player.stop();
+    updateState((state) => state.copyWith(
+          isSendingRequest: false,
+          messages: sortMessage(state.messages, TextMessage(
+            author: User(id: "AI"),
+            createdAt: DateTime.now().millisecondsSinceEpoch,
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
+            text: message,
+          )),
+        ));
+  }
+
   void stopProgress(){
     _player.stop();
     logger.w("TTT=> stopProgress");

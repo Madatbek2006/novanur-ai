@@ -2,11 +2,14 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:baiqavisit/core/gen/localization/strings.dart';
 import 'package:baiqavisit/presentation/support/extensions/color_extension.dart';
 import 'package:baiqavisit/presentation/widgets/card/custom_card.dart';
 import 'package:baiqavisit/presentation/widgets/dialog/speech_to_text_dialog.dart';
 import 'package:baiqavisit/utils/service/photo_picker_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
@@ -40,7 +43,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
   bool _isRecording = false;
 
   Duration _recordTime = Duration.zero;
-  late StreamSubscription _sub;
+  StreamSubscription? _sub;
 
   String _format(Duration d) {
     final m = d.inMinutes.remainder(60).toString().padLeft(2, '0');
@@ -55,12 +58,24 @@ class _CustomInputFieldState extends State<CustomInputField> {
 
   @override
   void dispose() {
-    _sub.cancel();
+    _sub?.cancel();
     _controller.dispose();
     focusNode.dispose();
     super.dispose();
   }
 
+
+  void _send() {
+    if (widget.isSendingRequest) return;
+    if(_controller.text.trim().isNotEmpty) {
+      widget.onSend(PartialText(text: _controller.text.trim()));
+    }
+    _controller.clear();
+    // Phones hide the keyboard after sending; in a browser the field stays ready.
+    if(!kIsWeb && focusNode.hasFocus){
+      FocusScope.of(context).unfocus();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,17 +132,23 @@ class _CustomInputFieldState extends State<CustomInputField> {
                       : Row(
                     children: [
                       Expanded(
-                        child: TextField(
-                          focusNode: focusNode,
-                          maxLines: 5,
-                          minLines: 1,
-                          enabled: !widget.isSendingRequest,
-                          controller: _controller,
-                          decoration: const InputDecoration(
-                            hintText: "Сообщение...",
-                            border: InputBorder.none,
+                        // On a keyboard, Enter sends and Shift+Enter adds a line.
+                        child: CallbackShortcuts(
+                          bindings: {
+                            if (kIsWeb) const SingleActivator(LogicalKeyboardKey.enter): _send,
+                          },
+                          child: TextField(
+                            focusNode: focusNode,
+                            maxLines: 5,
+                            minLines: 1,
+                            enabled: !widget.isSendingRequest,
+                            controller: _controller,
+                            decoration: InputDecoration(
+                              hintText: Strings.chatMessageHint,
+                              border: InputBorder.none,
+                            ),
+                            textInputAction: TextInputAction.newline,
                           ),
-                          textInputAction: TextInputAction.newline,
                         ),
                       ),
                       SizedBox(width: 16),
@@ -177,15 +198,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
                       ),
                     ):InkWell(
                       borderRadius: BorderRadius.circular(28),
-                      onTap: (){
-                        if(_controller.text.trim().isNotEmpty) {
-                          widget.onSend(PartialText(text: _controller.text.trim()));
-                        }
-                        _controller.clear();
-                        if(focusNode.hasFocus){
-                          FocusScope.of(context).unfocus();
-                        }
-                      },
+                      onTap: _send,
                       child: CustomCard(
                         borderRadius: BorderRadius.circular(28),
                         color: context.primaryLight,
