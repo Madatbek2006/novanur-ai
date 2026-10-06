@@ -1,0 +1,16 @@
+// Веб-версия NurNova AI на Cloudflare: статика из сборки Flutter, без кода
+// на стороне Cloudflare. Сайт лишь отдаёт файлы — к ИИ он ходит напрямую
+// на бэкенд через ngrok, поэтому трафик самого сайта ngrok не тратит.
+//
+// Выложить заново: flutter build web --release --pwa-strategy=none
+//                  npx wrangler deploy
+{
+  "name": "nurnova-ai",
+  // Аккаунт закреплён явно. Без этого wrangler берёт тот, что запомнил в
+  // .wrangler/cache, и после смены аккаунта выкладывает не туда.
+  "account_id": "3077fab42d4edae96316124b68df089f",
+  "compatibility_date": "2026-10-06",
+  "assets": {
+    "directory": "./build/web"
+  }
+}
