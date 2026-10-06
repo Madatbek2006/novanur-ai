@@ -1,6 +1,7 @@
 import 'package:nurnova_ai/core/extensions/text_extensions.dart';
 import 'package:nurnova_ai/core/gen/localization/strings.dart';
 import 'package:nurnova_ai/presentation/support/extensions/color_extension.dart';
+import 'package:nurnova_ai/presentation/support/theme/app_glass.dart';
 import 'package:flutter/material.dart';
 
 /// Layout breakpoints shared by the web screens.
@@ -11,7 +12,10 @@ abstract class WebBreakpoints {
   static bool isWide(BuildContext context) => MediaQuery.sizeOf(context).width >= wide;
 }
 
-/// Rounded surface used for the dashboard's columns.
+/// Frosted surface used for the dashboard's columns.
+///
+/// The same [GlassSurface] the phone app uses, so the two builds read as one
+/// product rather than two.
 class WebPanel extends StatelessWidget {
   const WebPanel({super.key, required this.child, this.padding = const EdgeInsets.all(20)});
 
@@ -20,13 +24,10 @@ class WebPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GlassSurface(
+      borderRadius: AppGlass.panelAll,
+      blur: AppGlass.blurPanel,
       padding: padding,
-      decoration: BoxDecoration(
-        color: context.cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: context.borderStroke),
-      ),
       child: child,
     );
   }

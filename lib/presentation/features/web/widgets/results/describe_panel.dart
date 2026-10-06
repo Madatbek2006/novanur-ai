@@ -152,16 +152,30 @@ class _EmbeddedChat extends StatelessWidget {
           type: type,
         ),
       child: BaseBuilder<ChatCubit, ChatState, ChatEvent>(
-        onWidgetBuild: (context, chatState) => ChatWidget(
-          messages: chatState.messages,
-          isSendingRequest: chatState.isSendingRequest,
-          userUid: 'user',
-          onSend: (sms) => context.read<ChatCubit>().sendSMS(sms, Localizations.localeOf(context)),
-          subRoom: () {},
-          unSubRoom: () {},
-          audioMessages: const [],
-          onUpdateAudio: (_) {},
-        ),
+        onWidgetBuild: (context, chatState) {
+          final chat = context.read<ChatCubit>();
+          return ChatWidget(
+            messages: chatState.messages,
+            isSendingRequest: chatState.isSendingRequest,
+            userUid: 'user',
+            onSend: (sms) => chat.sendSMS(sms, Localizations.localeOf(context)),
+            // Сбой связи надо и показать, и проговорить: иначе незрячий
+            // пользователь не отличит ошибку от «модель ещё думает».
+            errorText: chatState.error,
+            onRetry: chat.retry,
+            // Озвучка ответа с полосой, перемоткой и часами — тем же
+            // способом, что и на телефоне.
+            playback: chatState.playback,
+            speechClips: chatState.speechClips,
+            positionStream: chat.speechPositionStream,
+            onMessageTap: (message) => chat.toggleSpeech(message.id, message.text),
+            onSeek: chat.seekSpeech,
+            subRoom: () {},
+            unSubRoom: () {},
+            audioMessages: const [],
+            onUpdateAudio: (_) {},
+          );
+        },
       ),
     );
   }

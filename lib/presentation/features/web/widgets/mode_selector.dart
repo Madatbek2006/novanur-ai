@@ -1,19 +1,14 @@
 import 'package:nurnova_ai/core/extensions/text_extensions.dart';
-import 'package:nurnova_ai/core/gen/assets/assets.gen.dart';
 import 'package:nurnova_ai/core/gen/localization/strings.dart';
 import 'package:nurnova_ai/domain/models/dashboard/dashboard_button_data.dart';
 import 'package:nurnova_ai/presentation/support/extensions/color_extension.dart';
-import 'package:nurnova_ai/utils/extension/image.dart';
+import 'package:nurnova_ai/presentation/support/theme/app_glass.dart';
 import 'package:flutter/material.dart';
 
 extension WebModeInfo on DashboardButtonType {
-  SvgGenImage get svgIcon => switch (this) {
-        DashboardButtonType.scanText => Assets.images.bottomBar.scanText,
-        DashboardButtonType.scanBarcode => Assets.images.bottomBar.scanBarcode,
-        DashboardButtonType.describeScene => Assets.images.bottomBar.mountainSnow,
-        DashboardButtonType.objectRecognition => Assets.images.bottomBar.carFront,
-      };
-
+  // Иконки берём из самого DashboardButtonType.icon(): там они уже
+  // обновлены — искры для описания сцены и лупа для поиска объектов. Своя
+  // копия, которая жила здесь, успела отстать и рисовала гору и машину.
   String get description => switch (this) {
         DashboardButtonType.scanText => Strings.webModeScanTextDescription,
         DashboardButtonType.scanBarcode => Strings.webModeScanBarcodeDescription,
@@ -85,30 +80,23 @@ class _ModeTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final accent = context.colors.buttonPrimary;
     final foreground = selected ? accent : context.textPrimary;
-    final radius = BorderRadius.circular(compact ? 22 : 14);
-    final icon = mode.svgIcon.svgCustom(
-      width: compact ? 20 : 26,
-      height: compact ? 20 : 26,
-      color: foreground,
-    );
+    final radius = compact ? AppGlass.chipAll : AppGlass.cardAll;
+    final icon = mode.icon(context, color: foreground, size: compact ? 20 : 26);
 
     return Semantics(
       button: true,
       selected: selected,
-      child: Material(
-        color: selected ? accent.withValues(alpha: 0.12) : context.cardColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: radius,
-          side: BorderSide(color: selected ? accent : context.borderStroke, width: selected ? 2 : 1),
-        ),
-        child: InkWell(
-          borderRadius: radius,
-          onTap: onTap,
-          child: Padding(
-            padding: compact
-                ? const EdgeInsets.symmetric(horizontal: 14)
-                : const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            child: compact
+      child: GlassSurface(
+        borderRadius: radius,
+        blur: compact ? AppGlass.blurChip : AppGlass.blurCard,
+        isAccented: selected,
+        onTap: onTap,
+        padding: compact
+            ? const EdgeInsets.symmetric(horizontal: 14)
+            : const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: compact
                 ? Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -147,7 +135,6 @@ class _ModeTile extends StatelessWidget {
                       ),
                     ],
                   ),
-          ),
         ),
       ),
     );

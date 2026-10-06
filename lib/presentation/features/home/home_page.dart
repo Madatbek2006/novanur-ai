@@ -113,10 +113,17 @@ class HomePage extends BasePage<HomeCubit, HomeState, HomeEvent> {
     return Scaffold(
       body: Row(
         children: [
-          NavigationRail(
+          // Панель кладём на стекло, как нижний бар на телефоне: сама
+          // NavigationRail рисует свой фон, поэтому делаем его прозрачным.
+          GlassSurface(
+            borderRadius: BorderRadius.zero,
+            blur: AppGlass.blurPanel,
+            edge: GlassEdge.none,
+            hasShadow: false,
+            child: NavigationRail(
             extended: extended,
             minExtendedWidth: 220,
-            backgroundColor: context.appBarColor,
+            backgroundColor: Colors.transparent,
             selectedIndex: tabsRouter.activeIndex,
             onDestinationSelected: tabsRouter.setActiveIndex,
             labelType: extended ? NavigationRailLabelType.none : NavigationRailLabelType.all,
@@ -155,6 +162,7 @@ class HomePage extends BasePage<HomeCubit, HomeState, HomeEvent> {
               destination(Assets.images.bottomBar.dashboard, Strings.bottomNavigationHome),
               destination(Assets.images.bottomBar.settings, Strings.bottomNavigationSettings),
             ],
+            ),
           ),
           VerticalDivider(width: 1, thickness: 1, color: context.borderStroke),
           Expanded(child: child),

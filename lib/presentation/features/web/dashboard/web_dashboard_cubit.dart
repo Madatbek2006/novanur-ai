@@ -13,6 +13,8 @@ import 'package:nurnova_ai/utils/web/coco_labels.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:nurnova_ai/data/datasource/preference/speech_rate_preferences.dart';
+import 'package:nurnova_ai/data/repositories/speech_rate_repository.dart';
 
 part 'web_dashboard_cubit.freezed.dart';
 part 'web_dashboard_state.dart';
@@ -20,7 +22,7 @@ part 'web_dashboard_state.dart';
 /// Drives the browser dashboard: one image (picked, dropped, pasted or taken
 /// with the camera) analysed by whichever of the four tools is selected.
 class WebDashboardCubit extends BaseCubit<WebDashboardState, WebDashboardEvent> {
-  WebDashboardCubit(this._photoAnalysisRepository)
+  WebDashboardCubit(this._photoAnalysisRepository, this._speechRate)
       : super(const WebDashboardState()) {
     _tts.setCompletionHandler(_onSpeechDone);
     _tts.setCancelHandler(_onSpeechDone);
@@ -28,6 +30,7 @@ class WebDashboardCubit extends BaseCubit<WebDashboardState, WebDashboardEvent> 
   }
 
   final PhotoAnalysisRepository _photoAnalysisRepository;
+  final SpeechRateRepository _speechRate;
   final FlutterTts _tts = FlutterTts();
 
   String _languageCode = 'uz';
@@ -480,6 +483,12 @@ class WebDashboardCubit extends BaseCubit<WebDashboardState, WebDashboardEvent> 
     await _tts.stop();
     // Browsers load voices lazily, so pick one right before speaking.
     await _tts.setLanguage(languageCode ?? _languageCode);
+    // The setting is stored on the plugin's scale, where 0.5 is ordinary
+    // speech; in the browser the number goes straight into utterance.rate,
+    // whose ordinary speed is 1.0. So it is passed as a share of normal.
+    await _tts.setSpeechRate(
+      _speechRate.getSpeechRate() / SpeechRatePreferences.normal,
+    );
     updateState((state) => state.copyWith(isSpeaking: true));
     await _tts.speak(text);
   }

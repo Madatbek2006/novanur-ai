@@ -37,7 +37,7 @@ extension GetItModuleApp on GetIt {
     registerFactory(() => ScanTextCubit());
 
     // web
-    registerFactory(() => WebDashboardCubit(get()));
+    registerFactory(() => WebDashboardCubit(get(), get()));
 
 
     await allReady();

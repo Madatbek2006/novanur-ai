@@ -72,6 +72,10 @@ class ChatSpeaker {
   /// Файлы, синтезированные за этот сеанс, — чтобы подчистить за собой.
   final Set<String> _files = {};
 
+  /// Серверная озвучка в браузере. Файловой системы там нет, поэтому WAV
+  /// живёт в памяти вкладки — ровно столько, сколько открыт чат.
+  final Map<String, Uint8List> _memoryAudio = {};
+
   /// Готовые озвучки: всё, что известно о звуке каждого сообщения.
   /// Экран берёт отсюда полосу для ответов, которые сейчас не звучат.
   final Map<String, SpeechPlayback> _clips = {};
@@ -94,6 +98,16 @@ class ChatSpeaker {
   /// ещё даже не начали. Без этого флага озвучка гасла ровно в тот момент,
   /// когда файл был готов, и на экране оставалась полоса без волны и с 00:00.
   bool _rendering = false;
+
+  /// Скорость речи для самого движка.
+  ///
+  /// На телефоне плагин приводит платформы к общей шкале, где 0.5 — обычная
+  /// речь, и сохранённое значение уходит как есть. В браузере он кладёт
+  /// число прямо в utterance.rate, а там обычная скорость — это 1.0,
+  /// поэтому переводим в доли от нормы.
+  double get _engineRate => kIsWeb
+      ? _speechRate.getSpeechRate() / SpeechRatePreferences.normal
+      : _speechRate.getSpeechRate();
 
   void _emit(SpeechPlayback? playback) {
     _playback = playback;
@@ -162,10 +176,12 @@ class ChatSpeaker {
   ///
   /// На Android для этого есть `isLanguageInstalled`: он отсеивает голоса,
   /// которым нужна сеть. На iOS такого метода нет, там хватает проверки
-  /// доступности — системные голоса идут в комплекте.
+  /// доступности — системные голоса идут в комплекте. В браузере голоса
+  /// даёт сама система, и спрашивать Platform там нельзя: dart:io на вебе
+  /// компилируется, но обращение к нему падает уже во время работы.
   Future<bool> _isVoiceUsable(String voice) async {
     try {
-      final usable = Platform.isAndroid
+      final usable = (!kIsWeb && Platform.isAndroid)
           ? await _tts.isLanguageInstalled(voice)
           : await _tts.isLanguageAvailable(voice);
 
@@ -190,7 +206,10 @@ class ChatSpeaker {
   Future<void> _speakOnDevice(String? messageId, String text, String voice) async {
     await _tts.setLanguage(voice);
 
-    if (messageId != null) {
+    // В браузере записи в файл нет: synthesizeToFile там не реализован, да и
+    // файловой системы не существует. Читаем напрямую — полоса для русского
+    // и английского остаётся одной кнопкой, зато ответ звучит сразу.
+    if (!kIsWeb && messageId != null) {
       final file =
           await _cachedFile(messageId) ?? await _renderOnDevice(messageId, text);
       if (file != null) {
@@ -199,10 +218,10 @@ class ChatSpeaker {
       }
     }
 
-    // Либо это служебное объявление без пузыря, либо движок не смог записать
-    // файл. Читаем прямо в динамик, как раньше: полосы не будет, но ответ
-    // прозвучит — молчать здесь хуже всего.
-    await _tts.setSpeechRate(_speechRate.getSpeechRate());
+    // Либо это служебное объявление без пузыря, либо браузер, либо движок не
+    // смог записать файл. Читаем прямо в динамик, как раньше: полосы не
+    // будет, но ответ прозвучит — молчать здесь хуже всего.
+    await _tts.setSpeechRate(_engineRate);
     if (messageId != null) {
       _emit(SpeechPlayback(
         messageId: messageId,
@@ -259,9 +278,13 @@ class ChatSpeaker {
   /// сервер. Отсюда и берутся полоса, перемотка и часы.
   Future<void> _playFile(String? messageId, File file) async {
     final duration = await _player.setFilePath(file.path);
+    await _startPlaying(messageId, duration);
+  }
 
+  /// Общий хвост для любого источника: скорость, состояние, запуск.
+  Future<void> _startPlaying(String? messageId, Duration? duration) async {
     // Скорость применяем к воспроизведению: тогда её смена слышна сразу и
-    // не требует записывать файл заново.
+    // не требует получать звук заново.
     await _player.setSpeed(
       _speechRate.getSpeechRate() / SpeechRatePreferences.normal,
     );
@@ -293,6 +316,11 @@ class ChatSpeaker {
     String text,
     String languageCode,
   ) async {
+    if (kIsWeb) {
+      await _speakFromServerInMemory(messageId, text, languageCode);
+      return;
+    }
+
     // Служебное объявление не кэшируем: оно одноразовое.
     final cached = messageId == null ? null : await _cachedFile(messageId);
 
@@ -316,6 +344,44 @@ class ChatSpeaker {
     }
 
     await _playFile(messageId, file);
+  }
+
+  /// То же, что [_speakFromServer], но для браузера.
+  ///
+  /// Файловой системы там нет, поэтому WAV держим в памяти вкладки и отдаём
+  /// плееру data-ссылкой. Полоса, огибающая и перемотка от этого не
+  /// страдают — плееру всё равно, откуда байты.
+  Future<void> _speakFromServerInMemory(
+    String? messageId,
+    String text,
+    String languageCode,
+  ) async {
+    var audio = messageId == null ? null : _memoryAudio[messageId];
+
+    if (audio == null && messageId != null) {
+      _emit(SpeechPlayback(
+        messageId: messageId,
+        status: SpeechStatus.loading,
+        seekable: true,
+      ));
+    }
+
+    if (audio == null) {
+      audio = await _speech.synthesize(text: text, lang: languageCode);
+      if (audio.isEmpty) {
+        _finish();
+        return;
+      }
+      if (messageId != null) {
+        _memoryAudio[messageId] = audio;
+        _peaks[messageId] = peaksFromWav(audio, bars: _waveformBars);
+      }
+    }
+
+    final duration = await _player.setAudioSource(
+      AudioSource.uri(Uri.dataFromBytes(audio, mimeType: 'audio/wav')),
+    );
+    await _startPlaying(messageId, duration);
   }
 
   /// Уже синтезированный файл этого сообщения, если он есть: повторное
@@ -393,15 +459,19 @@ class ChatSpeaker {
     await _player.dispose();
 
     // Временные файлы сеанса за собой убираем: их размер — сотни килобайт
-    // на сообщение, а пережить сеанс им незачем.
-    for (final path in _files) {
-      try {
-        await File(path).delete();
-      } catch (_) {
-        // Файл мог исчезнуть сам — системе виднее.
+    // на сообщение, а пережить сеанс им незачем. В браузере файлов не
+    // заводили, и трогать там File нельзя — обращение к нему падает.
+    if (!kIsWeb) {
+      for (final path in _files) {
+        try {
+          await File(path).delete();
+        } catch (_) {
+          // Файл мог исчезнуть сам — системе виднее.
+        }
       }
     }
     _files.clear();
+    _memoryAudio.clear();
     _peaks.clear();
     _clips.clear();
   }

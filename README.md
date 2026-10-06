@@ -92,8 +92,12 @@ flutter build web --release
   ```
   Without `WS_BASE_URL` the WebSocket address is derived from `API_BASE_URL`.
 - **CORS.** The AI server must allow the site's origin (`Access-Control-Allow-Origin`;
-  with FastAPI that is `CORSMiddleware`). The web build sends no custom headers, so
-  no preflight rules are needed.
+  with FastAPI that is `CORSMiddleware`). The web build does send its own headers —
+  `Content-Type: application/json` and `ngrok-skip-browser-warning` — so the browser
+  asks permission first with an `OPTIONS` request, and both headers have to be
+  allowed along with `GET, POST, OPTIONS`. The backend already does this; list the
+  site's address in `WEB_ORIGINS` in its `.env`, comma-separated. Addresses on
+  `localhost` are allowed on any port, so `flutter run -d chrome` works as is.
 - **Recognition libraries.** On first use the browser downloads Tesseract.js, ZXing and
   MediaPipe from jsDelivr and the object model from Google Storage (roughly 10 MB for
   text and 20 MB for objects, cached afterwards). To host them yourself, define
