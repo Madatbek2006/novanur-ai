@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:baiqavisit/core/gen/localization/strings.dart';
-import 'package:baiqavisit/data/error/app_exception.dart';
-import 'package:baiqavisit/data/error/app_network_exception.dart';
+import 'package:nurnova_ai/core/gen/localization/strings.dart';
+import 'package:nurnova_ai/data/error/app_exception.dart';
+import 'package:nurnova_ai/data/error/app_network_exception.dart';
 import 'package:dio/dio.dart';
 
 extension DioErrorExts on DioError {

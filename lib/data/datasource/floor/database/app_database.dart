@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:baiqavisit/data/datasource/floor/dao/group_entity_dao.dart';
-import 'package:baiqavisit/data/datasource/floor/dao/tenant_entity_dao.dart';
-import 'package:baiqavisit/data/datasource/floor/dao/user_entity_dao.dart';
-import 'package:baiqavisit/data/datasource/floor/database/callback.dart';
-import 'package:baiqavisit/data/datasource/floor/database/migrations.dart';
-import 'package:baiqavisit/data/datasource/floor/entities/group_entity.dart';
-import 'package:baiqavisit/data/datasource/floor/entities/tenant_entity.dart';
-import 'package:baiqavisit/data/datasource/floor/entities/user_entity.dart';
+import 'package:nurnova_ai/data/datasource/floor/dao/group_entity_dao.dart';
+import 'package:nurnova_ai/data/datasource/floor/dao/tenant_entity_dao.dart';
+import 'package:nurnova_ai/data/datasource/floor/dao/user_entity_dao.dart';
+import 'package:nurnova_ai/data/datasource/floor/database/callback.dart';
+import 'package:nurnova_ai/data/datasource/floor/database/migrations.dart';
+import 'package:nurnova_ai/data/datasource/floor/entities/group_entity.dart';
+import 'package:nurnova_ai/data/datasource/floor/entities/tenant_entity.dart';
+import 'package:nurnova_ai/data/datasource/floor/entities/user_entity.dart';
 import 'package:floor/floor.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';

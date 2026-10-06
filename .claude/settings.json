@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Read",
+      "Edit",
+      "Write",
+      "NotebookEdit",
+      "Glob",
+      "Grep",
+      "Bash",
+      "Task",
+      "TodoWrite",
+      "WebFetch",
+      "WebSearch",
+      "Skill",
+      "mcp__figma",
+      "mcp__Figma",
+      "mcp__Claude_Browser",
+      "mcp__Claude_Code_iOS_Simulator",
+      "mcp__visualize",
+      "mcp__ccd_session"
+    ],
+    "deny": [
+      "Bash(rm -rf /*)",
+      "Bash(rm -rf ~*)",
+      "Bash(sudo rm *)",
+      "Bash(git push --force*)",
+      "Bash(mkfs*)",
+      "Bash(dd if=*of=/dev/*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true
+}

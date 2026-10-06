@@ -1,8 +1,8 @@
 import 'dart:ui';
 
-import 'package:baiqavisit/presentation/features/web/dashboard/web_dashboard_cubit.dart';
-import 'package:baiqavisit/utils/web/browser_vision_models.dart';
-import 'package:baiqavisit/utils/web/coco_labels.dart';
+import 'package:nurnova_ai/presentation/features/web/dashboard/web_dashboard_cubit.dart';
+import 'package:nurnova_ai/utils/web/browser_vision_models.dart';
+import 'package:nurnova_ai/utils/web/coco_labels.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

@@ -1,5 +1,5 @@
-import 'package:baiqavisit/data/datasource/network/dto/auth/user/user_response.dart';
-import 'package:baiqavisit/data/datasource/preference/preferences_extensions.dart';
+import 'package:nurnova_ai/data/datasource/network/dto/auth/user/user_response.dart';
+import 'package:nurnova_ai/data/datasource/preference/preferences_extensions.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

@@ -1,7 +1,9 @@
-import 'package:baiqavisit/presentation/widgets/card/custom_card.dart';
-import 'package:baiqavisit/presentation/widgets/chat/chat_text_field.dart';
-import 'package:baiqavisit/presentation/widgets/message/image_message_widget.dart';
-import 'package:baiqavisit/presentation/widgets/message/text_message_item.dart';
+import 'package:nurnova_ai/core/gen/localization/strings.dart';
+import 'package:nurnova_ai/domain/models/chat/speech_playback.dart';
+import 'package:nurnova_ai/presentation/widgets/card/custom_card.dart';
+import 'package:nurnova_ai/presentation/widgets/chat/chat_text_field.dart';
+import 'package:nurnova_ai/presentation/widgets/message/image_message_widget.dart';
+import 'package:nurnova_ai/presentation/widgets/message/text_message_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -21,6 +23,32 @@ class ChatWidget extends StatefulWidget {
   final Function() subRoom;
   final bool isSendingRequest;
 
+  /// Space kept clear at the top so the first messages are not hidden by a
+  /// translucent app bar that the list scrolls underneath.
+  final double topInset;
+
+  /// Что сейчас с озвучкой: какое сообщение, на какой стадии и перематывается
+  /// ли оно. Плеер рисуется у того сообщения, чей id здесь.
+  final SpeechPlayback? playback;
+
+  /// Что известно об озвучке каждого сообщения. Из этого рисуется полоса
+  /// у ответов, которые сейчас молчат.
+  final Map<String, SpeechPlayback> speechClips;
+
+  /// Позиция воспроизведения отдельным потоком: её тики перерисовывают
+  /// только полоску плеера, а не список сообщений.
+  final Stream<Duration>? positionStream;
+
+  /// Нажатие на ответ ассистента — переключает чтение вслух.
+  final Function(types.TextMessage)? onMessageTap;
+
+  /// Перемотка внутри ответа.
+  final ValueChanged<Duration>? onSeek;
+
+  /// Текст ошибки. Пока он есть, над полем ввода висит полоса с повтором.
+  final String? errorText;
+  final VoidCallback? onRetry;
+
   const ChatWidget({
     super.key,
     required this.messages,
@@ -31,6 +59,14 @@ class ChatWidget extends StatefulWidget {
     required this.audioMessages,
     required this.isSendingRequest,
     required this.onUpdateAudio,
+    this.topInset = 0,
+    this.playback,
+    this.speechClips = const {},
+    this.positionStream,
+    this.onMessageTap,
+    this.onSeek,
+    this.errorText,
+    this.onRetry,
   });
 
   @override
@@ -87,6 +123,9 @@ class _ChatWidgetState extends State<ChatWidget> {
     // });
   }
 
+  /// Горизонтальный паддинг списка сообщений.
+  static const double listHorizontalPadding = 16;
+
   Widget buildMessage(types.Message message) {
     final isSentByMe = message.author.id == widget.userUid;
 
@@ -97,11 +136,35 @@ class _ChatWidgetState extends State<ChatWidget> {
     // );
     Widget bubble;
 
+    // messageWidth — это ширина СОДЕРЖИМОГО, а пузырь занимает ещё и обвязку:
+    // отступ с дальней стороны плюс паддинг карточки. У текста она 40+12*2=64,
+    // у картинки 40+5*2=50, поэтому одно общее число неизбежно врёт для одного
+    // из типов (раньше вычиталось 50, и текстовый пузырь вылезал ровно на 14).
+    // Считаем по константам самих виджетов, чтобы значения не разъезжались.
+    final rowWidth =
+        MediaQuery.sizeOf(context).width - listHorizontalPadding * 2;
+    double contentWidth(double chrome) =>
+        (rowWidth - chrome).clamp(160.0, 320.0).toDouble();
+
     if (message is types.TextMessage) {
+      // Не «звучит», а «выбрано»: озвучка может и молчать, оставаясь на
+      // этом сообщении.
+      final isCurrent = widget.playback?.messageId == message.id;
+
       bubble = TextMessageItem(
         isSentByMe: isSentByMe,
         message: message,
-        messageWidth: 300,
+        messageWidth: contentWidth(TextMessageItem.chrome).round(),
+        // Звучать может только одно сообщение; остальным отдаём то, что о
+        // их звуке уже известно, — чтобы полоса с огибающей осталась на
+        // месте и переслушать их можно было с перемоткой.
+        playback: isCurrent ? widget.playback : widget.speechClips[message.id],
+        // Позицию слышит только то сообщение, которое звучит. Молчащая
+        // полоса обязана стоять на нуле, а не повторять чужой отсчёт.
+        positionStream: isCurrent ? widget.positionStream : null,
+        // Ответы читаются вслух, свои сообщения — нет.
+        onTap: isSentByMe ? null : () => widget.onMessageTap?.call(message),
+        onSeek: widget.onSeek,
         onClickRepliedMsg: (msg) {
           scrollToMessage(msg);
         },
@@ -110,7 +173,7 @@ class _ChatWidgetState extends State<ChatWidget> {
       bubble = ImageMessageWidget(
         isSentByMe: isSentByMe,
         message: message,
-        messageWidth: 300,
+        messageWidth: contentWidth(ImageMessageWidget.chrome).round(),
       );
     }
     // else if (message is types.AudioMessage) {
@@ -139,11 +202,19 @@ class _ChatWidgetState extends State<ChatWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    // The composer used to float in a Stack while the list guessed its height
+    // with a hardcoded `bottom: 80`. A Column gives the list exactly the room
+    // that is left, so nothing hides behind the bar and no magic number drifts.
+    return Column(
       children: [
-        Positioned.fill(
+        Expanded(
           child: ScrollablePositionedList.builder(
-            padding: EdgeInsets.only(bottom: 80, left: 16, right: 16),
+            padding: EdgeInsets.fromLTRB(
+                listHorizontalPadding,
+                widget.topInset + 8,
+                listHorizontalPadding,
+                8,
+              ),
             reverse: true,
             itemScrollController: itemScrollController,
             itemPositionsListener: itemPositionsListener,
@@ -152,7 +223,7 @@ class _ChatWidgetState extends State<ChatWidget> {
             itemBuilder: (context, index) {
               if (widget.isSendingRequest && index == 0) {
                 return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  padding: const EdgeInsets.symmetric(vertical: 3),
                   child: loadingBubble(),
                 );
               }
@@ -164,32 +235,65 @@ class _ChatWidgetState extends State<ChatWidget> {
               return KeyedSubtree(
                 key: ValueKey(message.id),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  padding: const EdgeInsets.symmetric(vertical: 3),
                   child: buildMessage(message),
                 ),
               );
             },
           ),
         ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CustomInputField(
-                isSendingRequest: widget.isSendingRequest,
-                onSend: _handleSend,
-                onSendAudio: _handleSendAudio,
-                onAttached: (files) {
-                  setState(() {
-                    attachedFiles = files;
-                  });
-                },
-              ),
-            ],
-          ),
+        if (widget.errorText != null) _errorBar(context, widget.errorText!),
+        CustomInputField(
+          isSendingRequest: widget.isSendingRequest,
+          onSend: _handleSend,
+          onSendAudio: _handleSendAudio,
+          onAttached: (files) {
+            setState(() {
+              attachedFiles = files;
+            });
+          },
         ),
       ],
+    );
+  }
+
+  /// Полоса с ошибкой и кнопкой повтора. Текст ошибки ещё и проговаривается
+  /// вслух — на экран здесь смотрят не все.
+  Widget _errorBar(BuildContext context, String text) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.fromLTRB(
+        listHorizontalPadding,
+        0,
+        listHorizontalPadding,
+        8,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: scheme.errorContainer,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.error_outline, size: 20, color: scheme.onErrorContainer),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(fontSize: 13, color: scheme.onErrorContainer),
+            ),
+          ),
+          if (widget.onRetry != null) ...[
+            const SizedBox(width: 8),
+            TextButton(
+              onPressed: widget.onRetry,
+              child: Text(Strings.chatErrorRetry),
+            ),
+          ],
+        ],
+      ),
     );
   }
 
@@ -197,19 +301,21 @@ class _ChatWidgetState extends State<ChatWidget> {
     return Row(
       children: [
         CustomCard(
-          padding: EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 2),
-          borderRadius: BorderRadius.only(
+          margin: EdgeInsets.zero,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(8),
             topRight: Radius.circular(8),
-            bottomLeft: Radius.circular( 0),
+            bottomLeft: Radius.circular(0),
             bottomRight: Radius.circular(8),
           ),
-          child: SizedBox(
-            width: 32,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                  child: TypingDots()
-              )
+          child: const SizedBox(
+            width: 26,
+            height: 18,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: TypingDots(),
+            ),
           ),
         ),
 
@@ -253,7 +359,7 @@ class _TypingDotsState extends State<TypingDots>
         final value = (_controller.value * 3).floor() + 1;
         return Text(
           '.' * value,
-          style: const TextStyle(fontSize: 24),
+          style: const TextStyle(fontSize: 18, height: 1),
         );
       },
     );

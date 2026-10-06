@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:baiqavisit/core/extensions/list_extensions.dart';
-import 'package:baiqavisit/presentation/router/app_router.dart';
+import 'package:nurnova_ai/core/extensions/list_extensions.dart';
+import 'package:nurnova_ai/presentation/router/app_router.dart';
 
 extension AutoRouteExts on StackRouter {
   void popUntilOrPushHome(String routerName) {

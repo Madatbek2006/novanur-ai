@@ -1,4 +1,4 @@
-import 'package:baiqavisit/core/extensions/format_extensions.dart';
+import 'package:nurnova_ai/core/extensions/format_extensions.dart';
 
 class AttendanceStats {
   int autoAttCount;

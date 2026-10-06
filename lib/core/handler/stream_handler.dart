@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:baiqavisit/data/error/app_exception.dart';
-import 'package:baiqavisit/data/mappers/dio_error_mappers.dart';
+import 'package:nurnova_ai/data/error/app_exception.dart';
+import 'package:nurnova_ai/data/mappers/dio_error_mappers.dart';
 import 'package:logger/logger.dart';
 
 extension StreamExtensions<T> on Stream<T> {

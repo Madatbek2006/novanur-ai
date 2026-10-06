@@ -1,7 +1,7 @@
-import 'package:baiqavisit/data/datasource/network/dto/auth/token/refresh_token_request.dart';
-import 'package:baiqavisit/data/datasource/preference/auth_preferences.dart';
-import 'package:baiqavisit/domain/models/logout/logout_event.dart';
-import 'package:baiqavisit/domain/stream_controllers/logout_event_stream_controller.dart';
+import 'package:nurnova_ai/data/datasource/network/dto/auth/token/refresh_token_request.dart';
+import 'package:nurnova_ai/data/datasource/preference/auth_preferences.dart';
+import 'package:nurnova_ai/domain/models/logout/logout_event.dart';
+import 'package:nurnova_ai/domain/stream_controllers/logout_event_stream_controller.dart';
 import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
 

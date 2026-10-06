@@ -1,9 +1,9 @@
-import 'package:baiqavisit/core/extensions/text_extensions.dart';
-import 'package:baiqavisit/core/gen/assets/assets.gen.dart';
-import 'package:baiqavisit/core/gen/localization/strings.dart';
-import 'package:baiqavisit/domain/models/dashboard/dashboard_button_data.dart';
-import 'package:baiqavisit/presentation/support/extensions/color_extension.dart';
-import 'package:baiqavisit/utils/extension/image.dart';
+import 'package:nurnova_ai/core/extensions/text_extensions.dart';
+import 'package:nurnova_ai/core/gen/assets/assets.gen.dart';
+import 'package:nurnova_ai/core/gen/localization/strings.dart';
+import 'package:nurnova_ai/domain/models/dashboard/dashboard_button_data.dart';
+import 'package:nurnova_ai/presentation/support/extensions/color_extension.dart';
+import 'package:nurnova_ai/utils/extension/image.dart';
 import 'package:flutter/material.dart';
 
 extension WebModeInfo on DashboardButtonType {

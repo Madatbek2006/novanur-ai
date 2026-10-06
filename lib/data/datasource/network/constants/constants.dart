@@ -11,12 +11,12 @@ abstract class Constants {
   // static String baseUrl = 'https://vqa.jprq.live/';
   static String baseUrl = _apiBaseUrlOverride.isNotEmpty
       ? _apiBaseUrlOverride
-      : 'http://81.17.102.235:8000/';
+      : 'https://glass-override-unpaved.ngrok-free.dev/';
   static String baseUrlWs = _wsBaseUrlOverride.isNotEmpty
       ? _wsBaseUrlOverride
       : _apiBaseUrlOverride.isNotEmpty
           ? _apiBaseUrlOverride.replaceFirst(RegExp('^http'), 'ws')
-          : 'ws://81.17.102.235:8000/';
+          : 'wss://glass-override-unpaved.ngrok-free.dev/';
   // static String baseUrl = 'http://81.17.102.235:8000/';
   static String baseUrlForImage = 'https://kindergarten2.istream.uz/';
   static var formatter = NumberFormat('###,000');

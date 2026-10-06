@@ -1,11 +1,11 @@
 import 'dart:math' as math;
 
-import 'package:baiqavisit/core/extensions/text_extensions.dart';
-import 'package:baiqavisit/core/gen/localization/strings.dart';
-import 'package:baiqavisit/presentation/features/web/widgets/detections_painter.dart';
-import 'package:baiqavisit/presentation/features/web/widgets/web_ui.dart';
-import 'package:baiqavisit/presentation/support/extensions/color_extension.dart';
-import 'package:baiqavisit/utils/web/browser_vision.dart';
+import 'package:nurnova_ai/core/extensions/text_extensions.dart';
+import 'package:nurnova_ai/core/gen/localization/strings.dart';
+import 'package:nurnova_ai/presentation/features/web/widgets/detections_painter.dart';
+import 'package:nurnova_ai/presentation/features/web/widgets/web_ui.dart';
+import 'package:nurnova_ai/presentation/support/extensions/color_extension.dart';
+import 'package:nurnova_ai/utils/web/browser_vision.dart';
 import 'package:flutter/material.dart';
 
 /// Left side of the dashboard: where the picture comes from.

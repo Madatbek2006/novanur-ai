@@ -1,201 +1,116 @@
 import 'dart:convert';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:baiqavisit/core/enum/describe_img_type.dart';
-import 'package:baiqavisit/core/extensions/text_extensions.dart';
-import 'package:baiqavisit/core/gen/assets/assets.gen.dart';
-import 'package:baiqavisit/core/gen/localization/strings.dart';
-import 'package:baiqavisit/presentation/router/app_router.dart';
-import 'package:baiqavisit/presentation/support/colors/static_colors.dart';
-import 'package:baiqavisit/presentation/support/cubit/base_page.dart';
-import 'package:baiqavisit/presentation/support/extensions/color_extension.dart';
-import 'package:baiqavisit/presentation/support/extensions/compressing_exts.dart';
-import 'package:baiqavisit/presentation/widgets/app_bar/default_app_bar.dart';
-import 'package:baiqavisit/presentation/widgets/bottom_sheet/bottom_sheet_title.dart';
-import 'package:baiqavisit/presentation/widgets/button/custom_elevated_button.dart';
-import 'package:baiqavisit/presentation/widgets/button/custom_outlined_button.dart';
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as lokiimage;
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:nurnova_ai/core/enum/describe_img_type.dart';
+import 'package:nurnova_ai/core/extensions/text_extensions.dart';
+import 'package:nurnova_ai/core/gen/localization/strings.dart';
+import 'package:nurnova_ai/presentation/features/common/cameras/app_camera_controller.dart';
+import 'package:nurnova_ai/presentation/features/common/cameras/app_camera_view.dart';
+import 'package:nurnova_ai/presentation/router/app_router.dart';
+import 'package:nurnova_ai/presentation/support/cubit/base_statefull_page.dart';
+import 'package:nurnova_ai/presentation/widgets/bottom_sheet/bottom_sheet_title.dart';
+import 'package:nurnova_ai/presentation/widgets/button/custom_elevated_button.dart';
 
 import 'take_photo_cubit.dart';
 
 @RoutePage()
 class TakePhotoPage
-    extends BasePage<TakePhotoCubit, TakePhotoState, TakePhotoEvent> {
-   TakePhotoPage({super.key});
+    extends BaseStatefulPage<TakePhotoCubit, TakePhotoState, TakePhotoEvent> {
+  const TakePhotoPage({super.key});
 
   @override
-  void onWidgetCreated(BuildContext context) {
-    cubit(context).setInitialData();
+  State<StatefulWidget> createState() => _TakePhotoPageState();
+}
+
+class _TakePhotoPageState extends BaseStatefulPageState<TakePhotoPage,
+    TakePhotoCubit, TakePhotoState, TakePhotoEvent> {
+  late final AppCameraController _camera;
+
+  @override
+  void onWidgetCreated() {
+    _camera = AppCameraController();
+    _camera.initialize();
   }
 
   @override
-  void onEventEmitted(BuildContext context, TakePhotoEvent event) {
+  void dispose() {
+    _camera.dispose();
+    super.dispose();
+  }
+
+  @override
+  void onEventEmitted(TakePhotoEvent event) {
     switch (event.type) {
       case TakePhotoEventType.onShowTakenPhoto:
-        _showTakenPhotoBottomSheet(context, cubit(context).states);
+        _showTakenPhotoBottomSheet(context, cubit().states);
+        break;
       case TakePhotoEventType.openResultScreen:
+        break;
     }
   }
 
   @override
   Widget onWidgetBuild(BuildContext context, TakePhotoState state) {
-    // if(state.isSendingRequest){
-    //   showProgressDialog(context);
-    // }
     return Scaffold(
-      backgroundColor: context.backgroundWhiteColor,
-      body: Container(
-        child: _buildBody(context, state),
-      ),
-    );
-
-  }
-
-  Widget _buildBody(BuildContext context, TakePhotoState state) {
-    if (state.isCameraInitLoading) {
-      return _buildLoadingBlock();
-    } else if (state.isCameraInitFailed) {
-      return _buildErrorBlock(context, state);
-    } else if (state.isCameraVisible) {
-      return _buildCameraViews(context, state);
-    } else {
-      return _buildErrorBlock(context, state);
-    }
-  }
-
-  Widget _buildLoadingBlock() {
-    return Center(
-      child: CircularProgressIndicator(
-        backgroundColor: Colors.grey[300],
-        valueColor: AlwaysStoppedAnimation<Color>(StaticColors.buttonColor),
-      ),
-    );
-  }
-
-  Widget _buildErrorBlock(BuildContext context, TakePhotoState state) {
-    return Center(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Strings.commonCameraError
-                .w(500)
-                .s(15)
-                .c(context.textPrimary)
-                .copyWith(textAlign: TextAlign.center, softWrap: true),
-            SizedBox(height: 32),
-            CustomOutlinedButton(
-              buttonHeight: 42,
-              text: Strings.commonRestartCamera,
-              strokeColor: StaticColors.buttonColor,
-              onPressed: () {
-                HapticFeedback.heavyImpact();
-                cubit(context).setupCamera();
-              },
-            ),
-            SizedBox(height: 20),
-            CustomElevatedButton(
-              buttonHeight: 42,
-              text: Strings.commonOpenSettings,
-              onPressed: () {
-                HapticFeedback.heavyImpact();
-                openAppSettings();
-              },
-            ),
-            SizedBox(height: 20),
-          ],
+      backgroundColor: Colors.black,
+      body: AppCameraView(
+        controller: _camera,
+        overlay: Align(
+          alignment: Alignment.bottomCenter,
+          child: _buildShutterButton(),
         ),
       ),
     );
   }
 
-  Widget _buildCameraViews(BuildContext context, TakePhotoState state) {
-    final cameraController = state.cameraController;
-    final double screenWidth = MediaQuery.of(context).size.width;
-
-    final double rectangleWidth = screenWidth * 0.8;
-    final double rectangleHeight = rectangleWidth * 4 / 3;
-
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          Container(
-            color: context.appBarColor,
+  Widget _buildShutterButton() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 64),
+      child: InkWell(
+        onTap: _onTakePhoto,
+        borderRadius: BorderRadius.circular(360),
+        child: Container(
+          height: 64,
+          width: 64,
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            border: Border.all(width: 2, color: Colors.white),
+            borderRadius: BorderRadius.circular(360),
           ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: CameraPreview(cameraController!,
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child:
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      InkWell(
-                        onTap: () async {
-                          onTakePhoto(context,cameraController);
-                        },
-                        borderRadius: BorderRadius.circular(360),
-                        child: Container(
-                          height: 64,
-                          width: 64,
-                          padding: EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              width: 2,
-                              color: Colors.white,
-                            ),
-                            borderRadius: BorderRadius.circular(360)
-                          ),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(360)
-                            )
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 64)
-                    ],
-                  )
-
-              ),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(360),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Future<void> onTakePhoto(BuildContext context, CameraController cameraController) async{
+  Future<void> _onTakePhoto() async {
     HapticFeedback.heavyImpact();
-    try {
-      final XFile photo = await cameraController.takePicture();
-      XFile compressed = await photo.compressPhoto();
-      final Uint8List bytes = await compressed.readAsBytes();
-      final String photoInBase64 = await _cropImage(bytes);
 
-      cubit(context).setTakenPhoto(compressed, photoInBase64);
-      cubit(context).showPicture(true);
+    final photo = await _camera.takePicture();
+    if (photo == null) return;
 
-      print("Cropped Image: $photoInBase64");
-    } catch (e) {
-      print("Error capturing image: $e");
-    }
+    final bytes = await photo.readAsBytes();
+    final photoInBase64 = await _cropImage(bytes);
+    if (!mounted) return;
+
+    cubit().setTakenPhoto(photo, photoInBase64);
+    cubit().showPicture();
   }
 
-
-
+  /// Crops the capture to the 3:4 frame the preview shows and returns it as
+  /// base64, ready for the confirmation sheet.
   Future<String> _cropImage(Uint8List originalImageBytes) async {
-    final lokiimage.Image? originalImage = lokiimage.decodeImage(originalImageBytes);
+    final lokiimage.Image? originalImage =
+        lokiimage.decodeImage(originalImageBytes);
     if (originalImage == null) return '';
 
     final int imageWidth = originalImage.width;
@@ -222,35 +137,23 @@ class TakePhotoPage
       height: cropHeight,
     );
 
-    // Convert the cropped image back to bytes
-    final Uint8List croppedImageBytes =
-        Uint8List.fromList(lokiimage.encodeJpg(croppedImage));
-    return base64Encode(croppedImageBytes);
+    return base64Encode(lokiimage.encodeJpg(croppedImage));
   }
 
-  void _showTakenPhotoBottomSheet(
-    BuildContext context,
-    TakePhotoState state,
-  ) {
+  void _showTakenPhotoBottomSheet(BuildContext context, TakePhotoState state) {
     showCupertinoModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isDismissible: false,
       builder: (BuildContext modalContext) {
         return Material(
-          child:Column(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 20),
-              BottomSheetTitle(
-                title: Strings.takeAttPreview,
-                // onCloseClicked: () {
-                //   context.router.pop();
-                // },
-              ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
+              BottomSheetTitle(title: Strings.takeAttPreview),
+              const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Strings.takeAttCheckImageBeforeSending
@@ -258,9 +161,9 @@ class TakePhotoPage
                     .w(500)
                     .copyWith(textAlign: TextAlign.center),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ClipRRect(
-                borderRadius: BorderRadius.circular(10.0),
+                borderRadius: BorderRadius.circular(10),
                 child: Image.memory(
                   base64Decode(state.takenPhotoInBase64),
                   fit: BoxFit.cover,
@@ -269,34 +172,36 @@ class TakePhotoPage
                   alignment: Alignment.center,
                 ),
               ),
-              SizedBox(height: 24),
-              Spacer(),
+              const SizedBox(height: 24),
+              const Spacer(),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: CustomElevatedButton(
                   text: Strings.commonRetakePhoto,
                   onPressed: () {
-                    Navigator.of(context).pop();
                     HapticFeedback.heavyImpact();
+                    Navigator.of(modalContext).pop();
                   },
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: CustomElevatedButton(
                   text: Strings.commonApply,
                   onPressed: () {
                     HapticFeedback.heavyImpact();
-                    Navigator.of(context).pop();
-                    context.router.pop();
-                    // cubit(context).sendTakenAttendancePhoto();
-                    context.router.push(ChatRoute( photoFile: state.takenPhotoFile!, type: DescribeImgType.question));
-
+                    Navigator.of(modalContext).pop();
+                    context.router.push(
+                      ChatRoute(
+                        photoFile: state.takenPhotoFile!,
+                        type: DescribeImgType.question,
+                      ),
+                    );
                   },
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
             ],
           ),
         );

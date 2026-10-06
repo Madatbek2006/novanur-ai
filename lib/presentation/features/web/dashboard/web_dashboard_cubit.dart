@@ -1,15 +1,15 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:baiqavisit/core/enum/describe_img_type.dart';
-import 'package:baiqavisit/core/enum/enums.dart';
-import 'package:baiqavisit/core/gen/localization/strings.dart';
-import 'package:baiqavisit/data/datasource/network/dto/barcode/product_response.dart';
-import 'package:baiqavisit/data/repositories/photo_analysis_repository.dart';
-import 'package:baiqavisit/domain/models/dashboard/dashboard_button_data.dart';
-import 'package:baiqavisit/presentation/support/cubit/base_cubit.dart';
-import 'package:baiqavisit/utils/web/browser_vision.dart';
-import 'package:baiqavisit/utils/web/coco_labels.dart';
+import 'package:nurnova_ai/core/enum/describe_img_type.dart';
+import 'package:nurnova_ai/core/enum/enums.dart';
+import 'package:nurnova_ai/core/gen/localization/strings.dart';
+import 'package:nurnova_ai/data/datasource/network/dto/barcode/product_response.dart';
+import 'package:nurnova_ai/data/repositories/photo_analysis_repository.dart';
+import 'package:nurnova_ai/domain/models/dashboard/dashboard_button_data.dart';
+import 'package:nurnova_ai/presentation/support/cubit/base_cubit.dart';
+import 'package:nurnova_ai/utils/web/browser_vision.dart';
+import 'package:nurnova_ai/utils/web/coco_labels.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';

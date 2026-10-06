@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:baiqavisit/presentation/support/colors/dark_theme_colors.dart';
-import 'package:baiqavisit/presentation/support/colors/light_theme_colors.dart';
-import 'package:baiqavisit/presentation/support/colors/static_colors.dart';
-import 'package:baiqavisit/presentation/support/colors/theme_colors.dart';
+import 'package:nurnova_ai/presentation/support/colors/dark_theme_colors.dart';
+import 'package:nurnova_ai/presentation/support/colors/light_theme_colors.dart';
+import 'package:nurnova_ai/presentation/support/colors/static_colors.dart';
+import 'package:nurnova_ai/presentation/support/colors/theme_colors.dart';
 
 extension ColorExtension on BuildContext {
   ThemeColors get colors => isDarkMode ? DarkThemeColors() : LightThemeColors();
@@ -83,11 +83,10 @@ extension ColorExtension on BuildContext {
 
   Color get iconSecondary => colors.iconSecondary;
 
-  Color get bottomSelectColor =>
-      isDarkMode ? StaticColors.colorPrimary : Color(0xFF009966);
+  Color get bottomSelectColor => primaryLight;
 
   Color get bottomUnSelectColor =>
-      isDarkMode ? Color(0xFFA0A0A0) : Color(0xFF949494);
+      isDarkMode ? Color(0xFFA0A0A0) : Color(0xFF6E7590);
 
   Color get borderStroke => isDarkMode ? Color(0xFF424242) : Color(0xFFECEFF5);
   Color get mainBg =>

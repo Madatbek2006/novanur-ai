@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:baiqavisit/core/cache/CustomCacheManager.dart';
-import 'package:baiqavisit/data/datasource/network/constants/constants.dart';
-import 'package:baiqavisit/presentation/support/extensions/color_extension.dart';
+import 'package:nurnova_ai/core/cache/CustomCacheManager.dart';
+import 'package:nurnova_ai/data/datasource/network/constants/constants.dart';
+import 'package:nurnova_ai/presentation/support/extensions/color_extension.dart';
 
 class CircleCachedNetworkImage extends StatelessWidget {
   const CircleCachedNetworkImage({

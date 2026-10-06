@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:baiqavisit/utils/web/browser_vision_models.dart';
+import 'package:nurnova_ai/utils/web/browser_vision_models.dart';
 
 /// Non-web builds never show the web dashboard; this only satisfies the compiler.
 class BrowserVision {

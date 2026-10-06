@@ -35,11 +35,15 @@ class PhotoAnalysisService {
       "api/create/chat",
       data: formData,
       options: Options(
-        // Browsers refuse to override User-Agent.
+        // Browsers refuse to override User-Agent; the ngrok bypass still
+        // has to be repeated because Options replace the common headers.
         headers: kIsWeb
-            ? null
+            ? {'ngrok-skip-browser-warning': 'true'}
             : {
                 'User-Agent': 'insomnia/11.4.0', // если нужно
+                // Options здесь перекрывает общие заголовки Dio, поэтому
+                // обход заставки ngrok приходится повторить и тут.
+                'ngrok-skip-browser-warning': 'true',
               },
       ),
     );

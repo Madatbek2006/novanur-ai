@@ -14,6 +14,8 @@ class ProfileState with _$ProfileState {
 //
     AppThemeMode? appThemeMode,
 //
+    @Default(SpeechRatePreferences.normal) double speechRate,
+//
   }) = _ProfileState;
 
   String get userFullName => user?.fullName ?? "";

@@ -1,4 +1,4 @@
-import 'package:baiqavisit/presentation/support/colors/static_colors.dart';
+import 'package:nurnova_ai/presentation/support/colors/static_colors.dart';
 import 'package:flutter/material.dart';
 
 class DefaultLoadingWidget extends StatelessWidget {

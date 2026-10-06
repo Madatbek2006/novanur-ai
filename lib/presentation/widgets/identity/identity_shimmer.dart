@@ -1,6 +1,6 @@
-import 'package:baiqavisit/presentation/support/colors/static_colors.dart';
-import 'package:baiqavisit/presentation/support/extensions/color_extension.dart';
-import 'package:baiqavisit/presentation/widgets/divider/custom_divider.dart';
+import 'package:nurnova_ai/presentation/support/colors/static_colors.dart';
+import 'package:nurnova_ai/presentation/support/extensions/color_extension.dart';
+import 'package:nurnova_ai/presentation/widgets/divider/custom_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 

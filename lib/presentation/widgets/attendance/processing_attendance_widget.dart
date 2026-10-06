@@ -1,9 +1,9 @@
-import 'package:baiqavisit/core/extensions/date_extensions.dart';
-import 'package:baiqavisit/core/extensions/text_extensions.dart';
-import 'package:baiqavisit/core/gen/localization/strings.dart';
-import 'package:baiqavisit/domain/models/attendance/processing_attendance.dart';
-import 'package:baiqavisit/presentation/support/extensions/color_extension.dart';
-import 'package:baiqavisit/presentation/widgets/image/rounded_cached_network_image_widget.dart';
+import 'package:nurnova_ai/core/extensions/date_extensions.dart';
+import 'package:nurnova_ai/core/extensions/text_extensions.dart';
+import 'package:nurnova_ai/core/gen/localization/strings.dart';
+import 'package:nurnova_ai/domain/models/attendance/processing_attendance.dart';
+import 'package:nurnova_ai/presentation/support/extensions/color_extension.dart';
+import 'package:nurnova_ai/presentation/widgets/image/rounded_cached_network_image_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

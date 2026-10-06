@@ -1,6 +1,6 @@
-import 'package:baiqavisit/data/datasource/floor/entities/tenant_entity.dart';
-import 'package:baiqavisit/data/datasource/network/dto/tenant/tenant_response.dart';
-import 'package:baiqavisit/domain/models/tenant/tenant.dart';
+import 'package:nurnova_ai/data/datasource/floor/entities/tenant_entity.dart';
+import 'package:nurnova_ai/data/datasource/network/dto/tenant/tenant_response.dart';
+import 'package:nurnova_ai/domain/models/tenant/tenant.dart';
 
 extension TenantResponseMappers on TenantResponse {
   TenantEntity toEntity() {

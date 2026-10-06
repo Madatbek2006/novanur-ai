@@ -1,7 +1,7 @@
 import 'package:injectable/injectable.dart';
-import 'package:baiqavisit/presentation/support/state_message/state_message.dart';
-import 'package:baiqavisit/presentation/support/state_message/state_message_manager.dart';
-import 'package:baiqavisit/presentation/support/state_message/state_message_type.dart';
+import 'package:nurnova_ai/presentation/support/state_message/state_message.dart';
+import 'package:nurnova_ai/presentation/support/state_message/state_message_manager.dart';
+import 'package:nurnova_ai/presentation/support/state_message/state_message_type.dart';
 
 @Singleton(as: StateMessageManager)
 class StateMessageManagerImpl extends StateMessageManager {

@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:baiqavisit/data/datasource/floor/dao/group_entity_dao.dart';
-import 'package:baiqavisit/data/datasource/floor/dao/tenant_entity_dao.dart';
-import 'package:baiqavisit/data/datasource/floor/dao/user_entity_dao.dart';
-import 'package:baiqavisit/data/datasource/floor/entities/group_entity.dart';
-import 'package:baiqavisit/data/datasource/floor/entities/tenant_entity.dart';
-import 'package:baiqavisit/data/datasource/floor/entities/user_entity.dart';
+import 'package:nurnova_ai/data/datasource/floor/dao/group_entity_dao.dart';
+import 'package:nurnova_ai/data/datasource/floor/dao/tenant_entity_dao.dart';
+import 'package:nurnova_ai/data/datasource/floor/dao/user_entity_dao.dart';
+import 'package:nurnova_ai/data/datasource/floor/entities/group_entity.dart';
+import 'package:nurnova_ai/data/datasource/floor/entities/tenant_entity.dart';
+import 'package:nurnova_ai/data/datasource/floor/entities/user_entity.dart';
 
 /// In-memory DAOs for the web build, where sqflite (and so floor) is unavailable.
 

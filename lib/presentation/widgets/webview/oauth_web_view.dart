@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:logger/logger.dart';
-import 'package:baiqavisit/core/enum/enums.dart';
-import 'package:baiqavisit/presentation/support/extensions/color_extension.dart';
-import 'package:baiqavisit/presentation/widgets/state/default_error_widget.dart';
+import 'package:nurnova_ai/core/enum/enums.dart';
+import 'package:nurnova_ai/presentation/support/extensions/color_extension.dart';
+import 'package:nurnova_ai/presentation/widgets/state/default_error_widget.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class OAuthWebView extends StatefulWidget {

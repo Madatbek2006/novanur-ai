@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
-import 'package:baiqavisit/core/gen/assets/fonts.gen.dart';
-import 'package:baiqavisit/utils/web/browser_vision.dart';
+import 'package:nurnova_ai/core/gen/assets/fonts.gen.dart';
+import 'package:nurnova_ai/utils/web/browser_vision.dart';
 import 'package:flutter/material.dart';
 
 /// Draws detected objects over an image or video shown with BoxFit.contain.

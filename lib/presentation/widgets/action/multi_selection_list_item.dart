@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:baiqavisit/presentation/support/extensions/color_extension.dart';
-import 'package:baiqavisit/core/extensions/text_extensions.dart';
-import 'package:baiqavisit/core/gen/assets/assets.gen.dart';
+import 'package:nurnova_ai/presentation/support/extensions/color_extension.dart';
+import 'package:nurnova_ai/core/extensions/text_extensions.dart';
+import 'package:nurnova_ai/core/gen/assets/assets.gen.dart';
 import 'package:flutter/services.dart';
 
 class MultiSelectionListItem extends StatelessWidget {

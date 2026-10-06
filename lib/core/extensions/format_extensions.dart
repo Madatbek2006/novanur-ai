@@ -1,4 +1,4 @@
-import 'package:baiqavisit/domain/models/language/language.dart';
+import 'package:nurnova_ai/domain/models/language/language.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 extension DoubleExtensions on double {
@@ -18,7 +18,7 @@ extension DoubleExtensions on double {
 
   String formatDecimal() {
     try {
-      final format = NumberFormat("0.##", Language.kazakhCyrill.getIdentifier());
+      final format = NumberFormat("0.##", Language.uzbekLatin.getIdentifier());
       return format.format(this);
     } catch (e) {
       return toString();

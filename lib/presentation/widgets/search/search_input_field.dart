@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:baiqavisit/core/gen/assets/assets.gen.dart';
-import 'package:baiqavisit/presentation/support/extensions/color_extension.dart';
+import 'package:nurnova_ai/core/gen/assets/assets.gen.dart';
+import 'package:nurnova_ai/presentation/support/extensions/color_extension.dart';
 import 'package:flutter/material.dart';
 
 class SearchInputField extends StatefulWidget {

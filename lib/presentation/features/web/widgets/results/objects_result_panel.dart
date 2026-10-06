@@ -1,10 +1,10 @@
-import 'package:baiqavisit/core/enum/enums.dart';
-import 'package:baiqavisit/core/extensions/text_extensions.dart';
-import 'package:baiqavisit/core/gen/localization/strings.dart';
-import 'package:baiqavisit/presentation/features/web/dashboard/web_dashboard_cubit.dart';
-import 'package:baiqavisit/presentation/features/web/widgets/results/speak_button.dart';
-import 'package:baiqavisit/presentation/features/web/widgets/web_ui.dart';
-import 'package:baiqavisit/presentation/support/extensions/color_extension.dart';
+import 'package:nurnova_ai/core/enum/enums.dart';
+import 'package:nurnova_ai/core/extensions/text_extensions.dart';
+import 'package:nurnova_ai/core/gen/localization/strings.dart';
+import 'package:nurnova_ai/presentation/features/web/dashboard/web_dashboard_cubit.dart';
+import 'package:nurnova_ai/presentation/features/web/widgets/results/speak_button.dart';
+import 'package:nurnova_ai/presentation/features/web/widgets/web_ui.dart';
+import 'package:nurnova_ai/presentation/support/extensions/color_extension.dart';
 import 'package:flutter/material.dart';
 
 class ObjectsResultPanel extends StatelessWidget {

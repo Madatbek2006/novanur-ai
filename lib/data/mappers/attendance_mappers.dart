@@ -1,9 +1,9 @@
-import 'package:baiqavisit/data/datasource/network/dto/attendance/attendance_response.dart';
-import 'package:baiqavisit/data/datasource/network/dto/attendance/attendance_stats_response.dart';
-import 'package:baiqavisit/data/datasource/network/dto/attendance/processing_attendance_response.dart';
-import 'package:baiqavisit/domain/models/attendance/attendance.dart';
-import 'package:baiqavisit/domain/models/attendance/attendance_stats.dart';
-import 'package:baiqavisit/domain/models/attendance/processing_attendance.dart';
+import 'package:nurnova_ai/data/datasource/network/dto/attendance/attendance_response.dart';
+import 'package:nurnova_ai/data/datasource/network/dto/attendance/attendance_stats_response.dart';
+import 'package:nurnova_ai/data/datasource/network/dto/attendance/processing_attendance_response.dart';
+import 'package:nurnova_ai/domain/models/attendance/attendance.dart';
+import 'package:nurnova_ai/domain/models/attendance/attendance_stats.dart';
+import 'package:nurnova_ai/domain/models/attendance/processing_attendance.dart';
 
 extension AttendanceResponseMappers on AttendanceResponse {
   Attendance toModel() {

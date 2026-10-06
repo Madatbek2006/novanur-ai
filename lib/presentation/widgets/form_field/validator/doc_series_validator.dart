@@ -1,4 +1,4 @@
-import 'package:baiqavisit/core/gen/localization/strings.dart';
+import 'package:nurnova_ai/core/gen/localization/strings.dart';
 
 class DocSeriesValidator {
   static String? validate(String? value) {

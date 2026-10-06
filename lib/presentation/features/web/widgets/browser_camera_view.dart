@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:baiqavisit/utils/web/browser_vision.dart';
+import 'package:nurnova_ai/utils/web/browser_vision.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 

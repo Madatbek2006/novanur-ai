@@ -1,6 +1,6 @@
 
 
-import 'package:baiqavisit/core/gen/localization/strings.dart';
+import 'package:nurnova_ai/core/gen/localization/strings.dart';
 
 enum DescribeImgType{
   short,

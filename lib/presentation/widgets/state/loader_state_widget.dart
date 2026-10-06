@@ -1,7 +1,7 @@
-import 'package:baiqavisit/core/enum/enums.dart';
-import 'package:baiqavisit/presentation/widgets/state/default_empty_widget.dart';
-import 'package:baiqavisit/presentation/widgets/state/default_error_widget.dart';
-import 'package:baiqavisit/presentation/widgets/state/default_loading_widget.dart';
+import 'package:nurnova_ai/core/enum/enums.dart';
+import 'package:nurnova_ai/presentation/widgets/state/default_empty_widget.dart';
+import 'package:nurnova_ai/presentation/widgets/state/default_error_widget.dart';
+import 'package:nurnova_ai/presentation/widgets/state/default_loading_widget.dart';
 import 'package:flutter/material.dart';
 
 class LoaderStateWidget extends StatelessWidget {

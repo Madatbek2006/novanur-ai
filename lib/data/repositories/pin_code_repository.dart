@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:baiqavisit/data/datasource/preference/pin_code_preferences.dart';
+import 'package:nurnova_ai/data/datasource/preference/pin_code_preferences.dart';
 import 'package:injectable/injectable.dart';
 
 @lazySingleton

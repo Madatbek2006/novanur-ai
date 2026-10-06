@@ -1,24 +1,26 @@
-import 'package:baiqavisit/presentation/widgets/bottom_sheet/bottom_sheet_title.dart';
+import 'dart:ui';
+
+import 'package:nurnova_ai/presentation/widgets/bottom_sheet/bottom_sheet_title.dart';
 import 'package:auto_route/auto_route.dart';
-import 'package:baiqavisit/presentation/widgets/button/custom_outlined_button.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:baiqavisit/core/extensions/text_extensions.dart';
-import 'package:baiqavisit/core/gen/localization/strings.dart';
-import 'package:baiqavisit/presentation/application/di/get_it_injection.dart';
-import 'package:baiqavisit/presentation/support/colors/static_colors.dart';
-import 'package:baiqavisit/presentation/support/cubit/base_builder.dart';
-import 'package:baiqavisit/presentation/support/cubit/base_event.dart';
-import 'package:baiqavisit/presentation/support/cubit/base_state.dart';
-import 'package:baiqavisit/presentation/support/extensions/color_extension.dart';
-import 'package:baiqavisit/presentation/support/extensions/platform_sizes.dart';
-import 'package:baiqavisit/presentation/support/state_message/state_bottom_sheet_exts.dart';
-import 'package:baiqavisit/presentation/support/state_message/state_message_type.dart';
-import 'package:baiqavisit/presentation/widgets/button/custom_elevated_button.dart';
+import 'package:nurnova_ai/core/extensions/text_extensions.dart';
+import 'package:nurnova_ai/core/gen/localization/strings.dart';
+import 'package:nurnova_ai/presentation/application/di/get_it_injection.dart';
+import 'package:nurnova_ai/presentation/support/colors/static_colors.dart';
+import 'package:nurnova_ai/presentation/support/cubit/base_builder.dart';
+import 'package:nurnova_ai/presentation/support/cubit/base_event.dart';
+import 'package:nurnova_ai/presentation/support/cubit/base_state.dart';
+import 'package:nurnova_ai/presentation/support/extensions/color_extension.dart';
+import 'package:nurnova_ai/presentation/support/extensions/platform_sizes.dart';
+import 'package:nurnova_ai/presentation/support/theme/app_glass.dart';
+import 'package:nurnova_ai/presentation/support/state_message/state_bottom_sheet_exts.dart';
+import 'package:nurnova_ai/presentation/support/state_message/state_message_type.dart';
+import 'package:nurnova_ai/presentation/widgets/button/custom_elevated_button.dart';
 
 abstract class BasePage<CUBIT extends Cubit<BaseState<STATE, EVENT>>, STATE,
     EVENT> extends StatelessWidget {
@@ -57,10 +59,6 @@ abstract class BasePage<CUBIT extends Cubit<BaseState<STATE, EVENT>>, STATE,
   CUBIT cubit(BuildContext context) {
     return context.read<CUBIT>();
   }
-
-  // STATE state(BuildContext context) {
-  //   return context.read<STATE>();
-  // }
 
   EVENT event(BuildContext context) {
     return context.read<EVENT>();
@@ -156,48 +154,54 @@ abstract class BasePage<CUBIT extends Cubit<BaseState<STATE, EVENT>>, STATE,
   }) {
     showCupertinoModalBottomSheet(
       context: context,
-      builder: (context) => Material(
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => GlassSheet(
+        showGrabber: false,
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            SizedBox(height: 24),
             BottomSheetTitle(title: title),
-            SizedBox(height: 24),
-            Center(child: message.s(16).copyWith(textAlign: TextAlign.center)),
-            SizedBox(height: 32),
-            Row(
-              children: <Widget>[
-                SizedBox(width: 16),
-                Expanded(
-                  child: CustomOutlinedButton(
-                    text: noTitle,
-                    textColor: StaticColors.attendanceAccepted,
-                    strokeColor: StaticColors.attendanceAccepted,
-                    onPressed: () {
-                      onNoClicked();
-                      Navigator.pop(context);
-                      HapticFeedback.heavyImpact();
-                    },
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: message.s(15).copyWith(
+                    textAlign: TextAlign.center,
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: CustomOutlinedButton(
-                    text: yesTitle,
-                    textColor: StaticColors.attendanceAbsent,
-                    strokeColor: StaticColors.attendanceAbsent,
-                    onPressed: () {
-                      onYesClicked();
-                      Navigator.pop(context);
-                      HapticFeedback.heavyImpact();
-                    },
-                  ),
-                ),
-                SizedBox(width: 16),
-              ],
             ),
-            SizedBox(height: defaultBottomPadding),
+            const SizedBox(height: 28),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: _GlassActionButton(
+                      label: noTitle,
+                      isPrimary: false,
+                      onTap: () {
+                        onNoClicked();
+                        Navigator.pop(ctx);
+                        HapticFeedback.lightImpact();
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _GlassActionButton(
+                      label: yesTitle,
+                      isPrimary: true,
+                      onTap: () {
+                        onYesClicked();
+                        Navigator.pop(ctx);
+                        HapticFeedback.heavyImpact();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -264,6 +268,80 @@ abstract class BasePage<CUBIT extends Cubit<BaseState<STATE, EVENT>>, STATE,
           ),
         );
       },
+    );
+  }
+}
+
+class _GlassActionButton extends StatelessWidget {
+  final String label;
+  final bool isPrimary;
+  final VoidCallback onTap;
+
+  const _GlassActionButton({
+    required this.label,
+    required this.isPrimary,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bool dark = Theme.of(context).brightness == Brightness.dark;
+    final primaryColor = Theme.of(context).colorScheme.primary;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 48,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          gradient: isPrimary
+              ? LinearGradient(
+                  colors: [primaryColor, primaryColor.withOpacity(0.7)],
+                )
+              : LinearGradient(
+                  colors: dark
+                      ? [
+                          Colors.white.withOpacity(0.12),
+                          Colors.white.withOpacity(0.06),
+                        ]
+                      : [
+                          Colors.white.withOpacity(0.65),
+                          Colors.white.withOpacity(0.35),
+                        ],
+                ),
+          border: Border.all(
+            color: isPrimary
+                ? primaryColor.withOpacity(0.5)
+                : dark
+                    ? Colors.white.withOpacity(0.20)
+                    : Colors.white.withOpacity(0.7),
+            width: 1,
+          ),
+          boxShadow: isPrimary
+              ? [
+                  BoxShadow(
+                    color: primaryColor.withOpacity(0.35),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  )
+                ]
+              : [],
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: isPrimary
+                  ? Colors.white
+                  : dark
+                      ? Colors.white.withOpacity(0.85)
+                      : Colors.black.withOpacity(0.75),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

@@ -1,7 +1,7 @@
-import 'package:baiqavisit/data/datasource/network/dto/visitor/dangerous_visitor_response.dart';
-import 'package:baiqavisit/data/datasource/network/dto/visitor/visitor_attendance_response.dart';
-import 'package:baiqavisit/domain/models/visitor/dangerous_visitor.dart';
-import 'package:baiqavisit/domain/models/visitor/visitor_attendance.dart';
+import 'package:nurnova_ai/data/datasource/network/dto/visitor/dangerous_visitor_response.dart';
+import 'package:nurnova_ai/data/datasource/network/dto/visitor/visitor_attendance_response.dart';
+import 'package:nurnova_ai/domain/models/visitor/dangerous_visitor.dart';
+import 'package:nurnova_ai/domain/models/visitor/visitor_attendance.dart';
 
 extension VisitorAttendanceMapper on VisitorAttendanceResponse {
   VisitorAttendance toModel() {

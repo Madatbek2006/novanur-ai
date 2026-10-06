@@ -4,7 +4,7 @@ import 'dart:js_interop_unsafe';
 import 'dart:typed_data';
 import 'dart:ui';
 
-import 'package:baiqavisit/utils/web/browser_vision_models.dart';
+import 'package:nurnova_ai/utils/web/browser_vision_models.dart';
 
 // The project's build_runner ships an analyzer that predates extension types,
 // so this binding sticks to dynamic calls from dart:js_interop_unsafe.

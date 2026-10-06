@@ -1,5 +1,5 @@
-import 'package:baiqavisit/data/error/app_exception.dart';
-import 'package:baiqavisit/data/mappers/dio_error_mappers.dart';
+import 'package:nurnova_ai/data/error/app_exception.dart';
+import 'package:nurnova_ai/data/mappers/dio_error_mappers.dart';
 // import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:logger/logger.dart';
 

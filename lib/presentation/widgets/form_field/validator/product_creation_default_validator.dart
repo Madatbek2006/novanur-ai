@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import 'package:baiqavisit/core/gen/localization/strings.dart';
+import 'package:nurnova_ai/core/gen/localization/strings.dart';
 
 class ProductCreationDefaultValidator {
   static GlobalKey? _firstErrorKey;

@@ -1,5 +1,5 @@
-import 'package:baiqavisit/core/extensions/string_extensions.dart';
-import 'package:baiqavisit/core/gen/localization/strings.dart';
+import 'package:nurnova_ai/core/extensions/string_extensions.dart';
+import 'package:nurnova_ai/core/gen/localization/strings.dart';
 
 class PhoneNumberValidator {
   static String? validate(String? value) {

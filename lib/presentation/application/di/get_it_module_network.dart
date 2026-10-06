@@ -1,11 +1,12 @@
-import 'package:baiqavisit/data/datasource/network/constants/constants.dart';
-import 'package:baiqavisit/data/datasource/network/interceptor/dynamic_token_interceptor.dart';
-import 'package:baiqavisit/data/datasource/network/interceptor/common_interceptor.dart';
-import 'package:baiqavisit/data/datasource/network/interceptor/error_interceptor.dart';
-import 'package:baiqavisit/data/datasource/network/interceptor/fixed_token_interceptor.dart';
-import 'package:baiqavisit/data/datasource/network/interceptor/language_interceptor.dart';
-import 'package:baiqavisit/data/datasource/network/interceptor/refresh_token_interceptor.dart';
-import 'package:baiqavisit/data/datasource/network/services/photo_analysis_service.dart';
+import 'package:nurnova_ai/data/datasource/network/constants/constants.dart';
+import 'package:nurnova_ai/data/datasource/network/interceptor/dynamic_token_interceptor.dart';
+import 'package:nurnova_ai/data/datasource/network/interceptor/common_interceptor.dart';
+import 'package:nurnova_ai/data/datasource/network/interceptor/error_interceptor.dart';
+import 'package:nurnova_ai/data/datasource/network/interceptor/fixed_token_interceptor.dart';
+import 'package:nurnova_ai/data/datasource/network/interceptor/language_interceptor.dart';
+import 'package:nurnova_ai/data/datasource/network/interceptor/refresh_token_interceptor.dart';
+import 'package:nurnova_ai/data/datasource/network/services/photo_analysis_service.dart';
+import 'package:nurnova_ai/data/datasource/network/services/speech_service.dart';
 // import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
@@ -143,6 +144,7 @@ extension GetItModuleNetwork on GetIt {
     );
 
     registerLazySingleton(() => PhotoAnalysisService(get(instanceName: private)));
+    registerLazySingleton(() => SpeechService(get(instanceName: private)));
 
     await allReady();
   }
@@ -157,6 +159,10 @@ Dio provideDio({List<Interceptor> interceptors = const []}) {
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json; charset=UTF-8',
+      // Бесплатный ngrok показывает браузерную заставку вместо ответа,
+      // если не сказать ему, что клиент не браузер. На обычном сервере
+      // заголовок просто игнорируется.
+      'ngrok-skip-browser-warning': 'true',
     },
   );
   dio.options = options

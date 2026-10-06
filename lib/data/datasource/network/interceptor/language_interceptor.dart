@@ -1,4 +1,4 @@
-import 'package:baiqavisit/data/datasource/preference/language_preferences.dart';
+import 'package:nurnova_ai/data/datasource/preference/language_preferences.dart';
 import 'package:dio/dio.dart';
 
 class LanguageInterceptor extends QueuedInterceptor {
