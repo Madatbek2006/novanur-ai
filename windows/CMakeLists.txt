@@ -55,6 +55,11 @@ add_subdirectory("runner")
 
 # Generated plugin build rules, which manage building the plugins and adding
 # them to the application.
+# just_audio_windows и permission_handler_windows подключают
+# <experimental/coroutine>: в MSVC 14.51 (Visual Studio 18) это ошибка STL1011,
+# а не предупреждение, и сборка падала. Обход — тот, что предлагает сам
+# компилятор, пока плагины не перейдут на <coroutine>.
+add_compile_definitions(_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS)
 include(flutter/generated_plugins.cmake)
 
 
