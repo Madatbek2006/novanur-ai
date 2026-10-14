@@ -90,15 +90,17 @@ class TextResultPanel extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
+        WebSpeechControl(
+          state: state,
+          cubit: cubit,
+          text: state.recognizedText,
+          languageCode: cubit.recognizedTextLanguage,
+        ),
+        const SizedBox(height: 8),
         Wrap(
           spacing: 8,
           runSpacing: 8,
           children: [
-            SpeakButton(
-              isSpeaking: state.isSpeaking,
-              onSpeak: cubit.speakRecognizedText,
-              onStop: cubit.stopSpeaking,
-            ),
             OutlinedButton.icon(
               onPressed: () async {
                 await Clipboard.setData(ClipboardData(text: state.recognizedText));

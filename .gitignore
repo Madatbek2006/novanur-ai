@@ -113,3 +113,9 @@ obj/
 !.dev.vars.example
 .env*
 !.env.example
+
+# Словари Tesseract для десктопа скачивает сборка (.github/workflows), в git их нет.
+desktop/tessdata/
+
+# DLL Tesseract для Windows кладёт сборка (.github/workflows/windows.yml).
+windows/tesseract/

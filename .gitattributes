@@ -1,0 +1,7 @@
+# Модели и словари — двоичные. Без этого git счёл model.onnx текстом, и на
+# Windows (core.autocrlf) переводы строк испортили бы его при checkout.
+*.onnx binary
+*.tflite binary
+*.traineddata binary
+*.pte binary
+*.pt binary

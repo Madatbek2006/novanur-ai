@@ -1,5 +1,6 @@
 import 'package:nurnova_ai/presentation/features/common/barcode/barcode_cubit.dart';
 import 'package:nurnova_ai/presentation/features/common/chat/chat_cubit.dart';
+import 'package:nurnova_ai/presentation/application/manager/uzbek_voice.dart';
 import 'package:nurnova_ai/presentation/features/common/chat/chat_speaker.dart';
 import 'package:nurnova_ai/presentation/features/common/object_detection/object_detection_cubit.dart';
 import 'package:nurnova_ai/presentation/features/common/scan_text/scan_text_cubit.dart';
@@ -22,7 +23,7 @@ extension GetItModuleApp on GetIt {
     // home
     registerFactory(() => HomeCubit());
 
-    registerFactory(() => DashboardCubit(get()));
+    registerFactory(() => DashboardCubit(get(), get()));
     registerFactory(
       () => ProfileCubit(get(), get(), get(), get(), get(), get()),
     );
@@ -30,11 +31,13 @@ extension GetItModuleApp on GetIt {
 
     // take photo
     registerFactory(() => TakePhotoCubit());
-    registerFactory(() => ChatSpeaker(get(), get()));
+    // Модель узбекского голоса — одна на всё приложение: ~110 МБ в памяти.
+    registerLazySingleton(() => UzbekVoice());
+    registerFactory(() => ChatSpeaker(get(), get(), get()));
     registerFactory(() => ChatCubit(get(), get()));
     registerFactory(() => BarcodeCubit(get()));
     registerFactory(() => ObjectDetectionCubit(get()));
-    registerFactory(() => ScanTextCubit());
+    registerFactory(() => ScanTextCubit(get()));
 
     // web
     registerFactory(() => WebDashboardCubit(get(), get()));

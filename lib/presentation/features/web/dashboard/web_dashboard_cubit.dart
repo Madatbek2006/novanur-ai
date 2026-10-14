@@ -11,10 +11,9 @@ import 'package:nurnova_ai/presentation/support/cubit/base_cubit.dart';
 import 'package:nurnova_ai/utils/web/browser_vision.dart';
 import 'package:nurnova_ai/utils/web/coco_labels.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:nurnova_ai/data/datasource/preference/speech_rate_preferences.dart';
-import 'package:nurnova_ai/data/repositories/speech_rate_repository.dart';
+import 'package:nurnova_ai/domain/models/chat/speech_playback.dart';
+import 'package:nurnova_ai/presentation/features/common/chat/chat_speaker.dart';
 
 part 'web_dashboard_cubit.freezed.dart';
 part 'web_dashboard_state.dart';
@@ -22,16 +21,23 @@ part 'web_dashboard_state.dart';
 /// Drives the browser dashboard: one image (picked, dropped, pasted or taken
 /// with the camera) analysed by whichever of the four tools is selected.
 class WebDashboardCubit extends BaseCubit<WebDashboardState, WebDashboardEvent> {
-  WebDashboardCubit(this._photoAnalysisRepository, this._speechRate)
+  WebDashboardCubit(this._photoAnalysisRepository, this._speaker)
       : super(const WebDashboardState()) {
-    _tts.setCompletionHandler(_onSpeechDone);
-    _tts.setCancelHandler(_onSpeechDone);
-    _tts.setErrorHandler((_) => _onSpeechDone());
+    _speaker.onPlayback = (playback) {
+      if (isClosed) return;
+      updateState((state) => state.copyWith(
+            playback: playback,
+            speechClips: _speaker.clips,
+          ));
+    };
   }
 
   final PhotoAnalysisRepository _photoAnalysisRepository;
-  final SpeechRateRepository _speechRate;
-  final FlutterTts _tts = FlutterTts();
+
+  /// Тот же голос, что у чата: телефонный движок, а где голоса нет — сервер.
+  /// Раньше здесь был свой FlutterTts, и в браузере узбекский текст, штрихкод
+  /// и объекты не звучали вовсе: узбекского голоса у браузеров нет.
+  final ChatSpeaker _speaker;
 
   String _languageCode = 'uz';
 
@@ -46,7 +52,8 @@ class WebDashboardCubit extends BaseCubit<WebDashboardState, WebDashboardEvent> 
 
   @override
   Future<void> close() async {
-    await _tts.stop();
+    _speaker.onPlayback = null;
+    await _speaker.dispose();
     return super.close();
   }
 
@@ -110,7 +117,10 @@ class WebDashboardCubit extends BaseCubit<WebDashboardState, WebDashboardEvent> 
         DashboardButtonType.scanText => 'text:${states.ocrLanguage.tesseractCodes}',
         DashboardButtonType.scanBarcode => 'barcode',
         DashboardButtonType.objectRecognition => 'objects',
-        DashboardButtonType.describeScene => '',
+        DashboardButtonType.describeScene ||
+        DashboardButtonType.homeObjects ||
+        DashboardButtonType.findObject =>
+          '',
       };
 
   // ----------------------------------------------------------------- images
@@ -276,6 +286,9 @@ class WebDashboardCubit extends BaseCubit<WebDashboardState, WebDashboardEvent> 
         if (states.objectsState == LoadingState.initial) detectObjects();
       case DashboardButtonType.describeScene:
         break; // waits for the user to pick the kind of description
+      case DashboardButtonType.homeObjects:
+      case DashboardButtonType.findObject:
+        break; // only in the phone app
     }
   }
 
@@ -305,6 +318,14 @@ class WebDashboardCubit extends BaseCubit<WebDashboardState, WebDashboardEvent> 
             recognizedText: cleaned,
             textState: cleaned.isEmpty ? LoadingState.empty : LoadingState.success,
           ));
+      // Зачитываем сразу, как ответ в чате: незрячему результат на экране
+      // ничего не даёт, пока его не произнесут. Пустой — тоже проговариваем,
+      // иначе тишину не отличить от «ещё распознаю».
+      if (cleaned.isEmpty) {
+        speak(Strings.webOcrEmpty);
+      } else {
+        speak(cleaned, languageCode: recognizedTextLanguage);
+      }
     } catch (e) {
       logger.w("recognizeText failed: $e");
       if (version != _imageVersion) return;
@@ -381,7 +402,7 @@ class WebDashboardCubit extends BaseCubit<WebDashboardState, WebDashboardEvent> 
     try {
       final product = await _photoAnalysisRepository.getProduct(barcode.text);
       if (version != _imageVersion || states.barcode != barcode) return;
-      final name = product?.productName?.trim() ?? '';
+      final name = product?.nameFor(_languageCode) ?? '';
       updateState((state) => state.copyWith(
             product: product,
             productState: name.isEmpty ? LoadingState.empty : LoadingState.success,
@@ -410,6 +431,10 @@ class WebDashboardCubit extends BaseCubit<WebDashboardState, WebDashboardEvent> 
             objects: objects,
             objectsState: objects.objects.isEmpty ? LoadingState.empty : LoadingState.success,
           ));
+      // Как и текст: найденное зачитывается само. Живой поток с камеры сюда
+      // не попадает — там список меняется каждую секунду и превратился бы в
+      // непрерывную болтовню; для него остаётся кнопка на полосе.
+      speak(objects.objects.isEmpty ? Strings.webObjectsEmpty : states.objectsSummary);
     } catch (e) {
       logger.w("detectObjects failed: $e");
       if (version != _imageVersion) return;
@@ -448,6 +473,8 @@ class WebDashboardCubit extends BaseCubit<WebDashboardState, WebDashboardEvent> 
         case DashboardButtonType.objectRecognition:
           detectObjects();
         case DashboardButtonType.describeScene:
+        case DashboardButtonType.homeObjects:
+        case DashboardButtonType.findObject:
           break;
       }
     } else if (states.isCameraOn) {
@@ -478,40 +505,42 @@ class WebDashboardCubit extends BaseCubit<WebDashboardState, WebDashboardEvent> 
 
   // ------------------------------------------------------------------ voice
 
-  Future<void> speak(String text, {String? languageCode}) async {
+  /// Язык распознанного текста — тот, что выбран для распознавания, а не
+  /// язык интерфейса: русскую вывеску надо читать русским голосом.
+  String get recognizedTextLanguage => switch (states.ocrLanguage) {
+        OcrLanguage.uzbek => 'uz',
+        OcrLanguage.russian => 'ru',
+        OcrLanguage.english => 'en',
+      };
+
+  /// Язык интерфейса — им говорят названия товаров и объектов.
+  String get speechLanguage => _languageCode;
+
+  /// Ключ озвучки текста: по нему полоса под текстом узнаёт свой звук.
+  String speechIdFor(String text, {String? languageCode}) =>
+      ChatSpeaker.keyFor(text, languageCode ?? _languageCode);
+
+  /// Читает текст вслух с начала — общим голосом приложения.
+  void speak(String text, {String? languageCode}) {
     if (text.trim().isEmpty) return;
-    await _tts.stop();
-    // Browsers load voices lazily, so pick one right before speaking.
-    await _tts.setLanguage(languageCode ?? _languageCode);
-    // The setting is stored on the plugin's scale, where 0.5 is ordinary
-    // speech; in the browser the number goes straight into utterance.rate,
-    // whose ordinary speed is 1.0. So it is passed as a share of normal.
-    await _tts.setSpeechRate(
-      _speechRate.getSpeechRate() / SpeechRatePreferences.normal,
-    );
-    updateState((state) => state.copyWith(isSpeaking: true));
-    await _tts.speak(text);
+    final language = languageCode ?? _languageCode;
+    _speaker.speak(ChatSpeaker.keyFor(text, language), text, language);
   }
 
-  void speakRecognizedText() => speak(
-        states.recognizedText,
-        languageCode: switch (states.ocrLanguage) {
-          OcrLanguage.uzbek => 'uz',
-          OcrLanguage.russian => 'ru',
-          OcrLanguage.english => 'en',
-        },
-      );
-
-  void stopSpeaking() {
-    if (!states.isSpeaking) return;
-    _tts.stop();
-    updateState((state) => state.copyWith(isSpeaking: false));
+  /// Кнопка на полосе плеера: играть, пауза, продолжить, заново.
+  void toggleSpeech(String text, {String? languageCode}) {
+    if (text.trim().isEmpty) return;
+    final language = languageCode ?? _languageCode;
+    _speaker.toggle(ChatSpeaker.keyFor(text, language), text, language);
   }
 
-  void _onSpeechDone() {
-    if (isClosed) return;
-    updateState((state) => state.copyWith(isSpeaking: false));
-  }
+  void seekSpeech(Duration position) => _speaker.seek(position);
+
+  /// Позиция воспроизведения — отдельным потоком, мимо состояния: тикает
+  /// десятки раз в секунду и перерисовывала бы весь экран.
+  Stream<Duration> get speechPositionStream => _speaker.positionStream;
+
+  void stopSpeaking() => _speaker.stop();
 
   void textCopied() => emitEvent(const WebDashboardEvent(WebDashboardEventType.textCopied));
 }

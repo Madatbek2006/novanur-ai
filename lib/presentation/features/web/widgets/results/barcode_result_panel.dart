@@ -60,15 +60,15 @@ class BarcodeResultPanel extends StatelessWidget {
 
   Widget _buildProduct(BuildContext context, VisionBarcode barcode) {
     if (!barcode.isProductCode) {
-      return Wrap(
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          WebSpeechControl(state: state, cubit: cubit, text: barcode.text),
+          const SizedBox(height: 8),
+          Wrap(
         spacing: 8,
         runSpacing: 8,
         children: [
-          SpeakButton(
-            isSpeaking: state.isSpeaking,
-            onSpeak: () => cubit.speak(barcode.text),
-            onStop: cubit.stopSpeaking,
-          ),
           OutlinedButton.icon(
             onPressed: () async {
               await Clipboard.setData(ClipboardData(text: barcode.text));
@@ -83,6 +83,8 @@ class BarcodeResultPanel extends StatelessWidget {
               icon: const Icon(Icons.open_in_new),
               label: Text(Strings.webOpenLink),
             ),
+        ],
+          ),
         ],
       );
     }
@@ -102,10 +104,13 @@ class BarcodeResultPanel extends StatelessWidget {
         ),
       LoadingState.success => _ProductCard(
           product: state.product!,
+          name: state.product?.nameFor(cubit.speechLanguage) ?? '',
           barcode: barcode.text,
-          isSpeaking: state.isSpeaking,
-          onSpeak: () => cubit.speak(state.product?.productName ?? ''),
-          onStop: cubit.stopSpeaking,
+          speech: WebSpeechControl(
+            state: state,
+            cubit: cubit,
+            text: state.product?.nameFor(cubit.speechLanguage) ?? '',
+          ),
         ),
     };
   }
@@ -167,16 +172,18 @@ class _ProductCard extends StatelessWidget {
   const _ProductCard({
     required this.product,
     required this.barcode,
-    required this.isSpeaking,
-    required this.onSpeak,
-    required this.onStop,
+    required this.speech,
+    required this.name,
   });
 
   final ProductResponse product;
+
+  /// Название на языке приложения — то же, что прозвучало.
+  final String name;
   final String barcode;
-  final bool isSpeaking;
-  final VoidCallback onSpeak;
-  final VoidCallback onStop;
+
+  /// Полоса озвучки названия — общая для всех разделов.
+  final Widget speech;
 
   @override
   Widget build(BuildContext context) {
@@ -211,7 +218,7 @@ class _ProductCard extends StatelessWidget {
             Expanded(
               child: Semantics(
                 header: true,
-                child: (product.productName ?? '').s(18).w(700).c(context.textPrimary),
+                child: name.s(18).w(700).c(context.textPrimary),
               ),
             ),
           ],
@@ -224,11 +231,12 @@ class _ProductCard extends StatelessWidget {
           const SizedBox(height: 10),
         ],
         const SizedBox(height: 4),
+        speech,
+        const SizedBox(height: 8),
         Wrap(
           spacing: 8,
           runSpacing: 8,
           children: [
-            SpeakButton(isSpeaking: isSpeaking, onSpeak: onSpeak, onStop: onStop),
             OutlinedButton.icon(
               onPressed: () => launchUrl(Uri.parse('https://world.openfoodfacts.org/product/$barcode')),
               icon: const Icon(Icons.open_in_new),

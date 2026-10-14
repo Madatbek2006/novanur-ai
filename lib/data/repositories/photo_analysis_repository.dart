@@ -23,10 +23,11 @@ class PhotoAnalysisRepository {
 
     return captionString;
   }
-  Future<String> getProductData(String barcode) async {
-    var response = await _photoAnalysis.getProductData(barcode);
-    Logger().d("TTT=> ${response.data}");
-    return ProductRootResponse.fromJson(response.data).product?.productName??Strings.commonProductNotFound;
+  /// Название товара или «Товар не найден». Нужен старым экранам, которые
+  /// умеют только произнести строку.
+  Future<String> getProductData(String barcode, {String languageCode = 'en'}) async {
+    final product = await getProduct(barcode);
+    return product?.nameFor(languageCode) ?? Strings.commonProductNotFound;
   }
 
   /// Full product card, or null when Open Food Facts doesn't know the code.

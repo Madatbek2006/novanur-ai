@@ -73,6 +73,18 @@ android {
             )
         }
     }
+    // Нативные библиотеки — onnxruntime для голоса, ML Kit, TFLite, сам
+    // Flutter — больше половины APK. Несжатыми их кладут ради установки без
+    // распаковки, но APK мы раздаём файлом (Telegram), и там важнее размер.
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+            // zxing-cpp из flutter_zxing нужен только десктопной версии:
+            // телефон читает штрихкоды через ML Kit.
+            excludes += "**/libflutter_zxing.so"
+        }
+    }
+
     applicationVariants.all {
         val variant = this
         variant.outputs.all {

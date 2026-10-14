@@ -12,6 +12,11 @@
     <queries>
         <package android:name="net.pulsesecure.pulsesecure" />
         <package android:name="uz.yt.idcard.eimzo" />
+        <!-- Голосовой ввод (speech_to_text): без этого Android 11+ не
+             показывает приложению службу распознавания речи. -->
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
     </queries>
 
     <application

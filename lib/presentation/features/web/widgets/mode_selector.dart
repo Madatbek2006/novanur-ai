@@ -14,6 +14,7 @@ extension WebModeInfo on DashboardButtonType {
         DashboardButtonType.scanBarcode => Strings.webModeScanBarcodeDescription,
         DashboardButtonType.describeScene => Strings.webModeDescribeSceneDescription,
         DashboardButtonType.objectRecognition => Strings.webModeObjectRecognitionDescription,
+        DashboardButtonType.homeObjects || DashboardButtonType.findObject => '',
       };
 }
 
@@ -37,10 +38,10 @@ class ModeSelector extends StatelessWidget {
         height: 44,
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
-          itemCount: DashboardButtonType.values.length,
+          itemCount: DashboardButtonType.web.length,
           separatorBuilder: (_, __) => const SizedBox(width: 8),
           itemBuilder: (context, index) {
-            final mode = DashboardButtonType.values[index];
+            final mode = DashboardButtonType.web[index];
             return _ModeTile(mode: mode, selected: mode == selected, compact: true, onTap: () => onSelected(mode));
           },
         ),
@@ -51,8 +52,8 @@ class ModeSelector extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          for (final mode in DashboardButtonType.values) ...[
-            if (mode != DashboardButtonType.values.first) const SizedBox(width: 12),
+          for (final mode in DashboardButtonType.web) ...[
+            if (mode != DashboardButtonType.web.first) const SizedBox(width: 12),
             Expanded(
               child: _ModeTile(mode: mode, selected: mode == selected, compact: false, onTap: () => onSelected(mode)),
             ),

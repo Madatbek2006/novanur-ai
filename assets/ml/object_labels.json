@@ -1,0 +1,2522 @@
+{
+ "Smart speaker": {
+  "ru": "Умная колонка",
+  "uz": "Aqlli karnay"
+ },
+ "Virtual reality headset": {
+  "ru": "Шлем виртуальной реальности",
+  "uz": "Virtual reallik shlemi"
+ },
+ "Tumbler": {
+  "ru": "Стакан",
+  "uz": "Stakan"
+ },
+ "Electric kettle": {
+  "ru": "Электрочайник",
+  "uz": "Elektr choynak"
+ },
+ "Electric razor": {
+  "ru": "Электробритва",
+  "uz": "Elektr ustara"
+ },
+ "Packaged goods": {
+  "ru": "Упакованный товар",
+  "uz": "Qadoqlangan mahsulot"
+ },
+ "Kid bike": {
+  "ru": "Детский велосипед",
+  "uz": "Bolalar velosipedi"
+ },
+ "2D barcode": {
+  "ru": "QR-код",
+  "uz": "QR-kod"
+ },
+ "1D barcode": {
+  "ru": "Штрихкод",
+  "uz": "Shtrix-kod"
+ },
+ "Water bottle": {
+  "ru": "Бутылка для воды",
+  "uz": "Suv shishasi"
+ },
+ "Tortoise": {
+  "ru": "Черепаха",
+  "uz": "Toshbaqa"
+ },
+ "Cooker": {
+  "ru": "Плита",
+  "uz": "Plita"
+ },
+ "Container": {
+  "ru": "Контейнер",
+  "uz": "Idish"
+ },
+ "Magpie": {
+  "ru": "Сорока",
+  "uz": "Zag‘izg‘on"
+ },
+ "Sea turtle": {
+  "ru": "Морская черепаха",
+  "uz": "Dengiz toshbaqasi"
+ },
+ "Football": {
+  "ru": "Футбольный мяч",
+  "uz": "Futbol to‘pi"
+ },
+ "Vacuum flask": {
+  "ru": "Термос",
+  "uz": "Termos"
+ },
+ "Ambulance": {
+  "ru": "Скорая помощь",
+  "uz": "Tez yordam mashinasi"
+ },
+ "Ladder": {
+  "ru": "Лестница",
+  "uz": "Narvon"
+ },
+ "Toothbrush": {
+  "ru": "Зубная щётка",
+  "uz": "Tish cho‘tkasi"
+ },
+ "Syringe": {
+  "ru": "Шприц",
+  "uz": "Shprits"
+ },
+ "Sink": {
+  "ru": "Раковина",
+  "uz": "Rakovina"
+ },
+ "Toy": {
+  "ru": "Игрушка",
+  "uz": "O‘yinchoq"
+ },
+ "T-shirt": {
+  "ru": "Футболка",
+  "uz": "Futbolka"
+ },
+ "Organ": {
+  "ru": "Орган",
+  "uz": "Organ"
+ },
+ "Cassette deck": {
+  "ru": "Кассетный магнитофон",
+  "uz": "Kassetali magnitofon"
+ },
+ "Apple": {
+  "ru": "Яблоко",
+  "uz": "Olma"
+ },
+ "Paddle": {
+  "ru": "Весло",
+  "uz": "Eshkak"
+ },
+ "Snowman": {
+  "ru": "Снеговик",
+  "uz": "Qor odam"
+ },
+ "Beer": {
+  "ru": "Пиво",
+  "uz": "Pivo"
+ },
+ "Bridge": {
+  "ru": "Мост",
+  "uz": "Ko‘prik"
+ },
+ "Board game": {
+  "ru": "Настольная игра",
+  "uz": "Stol o‘yini"
+ },
+ "Parking meter": {
+  "ru": "Паркомат",
+  "uz": "Parkomat"
+ },
+ "Traffic light": {
+  "ru": "Светофор",
+  "uz": "Svetofor"
+ },
+ "Croissant": {
+  "ru": "Круассан",
+  "uz": "Kruassan"
+ },
+ "Cucumber": {
+  "ru": "Огурец",
+  "uz": "Bodring"
+ },
+ "Radish": {
+  "ru": "Редис",
+  "uz": "Rediska"
+ },
+ "Towel": {
+  "ru": "Полотенце",
+  "uz": "Sochiq"
+ },
+ "Doll": {
+  "ru": "Кукла",
+  "uz": "Qo‘g‘irchoq"
+ },
+ "Notebook": {
+  "ru": "Тетрадь",
+  "uz": "Daftar"
+ },
+ "Washing machine": {
+  "ru": "Стиральная машина",
+  "uz": "Kir yuvish mashinasi"
+ },
+ "Glove": {
+  "ru": "Перчатка",
+  "uz": "Qo‘lqop"
+ },
+ "Vinyl record": {
+  "ru": "Виниловая пластинка",
+  "uz": "Vinil plastinka"
+ },
+ "Tick": {
+  "ru": "Клещ",
+  "uz": "Kana"
+ },
+ "Belt": {
+  "ru": "Ремень",
+  "uz": "Kamar"
+ },
+ "Sunglasses": {
+  "ru": "Солнцезащитные очки",
+  "uz": "Quyosh ko‘zoynagi"
+ },
+ "Action figure": {
+  "ru": "Игрушечная фигурка",
+  "uz": "O‘yinchoq haykalcha"
+ },
+ "Banjo": {
+  "ru": "Банджо",
+  "uz": "Banjo"
+ },
+ "Cart": {
+  "ru": "Тележка",
+  "uz": "Arava"
+ },
+ "Ball": {
+  "ru": "Мяч",
+  "uz": "To‘p"
+ },
+ "Backpack": {
+  "ru": "Рюкзак",
+  "uz": "Ryukzak"
+ },
+ "Bicycle": {
+  "ru": "Велосипед",
+  "uz": "Velosiped"
+ },
+ "Sweater": {
+  "ru": "Свитер",
+  "uz": "Sviter"
+ },
+ "Stadium": {
+  "ru": "Стадион",
+  "uz": "Stadion"
+ },
+ "Home appliance": {
+  "ru": "Бытовая техника",
+  "uz": "Maishiy texnika"
+ },
+ "Centipede": {
+  "ru": "Многоножка",
+  "uz": "Ko‘poyoq"
+ },
+ "Boat": {
+  "ru": "Лодка",
+  "uz": "Qayiq"
+ },
+ "Lighting": {
+  "ru": "Освещение",
+  "uz": "Yoritgich"
+ },
+ "Surfboard": {
+  "ru": "Доска для сёрфинга",
+  "uz": "Serfing taxtasi"
+ },
+ "Chopsticks": {
+  "ru": "Палочки для еды",
+  "uz": "Ovqat tayoqchalari"
+ },
+ "Boot": {
+  "ru": "Ботинок",
+  "uz": "Etik"
+ },
+ "Headphones": {
+  "ru": "Наушники",
+  "uz": "Quloqchin"
+ },
+ "Hot dog": {
+  "ru": "Хот-дог",
+  "uz": "Xot-dog"
+ },
+ "Shorts": {
+  "ru": "Шорты",
+  "uz": "Shortik"
+ },
+ "Bus": {
+  "ru": "Автобус",
+  "uz": "Avtobus"
+ },
+ "Camera lens": {
+  "ru": "Объектив",
+  "uz": "Obyektiv"
+ },
+ "Screwdriver": {
+  "ru": "Отвёртка",
+  "uz": "Otvertka"
+ },
+ "Bicycle wheel": {
+  "ru": "Велосипедное колесо",
+  "uz": "Velosiped g‘ildiragi"
+ },
+ "Flash": {
+  "ru": "Вспышка",
+  "uz": "Chaqnoq"
+ },
+ "Barge": {
+  "ru": "Баржа",
+  "uz": "Barja"
+ },
+ "Battery": {
+  "ru": "Батарейка",
+  "uz": "Batareya"
+ },
+ "Laptop": {
+  "ru": "Ноутбук",
+  "uz": "Noutbuk"
+ },
+ "Miniskirt": {
+  "ru": "Мини-юбка",
+  "uz": "Mini yubka"
+ },
+ "Drill": {
+  "ru": "Дрель",
+  "uz": "Drel"
+ },
+ "Dress": {
+  "ru": "Платье",
+  "uz": "Ko‘ylak"
+ },
+ "Bear": {
+  "ru": "Медведь",
+  "uz": "Ayiq"
+ },
+ "Waffle": {
+  "ru": "Вафля",
+  "uz": "Vafli"
+ },
+ "Pancake": {
+  "ru": "Блин",
+  "uz": "Quymoq"
+ },
+ "Brown bear": {
+  "ru": "Бурый медведь",
+  "uz": "Qo‘ng‘ir ayiq"
+ },
+ "Woodpecker": {
+  "ru": "Дятел",
+  "uz": "Qizilishton"
+ },
+ "Blue jay": {
+  "ru": "Голубая сойка",
+  "uz": "Ko‘k zag‘cha"
+ },
+ "Pretzel": {
+  "ru": "Крендель",
+  "uz": "Krendel"
+ },
+ "Bagel": {
+  "ru": "Бублик",
+  "uz": "Bublik"
+ },
+ "Teapot": {
+  "ru": "Заварочный чайник",
+  "uz": "Choynak"
+ },
+ "Person": {
+  "ru": "Человек",
+  "uz": "Odam"
+ },
+ "Bow and arrow": {
+  "ru": "Лук и стрелы",
+  "uz": "Kamon va o‘q"
+ },
+ "Swimwear": {
+  "ru": "Купальник",
+  "uz": "Suzish kiyimi"
+ },
+ "Brassiere": {
+  "ru": "Бюстгальтер",
+  "uz": "Byusgalter"
+ },
+ "Bee": {
+  "ru": "Пчела",
+  "uz": "Asalari"
+ },
+ "Bat": {
+  "ru": "Летучая мышь",
+  "uz": "Ko‘rshapalak"
+ },
+ "Starfish": {
+  "ru": "Морская звезда",
+  "uz": "Dengiz yulduzi"
+ },
+ "Popcorn": {
+  "ru": "Попкорн",
+  "uz": "Popkorn"
+ },
+ "Burrito": {
+  "ru": "Буррито",
+  "uz": "Burrito"
+ },
+ "Chainsaw": {
+  "ru": "Бензопила",
+  "uz": "Motorli arra"
+ },
+ "Balloon": {
+  "ru": "Воздушный шар",
+  "uz": "Havo shari"
+ },
+ "Wrench": {
+  "ru": "Гаечный ключ",
+  "uz": "Gayka kaliti"
+ },
+ "Tent": {
+  "ru": "Палатка",
+  "uz": "Chodir"
+ },
+ "License plate": {
+  "ru": "Номерной знак",
+  "uz": "Davlat raqami"
+ },
+ "Lantern": {
+  "ru": "Фонарь",
+  "uz": "Fonar"
+ },
+ "Toaster": {
+  "ru": "Тостер",
+  "uz": "Toster"
+ },
+ "Flashlight": {
+  "ru": "Фонарик",
+  "uz": "Qo‘l chirog‘i"
+ },
+ "Tiara": {
+  "ru": "Диадема",
+  "uz": "Diadema"
+ },
+ "Limousine": {
+  "ru": "Лимузин",
+  "uz": "Limuzin"
+ },
+ "Necklace": {
+  "ru": "Ожерелье",
+  "uz": "Marjon"
+ },
+ "Bracelet": {
+  "ru": "Браслет",
+  "uz": "Bilaguzuk"
+ },
+ "Scissors": {
+  "ru": "Ножницы",
+  "uz": "Qaychi"
+ },
+ "Computer keyboard": {
+  "ru": "Клавиатура",
+  "uz": "Klaviatura"
+ },
+ "Printer": {
+  "ru": "Принтер",
+  "uz": "Printer"
+ },
+ "Traffic sign": {
+  "ru": "Дорожный знак",
+  "uz": "Yo‘l belgisi"
+ },
+ "Chair": {
+  "ru": "Стул",
+  "uz": "Stul"
+ },
+ "Shirt": {
+  "ru": "Рубашка",
+  "uz": "Ko‘ylak"
+ },
+ "Poster": {
+  "ru": "Плакат",
+  "uz": "Plakat"
+ },
+ "Thermostat": {
+  "ru": "Термостат",
+  "uz": "Termostat"
+ },
+ "Cheese": {
+  "ru": "Сыр",
+  "uz": "Pishloq"
+ },
+ "Sock": {
+  "ru": "Носок",
+  "uz": "Paypoq"
+ },
+ "Fire hydrant": {
+  "ru": "Пожарный гидрант",
+  "uz": "Yong‘in gidranti"
+ },
+ "Barbecue grill": {
+  "ru": "Мангал",
+  "uz": "Mangal"
+ },
+ "Earrings": {
+  "ru": "Серьги",
+  "uz": "Sirg‘a"
+ },
+ "Tie": {
+  "ru": "Галстук",
+  "uz": "Galstuk"
+ },
+ "Cabinetry": {
+  "ru": "Шкаф",
+  "uz": "Shkaf"
+ },
+ "Suitcase": {
+  "ru": "Чемодан",
+  "uz": "Chamadon"
+ },
+ "Bodysuit": {
+  "ru": "Боди",
+  "uz": "Bodi"
+ },
+ "Business card": {
+  "ru": "Визитка",
+  "uz": "Vizitka"
+ },
+ "Vest": {
+  "ru": "Жилет",
+  "uz": "Nimcha"
+ },
+ "Muffin": {
+  "ru": "Кекс",
+  "uz": "Keks"
+ },
+ "Bidet": {
+  "ru": "Биде",
+  "uz": "Bide"
+ },
+ "Expresso machine": {
+  "ru": "Кофемашина",
+  "uz": "Qahva mashinasi"
+ },
+ "Snack": {
+  "ru": "Закуска",
+  "uz": "Gazak"
+ },
+ "Snowmobile": {
+  "ru": "Снегоход",
+  "uz": "Qor mototsikli"
+ },
+ "Clock": {
+  "ru": "Часы",
+  "uz": "Soat"
+ },
+ "Camel": {
+  "ru": "Верблюд",
+  "uz": "Tuya"
+ },
+ "Figurine": {
+  "ru": "Статуэтка",
+  "uz": "Haykalcha"
+ },
+ "Cattle": {
+  "ru": "Корова",
+  "uz": "Qoramol"
+ },
+ "Jet ski": {
+  "ru": "Гидроцикл",
+  "uz": "Gidrotsikl"
+ },
+ "Coat": {
+  "ru": "Пальто",
+  "uz": "Palto"
+ },
+ "Suit": {
+  "ru": "Костюм",
+  "uz": "Kostyum"
+ },
+ "Desk": {
+  "ru": "Письменный стол",
+  "uz": "Yozuv stoli"
+ },
+ "Cat": {
+  "ru": "Кошка",
+  "uz": "Mushuk"
+ },
+ "Bronze sculpture": {
+  "ru": "Бронзовая скульптура",
+  "uz": "Bronza haykal"
+ },
+ "Juice": {
+  "ru": "Сок",
+  "uz": "Sharbat"
+ },
+ "Basket": {
+  "ru": "Корзина",
+  "uz": "Savat"
+ },
+ "Gondola": {
+  "ru": "Гондола",
+  "uz": "Gondola"
+ },
+ "Beetle": {
+  "ru": "Жук",
+  "uz": "Qo‘ng‘iz"
+ },
+ "Cannon": {
+  "ru": "Пушка",
+  "uz": "Zambarak"
+ },
+ "Mouse": {
+  "ru": "Мышь",
+  "uz": "Sichqoncha"
+ },
+ "Wine bottle": {
+  "ru": "Бутылка вина",
+  "uz": "Vino shishasi"
+ },
+ "Comb": {
+  "ru": "Расчёска",
+  "uz": "Taroq"
+ },
+ "Slipper": {
+  "ru": "Тапочка",
+  "uz": "Shippak"
+ },
+ "Stuffed toy": {
+  "ru": "Мягкая игрушка",
+  "uz": "Yumshoq o‘yinchoq"
+ },
+ "Cookie": {
+  "ru": "Печенье",
+  "uz": "Pechene"
+ },
+ "Fountain": {
+  "ru": "Фонтан",
+  "uz": "Favvora"
+ },
+ "Wine cooler": {
+  "ru": "Винный холодильник",
+  "uz": "Vino sovutgichi"
+ },
+ "Coin": {
+  "ru": "Монета",
+  "uz": "Tanga"
+ },
+ "Calculator": {
+  "ru": "Калькулятор",
+  "uz": "Kalkulyator"
+ },
+ "Cocktail": {
+  "ru": "Коктейль",
+  "uz": "Kokteyl"
+ },
+ "Menu": {
+  "ru": "Меню",
+  "uz": "Menyu"
+ },
+ "Computer monitor": {
+  "ru": "Монитор",
+  "uz": "Monitor"
+ },
+ "Box": {
+  "ru": "Коробка",
+  "uz": "Quti"
+ },
+ "Stapler": {
+  "ru": "Степлер",
+  "uz": "Stepler"
+ },
+ "Christmas tree": {
+  "ru": "Ёлка",
+  "uz": "Archa"
+ },
+ "Cowboy hat": {
+  "ru": "Ковбойская шляпа",
+  "uz": "Kovboy shlyapasi"
+ },
+ "Video camera": {
+  "ru": "Видеокамера",
+  "uz": "Videokamera"
+ },
+ "Flip-flops": {
+  "ru": "Шлёпанцы",
+  "uz": "Yengil shippak"
+ },
+ "Bean bag": {
+  "ru": "Кресло-мешок",
+  "uz": "Yumshoq kreslo"
+ },
+ "Drum": {
+  "ru": "Барабан",
+  "uz": "Baraban"
+ },
+ "Dessert": {
+  "ru": "Десерт",
+  "uz": "Desert"
+ },
+ "Wine rack": {
+  "ru": "Винная полка",
+  "uz": "Vino javoni"
+ },
+ "Drink": {
+  "ru": "Напиток",
+  "uz": "Ichimlik"
+ },
+ "Zucchini": {
+  "ru": "Кабачок",
+  "uz": "Kabachok"
+ },
+ "Ladle": {
+  "ru": "Половник",
+  "uz": "Cho‘mich"
+ },
+ "Baseball cap": {
+  "ru": "Бейсболка",
+  "uz": "Kepka"
+ },
+ "Smartwatch": {
+  "ru": "Умные часы",
+  "uz": "Aqlli soat"
+ },
+ "Dairy": {
+  "ru": "Молочные продукты",
+  "uz": "Sut mahsulotlari"
+ },
+ "Bib": {
+  "ru": "Нагрудник",
+  "uz": "Ko‘krakcha"
+ },
+ "Bowtie": {
+  "ru": "Галстук-бабочка",
+  "uz": "Kapalak galstuk"
+ },
+ "Toy train": {
+  "ru": "Игрушечный поезд",
+  "uz": "O‘yinchoq poyezd"
+ },
+ "Dice": {
+  "ru": "Игральный кубик",
+  "uz": "O‘yin toshi"
+ },
+ "Oven": {
+  "ru": "Духовка",
+  "uz": "Duxovka"
+ },
+ "Dinosaur": {
+  "ru": "Динозавр",
+  "uz": "Dinozavr"
+ },
+ "Display device": {
+  "ru": "Экран",
+  "uz": "Ekran"
+ },
+ "Goggles": {
+  "ru": "Защитные очки",
+  "uz": "Himoya ko‘zoynagi"
+ },
+ "Wallet": {
+  "ru": "Кошелёк",
+  "uz": "Hamyon"
+ },
+ "Ratchet": {
+  "ru": "Храповой ключ",
+  "uz": "Xrapovik kalit"
+ },
+ "Couch": {
+  "ru": "Диван",
+  "uz": "Divan"
+ },
+ "Cricket ball": {
+  "ru": "Мяч для крикета",
+  "uz": "Kriket to‘pi"
+ },
+ "Winter melon": {
+  "ru": "Восковая тыква",
+  "uz": "Mum qovoq"
+ },
+ "Spatula": {
+  "ru": "Лопатка",
+  "uz": "Kurakcha"
+ },
+ "Cap": {
+  "ru": "Шапочка",
+  "uz": "Qalpoq"
+ },
+ "Whiteboard": {
+  "ru": "Маркерная доска",
+  "uz": "Oq doska"
+ },
+ "Pencil sharpener": {
+  "ru": "Точилка",
+  "uz": "Qalam ochgich"
+ },
+ "Door": {
+  "ru": "Дверь",
+  "uz": "Eshik"
+ },
+ "Hat": {
+  "ru": "Шляпа",
+  "uz": "Shlyapa"
+ },
+ "Shower": {
+  "ru": "Душ",
+  "uz": "Dush"
+ },
+ "Lemur": {
+  "ru": "Лемур",
+  "uz": "Lemur"
+ },
+ "Fedora": {
+  "ru": "Фетровая шляпа",
+  "uz": "Fetr shlyapa"
+ },
+ "Guacamole": {
+  "ru": "Гуакамоле",
+  "uz": "Guakamole"
+ },
+ "Scarf": {
+  "ru": "Шарф",
+  "uz": "Sharf"
+ },
+ "Dolphin": {
+  "ru": "Дельфин",
+  "uz": "Delfin"
+ },
+ "Sombrero": {
+  "ru": "Сомбреро",
+  "uz": "Sombrero"
+ },
+ "Tin can": {
+  "ru": "Консервная банка",
+  "uz": "Konserva bankasi"
+ },
+ "Mug": {
+  "ru": "Кружка",
+  "uz": "Krujka"
+ },
+ "Tap": {
+  "ru": "Кран",
+  "uz": "Jo‘mrak"
+ },
+ "Harbor seal": {
+  "ru": "Тюлень",
+  "uz": "Tyulen"
+ },
+ "Stretcher": {
+  "ru": "Носилки",
+  "uz": "Zambil"
+ },
+ "Lock": {
+  "ru": "Замок",
+  "uz": "Qulf"
+ },
+ "Roller skates": {
+  "ru": "Роликовые коньки",
+  "uz": "Rolik konki"
+ },
+ "Coffee cup": {
+  "ru": "Кофейная чашка",
+  "uz": "Qahva chashkasi"
+ },
+ "Straw hat": {
+  "ru": "Соломенная шляпа",
+  "uz": "Somon shlyapa"
+ },
+ "Overall": {
+  "ru": "Комбинезон",
+  "uz": "Kombinezon"
+ },
+ "Cutting board": {
+  "ru": "Разделочная доска",
+  "uz": "Taxtakach"
+ },
+ "Blender": {
+  "ru": "Блендер",
+  "uz": "Blender"
+ },
+ "Stove": {
+  "ru": "Плита",
+  "uz": "Plita"
+ },
+ "Stop sign": {
+  "ru": "Знак «Стоп»",
+  "uz": "«Stop» belgisi"
+ },
+ "Volleyball": {
+  "ru": "Волейбольный мяч",
+  "uz": "Voleybol to‘pi"
+ },
+ "Vase": {
+  "ru": "Ваза",
+  "uz": "Guldon"
+ },
+ "Slow cooker": {
+  "ru": "Мультиварка",
+  "uz": "Multivarka"
+ },
+ "Post-it note": {
+  "ru": "Стикер",
+  "uz": "Stiker"
+ },
+ "Wardrobe": {
+  "ru": "Платяной шкаф",
+  "uz": "Kiyim shkafi"
+ },
+ "Pinwheel": {
+  "ru": "Вертушка",
+  "uz": "Parrak o‘yinchoq"
+ },
+ "Whisk": {
+  "ru": "Венчик",
+  "uz": "Ko‘pirtirgich"
+ },
+ "Paper towel": {
+  "ru": "Бумажное полотенце",
+  "uz": "Qog‘oz sochiq"
+ },
+ "Food": {
+  "ru": "Еда",
+  "uz": "Ovqat"
+ },
+ "Sun hat": {
+  "ru": "Панама",
+  "uz": "Panama"
+ },
+ "Flying disc": {
+  "ru": "Фрисби",
+  "uz": "Frisbi"
+ },
+ "Chandelier": {
+  "ru": "Люстра",
+  "uz": "Qandil"
+ },
+ "Skirt": {
+  "ru": "Юбка",
+  "uz": "Yubka"
+ },
+ "Gas stove": {
+  "ru": "Газовая плита",
+  "uz": "Gaz plitasi"
+ },
+ "Salt and pepper shakers": {
+  "ru": "Солонка и перечница",
+  "uz": "Tuzdon va qalampirdon"
+ },
+ "Mechanical fan": {
+  "ru": "Вентилятор",
+  "uz": "Ventilyator"
+ },
+ "Face powder": {
+  "ru": "Пудра",
+  "uz": "Upa"
+ },
+ "Fax": {
+  "ru": "Факс",
+  "uz": "Faks"
+ },
+ "Fruit": {
+  "ru": "Фрукт",
+  "uz": "Meva"
+ },
+ "French fries": {
+  "ru": "Картофель фри",
+  "uz": "Kartoshka fri"
+ },
+ "Nightstand": {
+  "ru": "Тумбочка",
+  "uz": "Tumbochka"
+ },
+ "Barrel": {
+  "ru": "Бочка",
+  "uz": "Bochka"
+ },
+ "Kite": {
+  "ru": "Воздушный змей",
+  "uz": "Varrak"
+ },
+ "Tart": {
+  "ru": "Тарт",
+  "uz": "Tart"
+ },
+ "Treadmill": {
+  "ru": "Беговая дорожка",
+  "uz": "Yugurish yo‘lakchasi"
+ },
+ "Fox": {
+  "ru": "Лиса",
+  "uz": "Tulki"
+ },
+ "Throw pillow": {
+  "ru": "Диванная подушка",
+  "uz": "Divan yostig‘i"
+ },
+ "Flag": {
+  "ru": "Флаг",
+  "uz": "Bayroq"
+ },
+ "Horn": {
+  "ru": "Горн",
+  "uz": "Burg‘u"
+ },
+ "Window blind": {
+  "ru": "Жалюзи",
+  "uz": "Jalyuzi"
+ },
+ "Golf cart": {
+  "ru": "Гольф-кар",
+  "uz": "Golf mashinasi"
+ },
+ "Jacket": {
+  "ru": "Куртка",
+  "uz": "Kurtka"
+ },
+ "Jumpsuit": {
+  "ru": "Комбинезон",
+  "uz": "Kombinezon"
+ },
+ "Egg": {
+  "ru": "Яйцо",
+  "uz": "Tuxum"
+ },
+ "Street light": {
+  "ru": "Уличный фонарь",
+  "uz": "Ko‘cha chirog‘i"
+ },
+ "Guitar": {
+  "ru": "Гитара",
+  "uz": "Gitara"
+ },
+ "Pillow": {
+  "ru": "Подушка",
+  "uz": "Yostiq"
+ },
+ "Isopod": {
+  "ru": "Мокрица",
+  "uz": "Zaxkash"
+ },
+ "Visor": {
+  "ru": "Козырёк",
+  "uz": "Kozirek"
+ },
+ "Grape": {
+  "ru": "Виноград",
+  "uz": "Uzum"
+ },
+ "Bookcase": {
+  "ru": "Книжный шкаф",
+  "uz": "Kitob javoni"
+ },
+ "Candle hold": {
+  "ru": "Подсвечник",
+  "uz": "Shamdon"
+ },
+ "Power outlet": {
+  "ru": "Розетка",
+  "uz": "Rozetka"
+ },
+ "Panda": {
+  "ru": "Панда",
+  "uz": "Panda"
+ },
+ "Giraffe": {
+  "ru": "Жираф",
+  "uz": "Jirafa"
+ },
+ "Door handle": {
+  "ru": "Дверная ручка",
+  "uz": "Eshik dastasi"
+ },
+ "Rhinoceros": {
+  "ru": "Носорог",
+  "uz": "Karkidon"
+ },
+ "Bathtub": {
+  "ru": "Ванна",
+  "uz": "Vanna"
+ },
+ "Stroller": {
+  "ru": "Детская коляска",
+  "uz": "Bolalar aravachasi"
+ },
+ "Goldfish": {
+  "ru": "Золотая рыбка",
+  "uz": "Oltin baliq"
+ },
+ "Houseplant": {
+  "ru": "Комнатное растение",
+  "uz": "Xona o‘simligi"
+ },
+ "Goat": {
+  "ru": "Коза",
+  "uz": "Echki"
+ },
+ "Baseball bat": {
+  "ru": "Бейсбольная бита",
+  "uz": "Beysbol tayoqchasi"
+ },
+ "Baseball glove": {
+  "ru": "Бейсбольная перчатка",
+  "uz": "Beysbol qo‘lqopi"
+ },
+ "Top": {
+  "ru": "Топ",
+  "uz": "Top"
+ },
+ "Grandfather clock": {
+  "ru": "Напольные часы",
+  "uz": "Pol soati"
+ },
+ "Light switch": {
+  "ru": "Выключатель",
+  "uz": "O‘chirgich"
+ },
+ "House": {
+  "ru": "Дом",
+  "uz": "Uy"
+ },
+ "Stationary bicycle": {
+  "ru": "Велотренажёр",
+  "uz": "Velotrenajyor"
+ },
+ "Hammer": {
+  "ru": "Молоток",
+  "uz": "Bolg‘a"
+ },
+ "Ceiling fan": {
+  "ru": "Потолочный вентилятор",
+  "uz": "Shift ventilyatori"
+ },
+ "Keychain": {
+  "ru": "Брелок",
+  "uz": "Brelok"
+ },
+ "Adhesive tape": {
+  "ru": "Скотч",
+  "uz": "Skotch"
+ },
+ "Harp": {
+  "ru": "Арфа",
+  "uz": "Arfa"
+ },
+ "Blanket": {
+  "ru": "Одеяло",
+  "uz": "Ko‘rpa"
+ },
+ "Sandal": {
+  "ru": "Сандалия",
+  "uz": "Sandal"
+ },
+ "Bicycle helmet": {
+  "ru": "Велошлем",
+  "uz": "Velosiped shlemi"
+ },
+ "Handheld video game console": {
+  "ru": "Портативная игровая приставка",
+  "uz": "Ko‘chma o‘yin pristavkasi"
+ },
+ "Saucer": {
+  "ru": "Блюдце",
+  "uz": "Likopcha"
+ },
+ "Teacup": {
+  "ru": "Чайная чашка",
+  "uz": "Piyola"
+ },
+ "Harpsichord": {
+  "ru": "Клавесин",
+  "uz": "Klavesin"
+ },
+ "Heater": {
+  "ru": "Обогреватель",
+  "uz": "Isitgich"
+ },
+ "Harmonica": {
+  "ru": "Губная гармошка",
+  "uz": "Lab garmoni"
+ },
+ "Hamster": {
+  "ru": "Хомяк",
+  "uz": "Xomyak"
+ },
+ "Hardware": {
+  "ru": "Инструменты",
+  "uz": "Asbob-uskunalar"
+ },
+ "Greeting card": {
+  "ru": "Открытка",
+  "uz": "Tabriknoma"
+ },
+ "Curtain": {
+  "ru": "Штора",
+  "uz": "Parda"
+ },
+ "Kettle": {
+  "ru": "Чайник",
+  "uz": "Choynak"
+ },
+ "Bed": {
+  "ru": "Кровать",
+  "uz": "Karavot"
+ },
+ "Fireplace": {
+  "ru": "Камин",
+  "uz": "Kamin"
+ },
+ "Scale": {
+  "ru": "Весы",
+  "uz": "Tarozi"
+ },
+ "Baseball": {
+  "ru": "Бейсбольный мяч",
+  "uz": "Beysbol to‘pi"
+ },
+ "Insect": {
+  "ru": "Насекомое",
+  "uz": "Hasharot"
+ },
+ "Luggage": {
+  "ru": "Багаж",
+  "uz": "Yuk"
+ },
+ "Hair dryer": {
+  "ru": "Фен",
+  "uz": "Fen"
+ },
+ "Indoor rower": {
+  "ru": "Гребной тренажёр",
+  "uz": "Eshkak trenajyori"
+ },
+ "Food processor": {
+  "ru": "Кухонный комбайн",
+  "uz": "Oshxona kombayni"
+ },
+ "Jewellery": {
+  "ru": "Украшение",
+  "uz": "Zargarlik buyumi"
+ },
+ "Refrigerator": {
+  "ru": "Холодильник",
+  "uz": "Muzlatgich"
+ },
+ "Wood-burning stove": {
+  "ru": "Печь",
+  "uz": "Pechka"
+ },
+ "Punching bag": {
+  "ru": "Боксёрская груша",
+  "uz": "Boks qopi"
+ },
+ "Deep fryer": {
+  "ru": "Фритюрница",
+  "uz": "Frityurnitsa"
+ },
+ "Common fig": {
+  "ru": "Инжир",
+  "uz": "Anjir"
+ },
+ "Cocktail shaker": {
+  "ru": "Шейкер",
+  "uz": "Sheyker"
+ },
+ "Jaguar": {
+  "ru": "Ягуар",
+  "uz": "Yaguar"
+ },
+ "Golf ball": {
+  "ru": "Мяч для гольфа",
+  "uz": "Golf to‘pi"
+ },
+ "Wireless router": {
+  "ru": "Роутер",
+  "uz": "Router"
+ },
+ "Alarm clock": {
+  "ru": "Будильник",
+  "uz": "Budilnik"
+ },
+ "Filing cabinet": {
+  "ru": "Шкаф для документов",
+  "uz": "Hujjat shkafi"
+ },
+ "Artichoke": {
+  "ru": "Артишок",
+  "uz": "Artishok"
+ },
+ "Outerwear": {
+  "ru": "Верхняя одежда",
+  "uz": "Ustki kiyim"
+ },
+ "Cufflink": {
+  "ru": "Запонка",
+  "uz": "Zaponka"
+ },
+ "Motorcycle": {
+  "ru": "Мотоцикл",
+  "uz": "Mototsikl"
+ },
+ "Table": {
+  "ru": "Стол",
+  "uz": "Stol"
+ },
+ "Tableware": {
+  "ru": "Посуда",
+  "uz": "Idish-tovoq"
+ },
+ "Kangaroo": {
+  "ru": "Кенгуру",
+  "uz": "Kenguru"
+ },
+ "Koala": {
+  "ru": "Коала",
+  "uz": "Koala"
+ },
+ "Knife": {
+  "ru": "Нож",
+  "uz": "Pichoq"
+ },
+ "Bottle": {
+  "ru": "Бутылка",
+  "uz": "Shisha"
+ },
+ "Bottle opener": {
+  "ru": "Открывашка",
+  "uz": "Ochqich"
+ },
+ "Electric toothbrush": {
+  "ru": "Электрическая зубная щётка",
+  "uz": "Elektr tish cho‘tkasi"
+ },
+ "Lynx": {
+  "ru": "Рысь",
+  "uz": "Silovsin"
+ },
+ "Receipt": {
+  "ru": "Чек",
+  "uz": "Chek"
+ },
+ "Lighthouse": {
+  "ru": "Маяк",
+  "uz": "Mayoq"
+ },
+ "Dumbbell": {
+  "ru": "Гантель",
+  "uz": "Gantel"
+ },
+ "Bowl": {
+  "ru": "Миска",
+  "uz": "Kosa"
+ },
+ "Lizard": {
+  "ru": "Ящерица",
+  "uz": "Kaltakesak"
+ },
+ "Head-mounted display": {
+  "ru": "Шлем-дисплей",
+  "uz": "Bosh displeyi"
+ },
+ "Lego": {
+  "ru": "Лего",
+  "uz": "Lego"
+ },
+ "Check": {
+  "ru": "Банковский чек",
+  "uz": "Bank cheki"
+ },
+ "Billiard table": {
+  "ru": "Бильярдный стол",
+  "uz": "Bilyard stoli"
+ },
+ "Swim cap": {
+  "ru": "Шапочка для плавания",
+  "uz": "Suzish qalpog‘i"
+ },
+ "Frying pan": {
+  "ru": "Сковорода",
+  "uz": "Tova"
+ },
+ "Snowplow": {
+  "ru": "Снегоуборщик",
+  "uz": "Qor tozalagich"
+ },
+ "Bathroom cabinet": {
+  "ru": "Шкафчик для ванной",
+  "uz": "Vannaxona shkafchasi"
+ },
+ "Bust": {
+  "ru": "Бюст",
+  "uz": "Byust"
+ },
+ "Waffle iron": {
+  "ru": "Вафельница",
+  "uz": "Vaflidon"
+ },
+ "Milk": {
+  "ru": "Молоко",
+  "uz": "Sut"
+ },
+ "Ring binder": {
+  "ru": "Папка-регистратор",
+  "uz": "Papka"
+ },
+ "Plate": {
+  "ru": "Тарелка",
+  "uz": "Likop"
+ },
+ "Mobile phone": {
+  "ru": "Мобильный телефон",
+  "uz": "Mobil telefon"
+ },
+ "Baked goods": {
+  "ru": "Выпечка",
+  "uz": "Pishiriqlar"
+ },
+ "Mushroom": {
+  "ru": "Гриб",
+  "uz": "Qo‘ziqorin"
+ },
+ "Crutch": {
+  "ru": "Костыль",
+  "uz": "Qo‘ltiqtayoq"
+ },
+ "Mirror": {
+  "ru": "Зеркало",
+  "uz": "Ko‘zgu"
+ },
+ "Pitcher": {
+  "ru": "Кувшин",
+  "uz": "Ko‘za"
+ },
+ "Lifejacket": {
+  "ru": "Спасательный жилет",
+  "uz": "Qutqaruv nimchasi"
+ },
+ "Pencil case": {
+  "ru": "Пенал",
+  "uz": "Penal"
+ },
+ "Sweatpants": {
+  "ru": "Спортивные штаны",
+  "uz": "Sport shim"
+ },
+ "Musical keyboard": {
+  "ru": "Синтезатор",
+  "uz": "Sintezator"
+ },
+ "Scoreboard": {
+  "ru": "Табло",
+  "uz": "Tablo"
+ },
+ "Briefcase": {
+  "ru": "Портфель",
+  "uz": "Portfel"
+ },
+ "Kitchen knife": {
+  "ru": "Кухонный нож",
+  "uz": "Oshxona pichog‘i"
+ },
+ "Magazine": {
+  "ru": "Журнал",
+  "uz": "Jurnal"
+ },
+ "Table tennis racket": {
+  "ru": "Ракетка для настольного тенниса",
+  "uz": "Stol tennisi raketkasi"
+ },
+ "Portable media player": {
+  "ru": "Плеер",
+  "uz": "Pleyer"
+ },
+ "Hoodie": {
+  "ru": "Худи",
+  "uz": "Xudi"
+ },
+ "Nail": {
+  "ru": "Гвоздь",
+  "uz": "Mix"
+ },
+ "Tennis ball": {
+  "ru": "Теннисный мяч",
+  "uz": "Tennis to‘pi"
+ },
+ "Oboe": {
+  "ru": "Гобой",
+  "uz": "Goboy"
+ },
+ "Chest of drawers": {
+  "ru": "Комод",
+  "uz": "Komod"
+ },
+ "Ostrich": {
+  "ru": "Страус",
+  "uz": "Tuyaqush"
+ },
+ "Painting": {
+  "ru": "Картина",
+  "uz": "Rasm"
+ },
+ "Piano": {
+  "ru": "Пианино",
+  "uz": "Pianino"
+ },
+ "Playing card": {
+  "ru": "Игральная карта",
+  "uz": "O‘yin kartasi"
+ },
+ "Plant": {
+  "ru": "Растение",
+  "uz": "O‘simlik"
+ },
+ "Passport": {
+  "ru": "Паспорт",
+  "uz": "Pasport"
+ },
+ "Potato": {
+  "ru": "Картофель",
+  "uz": "Kartoshka"
+ },
+ "Pasta": {
+  "ru": "Макароны",
+  "uz": "Makaron"
+ },
+ "Penguin": {
+  "ru": "Пингвин",
+  "uz": "Pingvin"
+ },
+ "Pumpkin": {
+  "ru": "Тыква",
+  "uz": "Qovoq"
+ },
+ "Pear": {
+  "ru": "Груша",
+  "uz": "Nok"
+ },
+ "Infant bed": {
+  "ru": "Детская кроватка",
+  "uz": "Beshik"
+ },
+ "Polar bear": {
+  "ru": "Белый медведь",
+  "uz": "Oq ayiq"
+ },
+ "Mixer": {
+  "ru": "Миксер",
+  "uz": "Mikser"
+ },
+ "Cupboard": {
+  "ru": "Буфет",
+  "uz": "Bufet"
+ },
+ "Jacuzzi": {
+  "ru": "Джакузи",
+  "uz": "Jakuzi"
+ },
+ "Pizza": {
+  "ru": "Пицца",
+  "uz": "Pitsa"
+ },
+ "Pig": {
+  "ru": "Свинья",
+  "uz": "Cho‘chqa"
+ },
+ "Digital clock": {
+  "ru": "Электронные часы",
+  "uz": "Elektron soat"
+ },
+ "Snowboard": {
+  "ru": "Сноуборд",
+  "uz": "Snoubord"
+ },
+ "Skateboard": {
+  "ru": "Скейтборд",
+  "uz": "Skeytbord"
+ },
+ "Rifle": {
+  "ru": "Винтовка",
+  "uz": "Miltiq"
+ },
+ "Lipstick": {
+  "ru": "Помада",
+  "uz": "Lab bo‘yog‘i"
+ },
+ "Raven": {
+  "ru": "Ворон",
+  "uz": "Qarg‘a"
+ },
+ "High heels": {
+  "ru": "Туфли на каблуке",
+  "uz": "Poshnali tufli"
+ },
+ "Red panda": {
+  "ru": "Малая панда",
+  "uz": "Qizil panda"
+ },
+ "Rabbit": {
+  "ru": "Кролик",
+  "uz": "Quyon"
+ },
+ "Sculpture": {
+  "ru": "Скульптура",
+  "uz": "Haykal"
+ },
+ "Saxophone": {
+  "ru": "Саксофон",
+  "uz": "Saksofon"
+ },
+ "Shotgun": {
+  "ru": "Ружьё",
+  "uz": "Ov miltig‘i"
+ },
+ "Submarine sandwich": {
+  "ru": "Сэндвич",
+  "uz": "Sendvich"
+ },
+ "Ship": {
+  "ru": "Корабль",
+  "uz": "Kema"
+ },
+ "Shoe": {
+  "ru": "Туфля",
+  "uz": "Poyabzal"
+ },
+ "Sword": {
+  "ru": "Меч",
+  "uz": "Qilich"
+ },
+ "Picture frame": {
+  "ru": "Фоторамка",
+  "uz": "Rasm ramkasi"
+ },
+ "Sushi": {
+  "ru": "Суши",
+  "uz": "Sushi"
+ },
+ "Loveseat": {
+  "ru": "Двухместный диван",
+  "uz": "Ikki kishilik divan"
+ },
+ "Ski": {
+  "ru": "Лыжа",
+  "uz": "Chang‘i"
+ },
+ "Squirrel": {
+  "ru": "Белка",
+  "uz": "Olmaxon"
+ },
+ "Tripod": {
+  "ru": "Штатив",
+  "uz": "Shtativ"
+ },
+ "Stethoscope": {
+  "ru": "Стетоскоп",
+  "uz": "Stetoskop"
+ },
+ "Submarine": {
+  "ru": "Подводная лодка",
+  "uz": "Suv osti kemasi"
+ },
+ "Scorpion": {
+  "ru": "Скорпион",
+  "uz": "Chayon"
+ },
+ "Segway": {
+  "ru": "Сегвей",
+  "uz": "Segvey"
+ },
+ "Weight training bench": {
+  "ru": "Силовая скамья",
+  "uz": "Trenajyor skameykasi"
+ },
+ "Snake": {
+  "ru": "Змея",
+  "uz": "Ilon"
+ },
+ "Coffee table": {
+  "ru": "Журнальный столик",
+  "uz": "Jurnal stolchasi"
+ },
+ "Video game console": {
+  "ru": "Игровая приставка",
+  "uz": "O‘yin pristavkasi"
+ },
+ "Sheep": {
+  "ru": "Овца",
+  "uz": "Qo‘y"
+ },
+ "Single-lens reflex camera": {
+  "ru": "Зеркальный фотоаппарат",
+  "uz": "Fotoapparat"
+ },
+ "Television": {
+  "ru": "Телевизор",
+  "uz": "Televizor"
+ },
+ "Trombone": {
+  "ru": "Тромбон",
+  "uz": "Trombon"
+ },
+ "Tank": {
+  "ru": "Танк",
+  "uz": "Tank"
+ },
+ "Taco": {
+  "ru": "Тако",
+  "uz": "Tako"
+ },
+ "Telephone": {
+  "ru": "Телефон",
+  "uz": "Telefon"
+ },
+ "Torch": {
+  "ru": "Факел",
+  "uz": "Mash‘al"
+ },
+ "Tiger": {
+  "ru": "Тигр",
+  "uz": "Yo‘lbars"
+ },
+ "Strawberry": {
+  "ru": "Клубника",
+  "uz": "Qulupnay"
+ },
+ "Trumpet": {
+  "ru": "Труба",
+  "uz": "Truba"
+ },
+ "Tomato": {
+  "ru": "Помидор",
+  "uz": "Pomidor"
+ },
+ "Train": {
+  "ru": "Поезд",
+  "uz": "Poyezd"
+ },
+ "Pants": {
+  "ru": "Брюки",
+  "uz": "Shim"
+ },
+ "cup": {
+  "ru": "Чашка",
+  "uz": "Chashka"
+ },
+ "Football helmet": {
+  "ru": "Шлем для американского футбола",
+  "uz": "Futbol shlemi"
+ },
+ "Truck": {
+  "ru": "Грузовик",
+  "uz": "Yuk mashinasi"
+ },
+ "Measuring cup": {
+  "ru": "Мерный стакан",
+  "uz": "O‘lchov stakani"
+ },
+ "Coffeemaker": {
+  "ru": "Кофеварка",
+  "uz": "Qahvaqaynatgich"
+ },
+ "Violin": {
+  "ru": "Скрипка",
+  "uz": "Skripka"
+ },
+ "Vacuum": {
+  "ru": "Пылесос",
+  "uz": "Changyutgich"
+ },
+ "Handbag": {
+  "ru": "Сумочка",
+  "uz": "Sumka"
+ },
+ "Weapon": {
+  "ru": "Оружие",
+  "uz": "Qurol"
+ },
+ "Wheel": {
+  "ru": "Колесо",
+  "uz": "G‘ildirak"
+ },
+ "Worm": {
+  "ru": "Червь",
+  "uz": "Chuvalchang"
+ },
+ "Wok": {
+  "ru": "Вок",
+  "uz": "Vok"
+ },
+ "Whale": {
+  "ru": "Кит",
+  "uz": "Kit"
+ },
+ "Zebra": {
+  "ru": "Зебра",
+  "uz": "Zebra"
+ },
+ "Carseat": {
+  "ru": "Детское автокресло",
+  "uz": "Bolalar avtokreslosi"
+ },
+ "Jug": {
+  "ru": "Кувшин",
+  "uz": "Ko‘za"
+ },
+ "Light fixture": {
+  "ru": "Светильник",
+  "uz": "Chiroq"
+ },
+ "Pizza cutter": {
+  "ru": "Нож для пиццы",
+  "uz": "Pitsa pichog‘i"
+ },
+ "Cream": {
+  "ru": "Крем",
+  "uz": "Krem"
+ },
+ "Monkey": {
+  "ru": "Обезьяна",
+  "uz": "Maymun"
+ },
+ "Lion": {
+  "ru": "Лев",
+  "uz": "Sher"
+ },
+ "Bread": {
+  "ru": "Хлеб",
+  "uz": "Non"
+ },
+ "Chicken": {
+  "ru": "Курица",
+  "uz": "Tovuq"
+ },
+ "Eagle": {
+  "ru": "Орёл",
+  "uz": "Burgut"
+ },
+ "Helicopter": {
+  "ru": "Вертолёт",
+  "uz": "Vertolyot"
+ },
+ "Owl": {
+  "ru": "Сова",
+  "uz": "Boyqush"
+ },
+ "Duck": {
+  "ru": "Утка",
+  "uz": "O‘rdak"
+ },
+ "Turtle": {
+  "ru": "Черепаха",
+  "uz": "Toshbaqa"
+ },
+ "Hippopotamus": {
+  "ru": "Бегемот",
+  "uz": "Begemot"
+ },
+ "Crocodile": {
+  "ru": "Крокодил",
+  "uz": "Timsoh"
+ },
+ "Toilet": {
+  "ru": "Унитаз",
+  "uz": "Unitaz"
+ },
+ "Garden gnome": {
+  "ru": "Садовый гном",
+  "uz": "Bog‘ gnomi"
+ },
+ "Toilet paper": {
+  "ru": "Туалетная бумага",
+  "uz": "Hojatxona qog‘ozi"
+ },
+ "Squid": {
+  "ru": "Кальмар",
+  "uz": "Kalmar"
+ },
+ "Clothing": {
+  "ru": "Одежда",
+  "uz": "Kiyim"
+ },
+ "Footwear": {
+  "ru": "Обувь",
+  "uz": "Poyabzal"
+ },
+ "Lemon": {
+  "ru": "Лимон",
+  "uz": "Limon"
+ },
+ "Sneakers": {
+  "ru": "Кроссовки",
+  "uz": "Krossovka"
+ },
+ "Spider": {
+  "ru": "Паук",
+  "uz": "O‘rgimchak"
+ },
+ "Deer": {
+  "ru": "Олень",
+  "uz": "Kiyik"
+ },
+ "Ring": {
+  "ru": "Кольцо",
+  "uz": "Uzuk"
+ },
+ "Frog": {
+  "ru": "Лягушка",
+  "uz": "Qurbaqa"
+ },
+ "Banana": {
+  "ru": "Банан",
+  "uz": "Banan"
+ },
+ "Rocket": {
+  "ru": "Ракета",
+  "uz": "Raketa"
+ },
+ "Wine glass": {
+  "ru": "Бокал",
+  "uz": "Bokal"
+ },
+ "Oyster": {
+  "ru": "Устрица",
+  "uz": "Ustritsa"
+ },
+ "Chisel": {
+  "ru": "Стамеска",
+  "uz": "Iskana"
+ },
+ "Ant": {
+  "ru": "Муравей",
+  "uz": "Chumoli"
+ },
+ "Countertop": {
+  "ru": "Столешница",
+  "uz": "Stol usti"
+ },
+ "Optical disc": {
+  "ru": "Диск",
+  "uz": "Disk"
+ },
+ "Tablet computer": {
+  "ru": "Планшет",
+  "uz": "Planshet"
+ },
+ "Waste container": {
+  "ru": "Мусорный бак",
+  "uz": "Axlat qutisi"
+ },
+ "Electronic device": {
+  "ru": "Электроника",
+  "uz": "Elektron qurilma"
+ },
+ "Book": {
+  "ru": "Книга",
+  "uz": "Kitob"
+ },
+ "Elephant": {
+  "ru": "Слон",
+  "uz": "Fil"
+ },
+ "Robotic vacuum cleaner": {
+  "ru": "Робот-пылесос",
+  "uz": "Robot changyutgich"
+ },
+ "Shark": {
+  "ru": "Акула",
+  "uz": "Akula"
+ },
+ "Toy block": {
+  "ru": "Кубик",
+  "uz": "Kubik"
+ },
+ "Candle": {
+  "ru": "Свеча",
+  "uz": "Sham"
+ },
+ "Leopard": {
+  "ru": "Леопард",
+  "uz": "Qoplon"
+ },
+ "Axe": {
+  "ru": "Топор",
+  "uz": "Bolta"
+ },
+ "Hand dryer": {
+  "ru": "Сушилка для рук",
+  "uz": "Qo‘l quritgich"
+ },
+ "Soap dispenser": {
+  "ru": "Дозатор мыла",
+  "uz": "Sovun dozatori"
+ },
+ "Porcupine": {
+  "ru": "Дикобраз",
+  "uz": "Jayra"
+ },
+ "Flower": {
+  "ru": "Цветок",
+  "uz": "Gul"
+ },
+ "Furniture": {
+  "ru": "Мебель",
+  "uz": "Mebel"
+ },
+ "Canary": {
+  "ru": "Канарейка",
+  "uz": "Kanareyka"
+ },
+ "Cheetah": {
+  "ru": "Гепард",
+  "uz": "Gepard"
+ },
+ "Hamburger": {
+  "ru": "Гамбургер",
+  "uz": "Gamburger"
+ },
+ "Satchel": {
+  "ru": "Ранец",
+  "uz": "Sumka"
+ },
+ "Loudspeaker": {
+  "ru": "Колонка",
+  "uz": "Karnay"
+ },
+ "Building": {
+  "ru": "Здание",
+  "uz": "Bino"
+ },
+ "Fish": {
+  "ru": "Рыба",
+  "uz": "Baliq"
+ },
+ "Lobster": {
+  "ru": "Омар",
+  "uz": "Omar"
+ },
+ "Asparagus": {
+  "ru": "Спаржа",
+  "uz": "Sarsabil"
+ },
+ "Hedgehog": {
+  "ru": "Ёж",
+  "uz": "Tipratikan"
+ },
+ "Airplane": {
+  "ru": "Самолёт",
+  "uz": "Samolyot"
+ },
+ "Spoon": {
+  "ru": "Ложка",
+  "uz": "Qoshiq"
+ },
+ "Otter": {
+  "ru": "Выдра",
+  "uz": "Qunduz"
+ },
+ "Bull": {
+  "ru": "Бык",
+  "uz": "Buqa"
+ },
+ "Underpants": {
+  "ru": "Трусы",
+  "uz": "Ichki kiyim"
+ },
+ "Projector": {
+  "ru": "Проектор",
+  "uz": "Proyektor"
+ },
+ "Bench": {
+  "ru": "Скамейка",
+  "uz": "Skameyka"
+ },
+ "Driver's license": {
+  "ru": "Водительское удостоверение",
+  "uz": "Haydovchilik guvohnomasi"
+ },
+ "Ice cream": {
+  "ru": "Мороженое",
+  "uz": "Muzqaymoq"
+ },
+ "Caterpillar": {
+  "ru": "Гусеница",
+  "uz": "Tirtil"
+ },
+ "Butterfly": {
+  "ru": "Бабочка",
+  "uz": "Kapalak"
+ },
+ "Parachute": {
+  "ru": "Парашют",
+  "uz": "Parashyut"
+ },
+ "Orange": {
+  "ru": "Апельсин",
+  "uz": "Apelsin"
+ },
+ "Antelope": {
+  "ru": "Антилопа",
+  "uz": "Antilopa"
+ },
+ "Beaker": {
+  "ru": "Мензурка",
+  "uz": "Menzurka"
+ },
+ "Romper": {
+  "ru": "Детский комбинезон",
+  "uz": "Bolalar kombinezoni"
+ },
+ "Window": {
+  "ru": "Окно",
+  "uz": "Deraza"
+ },
+ "Castle": {
+  "ru": "Замок",
+  "uz": "Qal‘a"
+ },
+ "Jellyfish": {
+  "ru": "Медуза",
+  "uz": "Meduza"
+ },
+ "Moths and butterflies": {
+  "ru": "Бабочка",
+  "uz": "Kapalak"
+ },
+ "Goose": {
+  "ru": "Гусь",
+  "uz": "G‘oz"
+ },
+ "Mule": {
+  "ru": "Мул",
+  "uz": "Xachir"
+ },
+ "Swan": {
+  "ru": "Лебедь",
+  "uz": "Oqqush"
+ },
+ "Peach": {
+  "ru": "Персик",
+  "uz": "Shaftoli"
+ },
+ "Coconut": {
+  "ru": "Кокос",
+  "uz": "Kokos"
+ },
+ "Scooter": {
+  "ru": "Самокат",
+  "uz": "Samokat"
+ },
+ "Soccer ball": {
+  "ru": "Футбольный мяч",
+  "uz": "Futbol to‘pi"
+ },
+ "Raccoon": {
+  "ru": "Енот",
+  "uz": "Yenot"
+ },
+ "Fork": {
+  "ru": "Вилка",
+  "uz": "Sanchqi"
+ },
+ "Lamp": {
+  "ru": "Лампа",
+  "uz": "Chiroq"
+ },
+ "Camera": {
+  "ru": "Фотоаппарат",
+  "uz": "Fotoapparat"
+ },
+ "Squash": {
+  "ru": "Тыква",
+  "uz": "Qovoq"
+ },
+ "Racket": {
+  "ru": "Ракетка",
+  "uz": "Raketka"
+ },
+ "Vegetable": {
+  "ru": "Овощ",
+  "uz": "Sabzavot"
+ },
+ "Diaper": {
+  "ru": "Подгузник",
+  "uz": "Taglik"
+ },
+ "Unicycle": {
+  "ru": "Моноцикл",
+  "uz": "Monotsikl"
+ },
+ "Falcon": {
+  "ru": "Сокол",
+  "uz": "Lochin"
+ },
+ "Apron": {
+  "ru": "Фартук",
+  "uz": "Fartuk"
+ },
+ "Chime": {
+  "ru": "Колокольчик",
+  "uz": "Qo‘ng‘iroqcha"
+ },
+ "Snail": {
+  "ru": "Улитка",
+  "uz": "Shilliqqurt"
+ },
+ "Cabbage": {
+  "ru": "Капуста",
+  "uz": "Karam"
+ },
+ "Carrot": {
+  "ru": "Морковь",
+  "uz": "Sabzi"
+ },
+ "Mango": {
+  "ru": "Манго",
+  "uz": "Mango"
+ },
+ "Jeans": {
+  "ru": "Джинсы",
+  "uz": "Jinsi"
+ },
+ "Flowerpot": {
+  "ru": "Цветочный горшок",
+  "uz": "Gul tuvagi"
+ },
+ "Pineapple": {
+  "ru": "Ананас",
+  "uz": "Ananas"
+ },
+ "Stool": {
+  "ru": "Табурет",
+  "uz": "Taburetka"
+ },
+ "Basketball": {
+  "ru": "Баскетбольный мяч",
+  "uz": "Basketbol to‘pi"
+ },
+ "Envelope": {
+  "ru": "Конверт",
+  "uz": "Konvert"
+ },
+ "Cake": {
+  "ru": "Торт",
+  "uz": "Tort"
+ },
+ "Dragonfly": {
+  "ru": "Стрекоза",
+  "uz": "Ninachi"
+ },
+ "Microwave oven": {
+  "ru": "Микроволновка",
+  "uz": "Mikroto‘lqinli pech"
+ },
+ "Honeycomb": {
+  "ru": "Соты",
+  "uz": "Asal katagi"
+ },
+ "Drone": {
+  "ru": "Дрон",
+  "uz": "Dron"
+ },
+ "Sea lion": {
+  "ru": "Морской лев",
+  "uz": "Dengiz sheri"
+ },
+ "Barcode": {
+  "ru": "Штрихкод",
+  "uz": "Shtrix-kod"
+ },
+ "Lady bug": {
+  "ru": "Божья коровка",
+  "uz": "Xonqizi"
+ },
+ "Shelf": {
+  "ru": "Полка",
+  "uz": "Javon"
+ },
+ "Watch": {
+  "ru": "Наручные часы",
+  "uz": "Qo‘l soati"
+ },
+ "Candy": {
+  "ru": "Конфета",
+  "uz": "Konfet"
+ },
+ "Salad": {
+  "ru": "Салат",
+  "uz": "Salat"
+ },
+ "Parrot": {
+  "ru": "Попугай",
+  "uz": "To‘tiqush"
+ },
+ "Handgun": {
+  "ru": "Пистолет",
+  "uz": "To‘pponcha"
+ },
+ "Sparrow": {
+  "ru": "Воробей",
+  "uz": "Chumchuq"
+ },
+ "Van": {
+  "ru": "Фургон",
+  "uz": "Furgon"
+ },
+ "Ice skate": {
+  "ru": "Конёк",
+  "uz": "Konki"
+ },
+ "Grinder": {
+  "ru": "Измельчитель",
+  "uz": "Maydalagich"
+ },
+ "Spice rack": {
+  "ru": "Полка для специй",
+  "uz": "Ziravor javoni"
+ },
+ "Light bulb": {
+  "ru": "Лампочка",
+  "uz": "Lampochka"
+ },
+ "Toy vehicle": {
+  "ru": "Игрушечная машинка",
+  "uz": "O‘yinchoq mashina"
+ },
+ "Corded phone": {
+  "ru": "Стационарный телефон",
+  "uz": "Statsionar telefon"
+ },
+ "Dartboard": {
+  "ru": "Мишень для дартса",
+  "uz": "Darts nishoni"
+ },
+ "Tennis racket": {
+  "ru": "Теннисная ракетка",
+  "uz": "Tennis raketkasi"
+ },
+ "Wall clock": {
+  "ru": "Настенные часы",
+  "uz": "Devor soati"
+ },
+ "Serving tray": {
+  "ru": "Поднос",
+  "uz": "Patnis"
+ },
+ "Kitchen & dining room table": {
+  "ru": "Обеденный стол",
+  "uz": "Ovqat stoli"
+ },
+ "Dog bed": {
+  "ru": "Лежанка для собаки",
+  "uz": "It to‘shagi"
+ },
+ "Cake stand": {
+  "ru": "Подставка для торта",
+  "uz": "Tort tagligi"
+ },
+ "Baby carrier": {
+  "ru": "Переноска для ребёнка",
+  "uz": "Bola tashigich"
+ },
+ "Facial tissue holder": {
+  "ru": "Салфетница",
+  "uz": "Salfetkadon"
+ },
+ "Pressure cooker": {
+  "ru": "Скороварка",
+  "uz": "Bosimli qozon"
+ },
+ "Shipping box": {
+  "ru": "Посылка",
+  "uz": "Pochta qutisi"
+ },
+ "Kitchen Appliance": {
+  "ru": "Кухонная техника",
+  "uz": "Oshxona texnikasi"
+ },
+ "Tire": {
+  "ru": "Шина",
+  "uz": "Shina"
+ },
+ "Ruler": {
+  "ru": "Линейка",
+  "uz": "Chizg‘ich"
+ },
+ "Luggage & bags": {
+  "ru": "Сумки и багаж",
+  "uz": "Sumka va yuklar"
+ },
+ "Microphone": {
+  "ru": "Микрофон",
+  "uz": "Mikrofon"
+ },
+ "Broccoli": {
+  "ru": "Брокколи",
+  "uz": "Brokkoli"
+ },
+ "Umbrella": {
+  "ru": "Зонт",
+  "uz": "Soyabon"
+ },
+ "Pastry": {
+  "ru": "Пирожное",
+  "uz": "Pishiriq"
+ },
+ "Grapefruit": {
+  "ru": "Грейпфрут",
+  "uz": "Greypfrut"
+ },
+ "Eyewear": {
+  "ru": "Очки",
+  "uz": "Ko‘zoynak"
+ },
+ "Band-aid": {
+  "ru": "Пластырь",
+  "uz": "Plastir"
+ },
+ "Bell pepper": {
+  "ru": "Болгарский перец",
+  "uz": "Bulg‘or qalampiri"
+ },
+ "Turkey": {
+  "ru": "Индейка",
+  "uz": "Kurka"
+ },
+ "Pomegranate": {
+  "ru": "Гранат",
+  "uz": "Anor"
+ },
+ "Doughnut": {
+  "ru": "Пончик",
+  "uz": "Ponchik"
+ },
+ "Glasses": {
+  "ru": "Очки",
+  "uz": "Ko‘zoynak"
+ },
+ "Pen": {
+  "ru": "Ручка",
+  "uz": "Ruchka"
+ },
+ "Car": {
+  "ru": "Машина",
+  "uz": "Mashina"
+ },
+ "Skunk": {
+  "ru": "Скунс",
+  "uz": "Skuns"
+ },
+ "Teddy bear": {
+  "ru": "Плюшевый мишка",
+  "uz": "O‘yinchoq ayiq"
+ },
+ "Watermelon": {
+  "ru": "Арбуз",
+  "uz": "Tarvuz"
+ },
+ "Cantaloupe": {
+  "ru": "Дыня",
+  "uz": "Qovun"
+ },
+ "Dishwasher": {
+  "ru": "Посудомоечная машина",
+  "uz": "Idish yuvish mashinasi"
+ },
+ "Flute": {
+  "ru": "Флейта",
+  "uz": "Fleyta"
+ },
+ "Sandwich": {
+  "ru": "Бутерброд",
+  "uz": "Buterbrod"
+ },
+ "Bladeless fan": {
+  "ru": "Безлопастной вентилятор",
+  "uz": "Parraksiz ventilyator"
+ },
+ "Shrimp": {
+  "ru": "Креветка",
+  "uz": "Krevetka"
+ },
+ "Sewing machine": {
+  "ru": "Швейная машина",
+  "uz": "Tikuv mashinasi"
+ },
+ "Binoculars": {
+  "ru": "Бинокль",
+  "uz": "Durbin"
+ },
+ "Rays and skates": {
+  "ru": "Скат",
+  "uz": "Skat"
+ },
+ "Accordion": {
+  "ru": "Аккордеон",
+  "uz": "Akkordeon"
+ },
+ "Crab": {
+  "ru": "Краб",
+  "uz": "Qisqichbaqa"
+ },
+ "Bag": {
+  "ru": "Сумка",
+  "uz": "Sumka"
+ },
+ "Crown": {
+  "ru": "Корона",
+  "uz": "Toj"
+ },
+ "Seahorse": {
+  "ru": "Морской конёк",
+  "uz": "Dengiz otchasi"
+ },
+ "Perfume": {
+  "ru": "Духи",
+  "uz": "Atir"
+ },
+ "Alpaca": {
+  "ru": "Альпака",
+  "uz": "Alpaka"
+ },
+ "Canoe": {
+  "ru": "Каноэ",
+  "uz": "Kanoe"
+ },
+ "Game controller": {
+  "ru": "Геймпад",
+  "uz": "Geympad"
+ },
+ "Remote control": {
+  "ru": "Пульт",
+  "uz": "Pult"
+ },
+ "Wheelchair": {
+  "ru": "Инвалидная коляска",
+  "uz": "Nogironlar aravachasi"
+ },
+ "Rugby ball": {
+  "ru": "Мяч для регби",
+  "uz": "Regbi to‘pi"
+ },
+ "Armadillo": {
+  "ru": "Броненосец",
+  "uz": "Armadillo"
+ },
+ "Maracas": {
+  "ru": "Маракасы",
+  "uz": "Marakas"
+ },
+ "Activity tracker": {
+  "ru": "Фитнес-браслет",
+  "uz": "Fitnes bilaguzuk"
+ },
+ "Helmet": {
+  "ru": "Шлем",
+  "uz": "Shlem"
+ }
+}

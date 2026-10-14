@@ -7,7 +7,22 @@ enum DashboardButtonType{
   scanText,
   scanBarcode,
   describeScene,
-  objectRecognition;
+  objectRecognition,
+
+  /// Мебель и предметы комнаты — своей моделью (YOLO на HomeObjects-3K).
+  /// Только в приложении: в браузере эта модель не запускается.
+  homeObjects,
+
+  /// Поиск одного предмета: пользователь называет его, а камера говорит,
+  /// когда он в кадре. Как «Find Object» в Envision. Только в приложении.
+  findObject;
+
+  /// Режимы сайта — все, кроме тех, что работают только на телефоне.
+  static List<DashboardButtonType> get web => values
+      .where((t) =>
+          t != DashboardButtonType.homeObjects &&
+          t != DashboardButtonType.findObject)
+      .toList();
 
   String get title {
     switch(this){
@@ -22,6 +37,12 @@ enum DashboardButtonType{
 
       case DashboardButtonType.objectRecognition:
         return Strings.dashboardButtonTypeObjectRecognition;
+
+      case DashboardButtonType.homeObjects:
+        return Strings.dashboardButtonTypeHomeObjects;
+
+      case DashboardButtonType.findObject:
+        return Strings.dashboardButtonTypeFindObject;
     }
   }
 
@@ -35,6 +56,8 @@ enum DashboardButtonType{
       DashboardButtonType.describeScene => Assets.images.bottomBar.sparkles,
       DashboardButtonType.objectRecognition =>
         Assets.images.bottomBar.scanSearch,
+      DashboardButtonType.homeObjects => Assets.images.bottomBar.sofa,
+      DashboardButtonType.findObject => Assets.images.bottomBar.locateFixed,
     };
 
     return icon.svg(

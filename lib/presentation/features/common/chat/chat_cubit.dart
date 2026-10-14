@@ -201,39 +201,10 @@ class ChatCubit extends BaseCubit<ChatState, ChatEvent> {
       logger.e("TTT=> Не удалось подключиться к WebSocket: $e");
     }
   }
-  /// Одна кнопка на все состояния озвучки.
-  ///
-  /// Для серверного звука это пауза и продолжение — файл никуда не делся,
-  /// возвращаться к началу незачем. Для движка телефона паузы не существует,
-  /// поэтому повторное нажатие просто обрывает чтение.
-  void toggleSpeech(String messageId, String text) {
-    final playback = states.playback;
-
-    if (playback?.messageId == messageId) {
-      switch (playback!.status) {
-        case SpeechStatus.playing:
-          if (playback.seekable) {
-            _speaker.pause();
-          } else {
-            stopSpeaking();
-          }
-          return;
-        case SpeechStatus.paused:
-          _speaker.resume();
-          return;
-        case SpeechStatus.loading:
-          // Звук ещё синтезируется — нажатие отменяет ожидание.
-          stopSpeaking();
-          return;
-        case SpeechStatus.idle:
-          // Дослушали или прервали — играем заново. В сеть при этом не идём:
-          // файл и огибающая уже лежат на устройстве.
-          break;
-      }
-    }
-
-    _speaker.speak(messageId, text, _languageCode);
-  }
+  /// Кнопка озвучки под ответом. Логика общая для всех разделов и живёт в
+  /// самом спикере.
+  void toggleSpeech(String messageId, String text) =>
+      _speaker.toggle(messageId, text, _languageCode);
 
   /// Перемотка. Работает только там, где звук — это файл.
   void seekSpeech(Duration position) => _speaker.seek(position);

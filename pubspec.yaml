@@ -42,7 +42,7 @@ dependencies:
   geolocator: ^11.0.0
   get_it: ^7.6.0
   image: ^4.5.3
-  image_picker: ^0.8.7+5
+  image_picker: ^1.1.2
   injectable_generator: ^2.4.1
   infinite_scroll_pagination: ^4.0.0
   json_annotation: ^4.8.1
@@ -89,6 +89,17 @@ dependencies:
   ##
   google_mlkit_object_detection: ^0.15.0
   tflite_flutter: ^0.12.1
+  # Узбекский голос прямо на телефоне — MMS через onnxruntime (tool/tts).
+  sherpa_onnx: ^1.13.8
+  # Десктопная версия (Windows): то, что на сайте делают браузерные
+  # библиотеки, здесь — нативные. См. lib/utils/desktop.
+  ffi: ^2.1.0
+  flutter_zxing: ">=2.2.1 <2.3.0"
+  file_selector: ^1.0.3
+  desktop_drop: ^0.6.0
+  pasteboard: ^0.4.0
+  camera_windows: ^0.2.6
+  just_audio_windows: ^0.2.2
 #  tflite_flutter_helper: ^0.4.0
 #  tflite_flutter_helper_plus: ^0.0.2
   google_mlkit_text_recognition: ^0.15.0
@@ -148,6 +159,9 @@ flutter:
     - assets/song/progress_audio.mp3
     - assets/models/labelmap.txt
     - assets/ml/object_labeler.tflite
+    - assets/ml/object_labels.json
+    - assets/ml/home_objects.tflite
+    - assets/tts/uz/
 flutter_gen:
   output: lib/core/gen/assets/
   integrations:

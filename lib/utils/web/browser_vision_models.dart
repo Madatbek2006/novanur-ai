@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 import 'dart:ui';
 
+import 'package:nurnova_ai/core/barcode/product_code.dart' as product_code;
+
 /// An image that is ready for analysis: an upright JPEG and its pixel size.
 class BrowserImage {
   final Uint8List bytes;
@@ -74,7 +76,7 @@ class VisionBarcode {
   const VisionBarcode({required this.text, required this.format});
 
   /// EAN/UPC style codes are what Open Food Facts can look up.
-  bool get isProductCode => RegExp(r'^\d{8,14}$').hasMatch(text);
+  bool get isProductCode => product_code.isProductCode(text);
 
   @override
   bool operator ==(Object other) =>
@@ -102,4 +104,17 @@ class VisionObjects {
   const VisionObjects({required this.imageSize, required this.objects});
 
   static const empty = VisionObjects(imageSize: Size.zero, objects: []);
+}
+
+/// Тип картинки по расширению — для файлов, у которых его не назвали
+/// (десктопная версия: выбор файла, перетаскивание).
+String imageMimeType(String name) {
+  final ext = name.toLowerCase().split('.').last;
+  return switch (ext) {
+    'png' => 'image/png',
+    'webp' => 'image/webp',
+    'gif' => 'image/gif',
+    'bmp' => 'image/bmp',
+    _ => 'image/jpeg',
+  };
 }

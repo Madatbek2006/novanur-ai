@@ -7,6 +7,7 @@ import 'package:nurnova_ai/data/datasource/preference/speech_rate_preferences.da
 import 'package:nurnova_ai/data/repositories/speech_rate_repository.dart';
 import 'package:nurnova_ai/data/repositories/speech_repository.dart';
 import 'package:nurnova_ai/domain/models/chat/speech_playback.dart';
+import 'package:nurnova_ai/presentation/application/manager/uzbek_voice.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:just_audio/just_audio.dart';
@@ -27,8 +28,13 @@ import 'package:path_provider/path_provider.dart';
 /// Полагаться на движок вслепую нельзя: он может заявлять язык, не имея
 /// скачанного голоса, и тогда `speak` молча ничего не произносит. Поэтому
 /// голос проверяется, а при его отсутствии озвучку берём с сервера.
+///
+/// Это единственный голос приложения: им говорят все разделы — чат,
+/// распознанный текст, штрихкоды, объекты, на телефоне и в браузере. Свой
+/// FlutterTts в разделе означает, что раздел зазвучит иначе, проигнорирует
+/// скорость из настроек и промолчит на узбекском, которого нет в движках.
 class ChatSpeaker {
-  ChatSpeaker(this._speech, this._speechRate) {
+  ChatSpeaker(this._speech, this._speechRate, this._uzbek) {
     // Экран показывает, что именно читается сейчас, поэтому о завершении
     // нужно узнать со всех сторон: движок мог договорить, его могли
     // отменить или он мог упасть.
@@ -51,9 +57,11 @@ class ChatSpeaker {
   /// Языки, которые телефон в принципе умеет читать, и их коды для движка.
   static const _deviceVoices = {'ru': 'ru-RU', 'en': 'en-US'};
 
-  /// Чем озвучивает сервер. Узбекского нет в движках телефонов, русский нужен
-  /// запасным вариантом. Остальное бэкенд отвечает по-английски — значит
-  /// и читать это надо по-английски.
+  /// Что синтезируется в файл, а не читается движком телефона. Узбекского
+  /// нет в движках телефонов — его синтезирует своя модель на телефоне
+  /// ([UzbekVoice]), а сервер остаётся запасным путём. Русский — запасной
+  /// вариант на случай, если голоса нет. Остальное бэкенд отвечает
+  /// по-английски — значит и читать это надо по-английски.
   static const _serverLanguages = {'ru': 'ru', 'uz': 'uz'};
 
   /// Сколько столбиков рисуем. Больше в ширину пузыря всё равно не влезает.
@@ -61,6 +69,7 @@ class ChatSpeaker {
 
   final SpeechRepository _speech;
   final SpeechRateRepository _speechRate;
+  final UzbekVoice _uzbek;
   final FlutterTts _tts = FlutterTts();
   final AudioPlayer _player = AudioPlayer();
   final Logger _logger = Logger();
@@ -142,6 +151,39 @@ class ChatSpeaker {
   Future<void> announce(String text, String languageCode) =>
       speak(null, text, languageCode);
 
+  /// Ключ озвучки для текста, у которого нет своего id — результата
+  /// распознавания, названия товара.
+  ///
+  /// Готовый звук кэшируется по ключу, поэтому ключ обязан меняться вместе с
+  /// текстом: иначе новый снимок зазвучал бы прошлым ответом.
+  static String keyFor(String text, String languageCode) =>
+      '${languageCode}_${text.hashCode.toUnsigned(32)}';
+
+  /// Одна кнопка на все состояния озвучки — одинаковая во всех разделах.
+  ///
+  /// Звук из файла ставится на паузу и продолжается с того же места. Движку,
+  /// который говорит прямо в динамик, паузы взять неоткуда — нажатие его
+  /// обрывает. Пока звук синтезируется, нажатие отменяет ожидание, а
+  /// дослушанное сообщение играет заново, не обращаясь к сети.
+  Future<void> toggle(String messageId, String text, String languageCode) async {
+    final playback = _playback;
+
+    if (playback?.messageId == messageId) {
+      switch (playback!.status) {
+        case SpeechStatus.playing:
+          return playback.seekable ? pause() : stop();
+        case SpeechStatus.paused:
+          return resume();
+        case SpeechStatus.loading:
+          return stop();
+        case SpeechStatus.idle:
+          break;
+      }
+    }
+
+    return speak(messageId, text, languageCode);
+  }
+
   /// Начинает читать сообщение заново — с начала.
   /// [messageId] равен null для служебных объявлений, у которых нет пузыря.
   Future<void> speak(String? messageId, String text, String languageCode) async {
@@ -160,7 +202,7 @@ class ChatSpeaker {
         return;
       }
 
-      await _speakFromServer(
+      await _speakRendered(
         messageId,
         text,
         _serverLanguages[languageCode] ?? 'en',
@@ -311,13 +353,13 @@ class ChatSpeaker {
     unawaited(_player.play());
   }
 
-  Future<void> _speakFromServer(
+  Future<void> _speakRendered(
     String? messageId,
     String text,
     String languageCode,
   ) async {
     if (kIsWeb) {
-      await _speakFromServerInMemory(messageId, text, languageCode);
+      await _speakRenderedInMemory(messageId, text, languageCode);
       return;
     }
 
@@ -346,12 +388,12 @@ class ChatSpeaker {
     await _playFile(messageId, file);
   }
 
-  /// То же, что [_speakFromServer], но для браузера.
+  /// То же, что [_speakRendered], но для браузера.
   ///
   /// Файловой системы там нет, поэтому WAV держим в памяти вкладки и отдаём
   /// плееру data-ссылкой. Полоса, огибающая и перемотка от этого не
   /// страдают — плееру всё равно, откуда байты.
-  Future<void> _speakFromServerInMemory(
+  Future<void> _speakRenderedInMemory(
     String? messageId,
     String text,
     String languageCode,
@@ -367,7 +409,7 @@ class ChatSpeaker {
     }
 
     if (audio == null) {
-      audio = await _speech.synthesize(text: text, lang: languageCode);
+      audio = await _synthesize(text, languageCode);
       if (audio.isEmpty) {
         _finish();
         return;
@@ -396,8 +438,7 @@ class ChatSpeaker {
     String text,
     String languageCode,
   ) async {
-    final Uint8List audio =
-        await _speech.synthesize(text: text, lang: languageCode);
+    final Uint8List audio = await _synthesize(text, languageCode);
     if (audio.isEmpty) return null;
 
     final file = File(await _pathFor(messageId ?? 'announcement'));
@@ -412,6 +453,16 @@ class ChatSpeaker {
     }
 
     return file;
+  }
+
+  /// WAV для текста: узбекский — своей моделью на телефоне, без сети и
+  /// без задержки на запрос; если она не поднялась — сервером, как раньше.
+  Future<Uint8List> _synthesize(String text, String languageCode) async {
+    if (languageCode == 'uz') {
+      final local = await _uzbek.synthesize(text);
+      if (local != null) return local;
+    }
+    return _speech.synthesize(text: text, lang: languageCode);
   }
 
   Future<String> _pathFor(String messageId) async {

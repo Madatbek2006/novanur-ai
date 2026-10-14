@@ -1,4 +1,5 @@
 import 'package:nurnova_ai/core/gen/assets/assets.gen.dart';
+import 'package:nurnova_ai/core/gen/localization/strings.dart';
 import 'package:nurnova_ai/presentation/support/extensions/color_extension.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -233,7 +234,7 @@ class _GoogleSpeechDialogState extends State<GoogleSpeechDialog>
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
         child: Text(
-          _text.isEmpty ? 'Скажите что-нибудь…' : _text,
+          _text.isEmpty ? Strings.speechDialogPrompt : _text,
           key: ValueKey(_text.isEmpty),
           textAlign: TextAlign.center,
           style: TextStyle(
@@ -268,7 +269,7 @@ class _GoogleSpeechDialogState extends State<GoogleSpeechDialog>
         ),
         const SizedBox(height: 16),
         Text(
-          'Язык: ${_localeId.toUpperCase()}',
+          _localeId.toUpperCase(),
           style: TextStyle(
             color: context.textPrimary.withOpacity(0.45),
             fontSize: 11,

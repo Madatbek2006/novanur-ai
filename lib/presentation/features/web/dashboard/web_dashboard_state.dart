@@ -59,7 +59,12 @@ class WebDashboardState with _$WebDashboardState {
     DescribeImgType? describeType,
     @Default(0) int chatSession,
 //
-    @Default(false) bool isSpeaking,
+    /// Что сейчас с озвучкой: какой текст, на какой стадии, можно ли его
+    /// перематывать. Тот же плеер, что под ответом в чате.
+    SpeechPlayback? playback,
+    /// Уже озвученные тексты — чтобы их полоса не пропадала, когда звучит
+    /// другой.
+    @Default(<String, SpeechPlayback>{}) Map<String, SpeechPlayback> speechClips,
   }) = _WebDashboardState;
 
   bool get hasImage => source == WebImageSource.image && image != null;

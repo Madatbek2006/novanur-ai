@@ -5,9 +5,13 @@ class ObjectPainter extends CustomPainter {
   final List<DetectedObject> objects;
   final Size previewSize;
 
+  /// Подпись к рамке. Если не задана — первая метка детектора как есть.
+  final String? Function(DetectedObject object)? describe;
+
   ObjectPainter({
     required this.objects,
     required this.previewSize,
+    this.describe,
   });
 
   @override
@@ -34,7 +38,7 @@ class ObjectPainter extends CustomPainter {
       );
 
       canvas.drawRect(rect, paintRect);
-      final mainLabel = obj.labels.first.text;
+      final mainLabel = describe?.call(obj) ?? obj.labels.first.text;
       // for (final label in obj.labels) {
         final textSpan = TextSpan(text: mainLabel, style: textStyle);
         final tp = TextPainter(text: textSpan, textDirection: TextDirection.ltr);

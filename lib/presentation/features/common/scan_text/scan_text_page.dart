@@ -5,7 +5,9 @@ import 'package:nurnova_ai/presentation/support/cubit/base_statefull_page.dart';
 import 'package:nurnova_ai/presentation/support/extensions/color_extension.dart';
 import 'package:nurnova_ai/presentation/widgets/app_bar/default_app_bar.dart';
 import 'package:nurnova_ai/presentation/widgets/dialog/progress_dialog.dart';
+import 'package:nurnova_ai/presentation/widgets/speech/speech_control.dart';
 import 'package:nurnova_ai/presentation/widgets/state/loader_state_widget.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_object_detection/google_mlkit_object_detection.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
@@ -78,19 +80,30 @@ class ScanTextPageState extends BaseStatefulPageState<ScanTextPage, ScanTextCubi
       }
     }
     Logger().d("TTT=>text: $text");
+    textRecognizer.close();
+    if (!mounted) return;
+
+    final cleaned = text.trim();
     setState(() {
-      recognizedText = text;
-      loadingState=text.isNotEmpty?LoadingState.success:LoadingState.empty;
+      recognizedText = cleaned;
+      loadingState=cleaned.isNotEmpty?LoadingState.success:LoadingState.empty;
     });
 
-    textRecognizer.close();
+    // Тем же голосом и на том же языке, что и ответ в чате.
+    final language = context.locale.languageCode;
+    if (cleaned.isEmpty) {
+      cubit().announce(Strings.scanTextEmpty, language);
+    } else {
+      cubit().read(cleaned, language);
+    }
   }
 
   Widget _buildBody(BuildContext context, ScanTextState state) {
     return LoaderStateWidget(
         loadingState: loadingState,
         loadingBody: _buildLoading(),
-        successBody: _buildSuccess()
+        successBody: _buildSuccess(state),
+        emptyBody: _buildEmpty(),
     );
   }
 
@@ -99,19 +112,52 @@ class ScanTextPageState extends BaseStatefulPageState<ScanTextPage, ScanTextCubi
         child: CircularProgressIndicator(),
       );
   }
-  Widget _buildSuccess(){
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: SingleChildScrollView(
+  Widget _buildEmpty() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
         child: Text(
-          recognizedText,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600, // если .w(600) — это semi-bold
-            color: context.textPrimary,
-          ),
+          Strings.scanTextEmpty,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 16, color: context.textSecondary),
         ),
       ),
+    );
+  }
+
+  Widget _buildSuccess(ScanTextState state){
+    return Column(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              recognizedText,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600, // если .w(600) — это semi-bold
+                color: context.textPrimary,
+              ),
+            ),
+          ),
+        ),
+        // Плеер под текстом и всегда на виду, даже когда текст длинный и
+        // прокручен: та же полоса, что под ответом в чате.
+        SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            child: SpeechControl(
+              speechId: cubit().speechIdFor(recognizedText),
+              playback: state.playback,
+              clips: state.speechClips,
+              positionStream: cubit().speechPositionStream,
+              onToggle: () => cubit().toggleSpeech(recognizedText),
+              onSeek: cubit().seekSpeech,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

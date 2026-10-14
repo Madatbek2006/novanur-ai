@@ -4,13 +4,29 @@ import 'package:flutter/foundation.dart';
 
 class PhotoAnalysisService {
   final Dio _dio;
+  /// Open Food Facts. API v2 со списком полей отдаёт 0.5 КБ вместо 37 КБ
+  /// полной карточки из v0 и отвечает вдвое быстрее — на мобильной сети это
+  /// разница между «назвал сразу» и «назвал, когда уже отошёл от полки».
   final Dio _dio2 = Dio(
     BaseOptions(
-      baseUrl: "https://world.openfoodfacts.org/api/v0/",
+      baseUrl: "https://world.openfoodfacts.org/api/v2/",
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
+      // На неизвестный код v2 отвечает 404 с обычным телом (status: 0).
+      // Это «товара нет в базе», а не сбой связи.
+      validateStatus: (status) =>
+          status != null && (status < 400 || status == 404),
+      // База просит представляться, иначе режет по лимитам. В браузере
+      // User-Agent выставить нельзя — там он свой.
+      headers: kIsWeb
+          ? null
+          : {'User-Agent': 'NurNovaAI/1.0 (https://nurnova-ai.nurnova.workers.dev)'},
     ),
   );
+
+  /// Ровно то, что показывают и произносят приложение и сайт.
+  static const _productFields = 'product_name,product_name_ru,product_name_uz,'
+      'product_name_en,brands,quantity,ingredients_text,image_url';
 
   PhotoAnalysisService(this._dio);
 
@@ -18,8 +34,9 @@ class PhotoAnalysisService {
 
   Future<Response> fetchPhotoAnalysis(XFile file) async {
     final formData = FormData.fromMap({
-      // Browsers expose no file paths, so the web build uploads the bytes.
-      'file': kIsWeb
+      // Browsers expose no file paths, and a picture opened in the desktop
+      // dashboard lives only in memory too — those upload the bytes.
+      'file': kIsWeb || file.path.isEmpty
           ? MultipartFile.fromBytes(
               await file.readAsBytes(),
               filename: file.name.isNotEmpty ? file.name : 'photo.jpg',
@@ -49,7 +66,10 @@ class PhotoAnalysisService {
     );
   }
   Future<Response> getProductData(String barcode) async {
-    return _dio2.get("product/$barcode.json");
+    return _dio2.get(
+      "product/$barcode",
+      queryParameters: {'fields': _productFields},
+    );
   }
 
 }

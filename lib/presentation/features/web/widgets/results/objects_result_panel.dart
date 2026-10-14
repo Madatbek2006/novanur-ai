@@ -85,14 +85,7 @@ class ObjectsResultPanel extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: SpeakButton(
-            isSpeaking: state.isSpeaking,
-            onSpeak: () => cubit.speak(state.objectsSummary),
-            onStop: cubit.stopSpeaking,
-          ),
-        ),
+        WebSpeechControl(state: state, cubit: cubit, text: state.objectsSummary),
       ],
     );
   }

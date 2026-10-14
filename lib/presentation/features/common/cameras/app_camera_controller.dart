@@ -6,7 +6,10 @@ import 'package:flutter/widgets.dart';
 import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart';
 import 'package:google_mlkit_object_detection/google_mlkit_object_detection.dart';
 import 'package:logger/logger.dart';
+import 'package:nurnova_ai/core/barcode/barcode_repeat_filter.dart';
 import 'package:nurnova_ai/core/extensions/list_extensions.dart';
+import 'package:nurnova_ai/core/objects/home_objects.dart';
+import 'package:nurnova_ai/presentation/application/manager/home_object_detector.dart';
 import 'package:nurnova_ai/presentation/application/manager/object_detection_manager.dart';
 import 'package:nurnova_ai/presentation/support/extensions/compressing_exts.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -16,7 +19,14 @@ import 'package:permission_handler/permission_handler.dart';
 /// Switching analysis does **not** reopen the camera — only the consumer of the
 /// frames changes. That is what keeps mode switching on the dashboard instant
 /// and guarantees there is never more than one open camera.
-enum CameraAnalysis { none, objectDetection, barcode }
+enum CameraAnalysis {
+  none,
+  objectDetection,
+
+  /// Мебель и предметы комнаты — своей моделью, а не ML Kit.
+  homeObjects,
+  barcode,
+}
 
 enum CameraStatus {
   idle,
@@ -40,7 +50,9 @@ class AppCameraController extends ChangeNotifier with WidgetsBindingObserver {
 
   final ResolutionPreset resolution;
 
-  /// Invoked once per newly seen barcode while [CameraAnalysis.barcode] is on.
+  /// Сообщает о коде, как только он попал в кадр. Пока код остаётся в кадре,
+  /// повторно не сообщает; убрал камеру и навёл снова — сообщит опять
+  /// (см. [BarcodeRepeatFilter]).
   final void Function(String value)? onBarcode;
 
   CameraController? _camera;
@@ -55,7 +67,8 @@ class AppCameraController extends ChangeNotifier with WidgetsBindingObserver {
   bool _analysing = false;
   bool _streaming = false;
   bool _disposed = false;
-  String? _lastBarcode;
+  final BarcodeRepeatFilter _barcodeFilter = BarcodeRepeatFilter();
+  final HomeObjectDetector _homeObjects = HomeObjectDetector();
 
   CameraController? get camera => _camera;
 
@@ -87,7 +100,7 @@ class AppCameraController extends ChangeNotifier with WidgetsBindingObserver {
     if (_disposed || _analysis == analysis) return;
     _analysis = analysis;
     _objects = const <DetectedObject>[];
-    _lastBarcode = null;
+    _barcodeFilter.reset();
     await _syncStream();
     _notify();
   }
@@ -161,6 +174,7 @@ class AppCameraController extends ChangeNotifier with WidgetsBindingObserver {
     await _barcodeScanner?.close();
     _barcodeScanner = null;
     await ObjectDetectionManager().dispose();
+    await _homeObjects.dispose();
   }
 
   // ------------------------------------------------------------------ private
@@ -272,8 +286,13 @@ class AppCameraController extends ChangeNotifier with WidgetsBindingObserver {
     switch (_analysis) {
       case CameraAnalysis.objectDetection:
         if (!ObjectDetectionManager().isInitialized) {
-          await ObjectDetectionManager().init();
+          // Несколько предметов сразу (ML Kit отдаёт до пяти). Раньше детектор
+          // видел один, самый заметный, и в комнате называл только его.
+          await ObjectDetectionManager().init(multipleObjects: true);
         }
+        break;
+      case CameraAnalysis.homeObjects:
+        await _homeObjects.init();
         break;
       case CameraAnalysis.barcode:
         _barcodeScanner ??= BarcodeScanner();
@@ -288,23 +307,50 @@ class AppCameraController extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> _onFrame(CameraImage image) async {
     if (_disposed || _analysing || _analysis == CameraAnalysis.none) return;
     _analysing = true;
+    final analysis = _analysis;
 
     try {
-      final input = _toInputImage(image);
-      if (input == null) return;
-
-      switch (_analysis) {
+      switch (analysis) {
         case CameraAnalysis.objectDetection:
+          final input = _toInputImage(image);
+          if (input == null) return;
           final detected = await ObjectDetectionManager().detect(input);
+          // Пока кадр считался, режим могли сменить — чужие рамки не рисуем.
+          if (_analysis != analysis) return;
           _objects = detected.filterIf((o) => o.labels.isNotEmpty);
           _notify();
           break;
+        case CameraAnalysis.homeObjects:
+          final frame = _toFrame(image);
+          if (frame == null) return;
+          final found = await _homeObjects.detect(frame);
+          if (_analysis != analysis) return;
+          // В том же виде, что у ML Kit: рамки, подписи, перевод и озвучка
+          // у обоих режимов общие.
+          _objects = [
+            for (final o in found)
+              DetectedObject(
+                boundingBox: o.box,
+                labels: [
+                  Label(
+                    confidence: o.confidence,
+                    index: homeObjectNames.indexOf(o.name),
+                    text: o.name,
+                  ),
+                ],
+                trackingId: null,
+              ),
+          ];
+          _notify();
+          break;
         case CameraAnalysis.barcode:
+          final input = _toInputImage(image);
+          if (input == null) return;
           final codes = await _barcodeScanner!.processImage(input);
           final value =
               codes.firstIf((b) => (b.rawValue ?? '').isNotEmpty)?.rawValue;
-          if (value != null && value != _lastBarcode) {
-            _lastBarcode = value;
+          if (value != null &&
+              _barcodeFilter.shouldReport(value, DateTime.now())) {
             onBarcode?.call(value);
           }
           break;
@@ -337,6 +383,36 @@ class AppCameraController extends ChangeNotifier with WidgetsBindingObserver {
             : InputImageFormat.bgra8888,
         bytesPerRow: plane.bytesPerRow,
       ),
+    );
+  }
+
+  /// Кадр для своей модели: те же байты, что уходят в ML Kit, и тот же
+  /// поворот, поэтому рамки ложатся на превью так же.
+  CameraFrame? _toFrame(CameraImage image) {
+    final description = _description;
+    if (description == null || image.planes.isEmpty) return null;
+
+    final layout = switch (image.format.group) {
+      ImageFormatGroup.nv21 => FrameLayout.nv21,
+      ImageFormatGroup.bgra8888 => FrameLayout.bgra8888,
+      _ => null,
+    };
+    if (layout == null) return null;
+
+    final plane = image.planes.first;
+    // NV21 приходит одной плоскостью: яркость, за ней цвет вдвое мельче.
+    final expected = layout == FrameLayout.nv21
+        ? plane.bytesPerRow * image.height * 3 ~/ 2
+        : plane.bytesPerRow * image.height;
+    if (plane.bytes.length < expected) return null;
+
+    return CameraFrame(
+      bytes: plane.bytes,
+      width: image.width,
+      height: image.height,
+      bytesPerRow: plane.bytesPerRow,
+      layout: layout,
+      rotation: description.sensorOrientation,
     );
   }
 

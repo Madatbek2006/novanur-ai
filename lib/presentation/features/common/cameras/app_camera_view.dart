@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_mlkit_object_detection/google_mlkit_object_detection.dart';
 import 'package:nurnova_ai/core/extensions/text_extensions.dart';
 import 'package:nurnova_ai/core/gen/localization/strings.dart';
 import 'package:nurnova_ai/presentation/features/common/cameras/app_camera_controller.dart';
@@ -19,9 +20,17 @@ class AppCameraView extends StatelessWidget {
     super.key,
     required this.controller,
     this.overlay,
+    this.describeObject,
+    this.showObject,
   });
 
   final AppCameraController controller;
+
+  /// Подпись к рамке найденного предмета — на языке приложения.
+  final String? Function(DetectedObject object)? describeObject;
+
+  /// Какие рамки рисовать. Не задано — все; при поиске — только искомое.
+  final bool Function(DetectedObject object)? showObject;
 
   /// Drawn on top of the preview — capture buttons, framing guides, and so on.
   final Widget? overlay;
@@ -43,13 +52,18 @@ class AppCameraView extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             CameraPreview(camera),
-            if (controller.analysis == CameraAnalysis.objectDetection &&
+            // Рамки у обоих детекторов: ML Kit и «Предметов дома».
+            if ((controller.analysis == CameraAnalysis.objectDetection ||
+                    controller.analysis == CameraAnalysis.homeObjects) &&
                 previewSize != null)
               Positioned.fill(
                 child: CustomPaint(
                   painter: ObjectPainter(
-                    objects: controller.objects,
+                    objects: showObject == null
+                        ? controller.objects
+                        : controller.objects.where(showObject!).toList(),
                     previewSize: previewSize,
+                    describe: describeObject,
                   ),
                 ),
               ),

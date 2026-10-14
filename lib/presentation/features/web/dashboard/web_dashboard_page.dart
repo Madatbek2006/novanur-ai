@@ -203,6 +203,7 @@ class _WebDashboardPageState extends BaseStatefulPageState<WebDashboardPage,
         DashboardButtonType.objectRecognition => Strings.webObjectsCameraHint,
         DashboardButtonType.scanText => Strings.webTextCameraHint,
         DashboardButtonType.describeScene => Strings.webDescribeCameraHint,
+        DashboardButtonType.homeObjects || DashboardButtonType.findObject => '',
       },
       isDragging: state.isDragging,
       isOpeningImage: state.isOpeningImage,
@@ -264,6 +265,10 @@ class _WebDashboardPageState extends BaseStatefulPageState<WebDashboardPage,
                         DashboardButtonType.scanBarcode => BarcodeResultPanel(state: state, cubit: cubit()),
                         DashboardButtonType.describeScene => DescribePanel(state: state, cubit: cubit()),
                         DashboardButtonType.objectRecognition => ObjectsResultPanel(state: state, cubit: cubit()),
+                        // Only in the phone app; the site never selects it.
+                        DashboardButtonType.homeObjects ||
+                        DashboardButtonType.findObject =>
+                          const SizedBox.shrink(),
                       },
                   ],
                 ),

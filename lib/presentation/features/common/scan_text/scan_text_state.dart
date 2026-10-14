@@ -8,6 +8,9 @@ class ScanTextState with _$ScanTextState {
   const factory ScanTextState({
     //
     @Default(LoadingState.initial) LoadingState loadingState,
+    /// Озвучка распознанного текста — тот же плеер, что под ответом в чате.
+    SpeechPlayback? playback,
+    @Default(<String, SpeechPlayback>{}) Map<String, SpeechPlayback> speechClips,
     //
   }) = _ScanTextState;
 }
