@@ -20,6 +20,9 @@ jobs:
           channel: stable
           cache: true
 
+      # flutter_tts собирает свою Windows-часть через nuget.
+      - uses: nuget/setup-nuget@v2
+
       # Tesseract — тот же движок, что tesseract.js на сайте (lib/utils/desktop).
       # Сборка UB-Mannheim с их релизов на GitHub: через Chocolatey первая же
       # сборка упала — их сервер пакетов ответил 504. DLL кладём рядом с
@@ -30,11 +33,10 @@ jobs:
           $setup = "$env:RUNNER_TEMP\tesseract-setup.exe"
           Invoke-WebRequest https://github.com/UB-Mannheim/tesseract/releases/download/v5.4.0.20240606/tesseract-ocr-w64-setup-5.4.0.20240606.exe -OutFile $setup
           Start-Process -FilePath $setup -ArgumentList '/S' -Wait
-          $tess = "C:\Program Files\Tesseract-OCR"
-          New-Item -ItemType Directory -Force windows\tesseract | Out-Null
-          Copy-Item "$tess\*.dll" windows\tesseract\
-          Get-ChildItem windows\tesseract | Measure-Object -Property Length -Sum |
-            ForEach-Object { "DLL Tesseract: $($_.Count) шт., $([math]::Round($_.Sum / 1MB, 1)) МБ" }
+          # Только libtesseract и её зависимости: установщик кладёт 158 МБ DLL,
+          # большая часть — инструменты обучения моделей.
+          python -m pip install --quiet pefile
+          python tool\windows\copy_dll_closure.py "C:\Program Files\Tesseract-OCR" windows\tesseract libtesseract-5.dll
 
       - name: Словари Tesseract
         shell: pwsh
