@@ -35,6 +35,8 @@ def closure(folder: Path, root: str) -> dict[str, Path]:
 
 
 def main():
+    # Консоль Windows по умолчанию в cp1252 — кириллица в отчёте её роняла.
+    sys.stdout.reconfigure(encoding="utf-8")
     source, target, root = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
     found = closure(source, root)
     if root.lower() not in found:
