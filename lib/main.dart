@@ -23,14 +23,15 @@ import 'package:uuid/uuid.dart';
 import 'data/datasource/device/device_info_holder.dart';
 import 'presentation/application/application.dart';
 import 'presentation/application/service/fcm_messaging_service.dart';
+import 'package:nurnova_ai/core/platform/app_platform.dart';
 
 Future<void> main() async {
   runZonedGuarded<Future<void>>(() async {
     WidgetsFlutterBinding.ensureInitialized();
 
-    // The web build sends no notifications, and browsers penalize permission
-    // prompts that are not triggered by the user.
-    if (!kIsWeb) {
+    // The web and desktop builds send no notifications, and browsers penalize
+    // permission prompts that are not triggered by the user.
+    if (!usesWebLayout) {
       await Permission.notification.isDenied.then((value) {
         if (value) {
           Permission.notification.request();
@@ -165,6 +166,16 @@ Future<void> _prepareDeviceInfoHolder() async {
       IosDeviceInfo info = await deviceInfo.iosInfo;
       deviceName = info.name;
       mobileOS = "iOS ${info.systemVersion}";
+    } else if (Platform.isWindows) {
+      WindowsDeviceInfo info = await deviceInfo.windowsInfo;
+      deviceName = info.computerName;
+      mobileOS = "Windows ${info.displayVersion}".trim();
+      appSource = "Desktop";
+    } else if (Platform.isMacOS) {
+      MacOsDeviceInfo info = await deviceInfo.macOsInfo;
+      deviceName = info.computerName;
+      mobileOS = "macOS ${info.osRelease}";
+      appSource = "Desktop";
     }
 
     var uuid = Uuid();

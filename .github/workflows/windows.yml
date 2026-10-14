@@ -1,0 +1,85 @@
+# Десктопная версия для Windows. Flutter не собирает Windows-приложения на
+# маке, поэтому сборка — здесь, на Windows-машине GitHub. Готовый zip лежит в
+# артефактах запуска (Actions → запуск → Artifacts → NurNovaAI-windows).
+name: Windows
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.38.10
+          channel: stable
+          cache: true
+
+      # Tesseract — тот же движок, что tesseract.js на сайте (lib/utils/desktop).
+      # Берём сборку UB-Mannheim и кладём её DLL рядом с программой.
+      - name: Tesseract
+        shell: pwsh
+        run: |
+          choco install tesseract -y --no-progress
+          $tess = "C:\Program Files\Tesseract-OCR"
+          New-Item -ItemType Directory -Force windows\tesseract | Out-Null
+          Copy-Item "$tess\*.dll" windows\tesseract\
+          Get-ChildItem windows\tesseract | Measure-Object -Property Length -Sum |
+            ForEach-Object { "DLL Tesseract: $($_.Count) шт., $([math]::Round($_.Sum / 1MB, 1)) МБ" }
+
+      - name: Словари Tesseract
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force desktop\tessdata | Out-Null
+          foreach ($lang in 'uzb', 'uzb_cyrl', 'rus', 'eng') {
+            Invoke-WebRequest "https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/main/$lang.traineddata" `
+              -OutFile "desktop\tessdata\$lang.traineddata"
+          }
+
+      - name: Зависимости и генерация кода
+        run: |
+          flutter pub get
+          dart run lib/core/scripts/generate_strings_script.dart
+          dart run build_runner build --delete-conflicting-outputs
+
+      # Те же тесты, что на маке, плюс настоящие Tesseract и onnxruntime уже
+      # на Windows — самое хрупкое в этой сборке.
+      - name: Тесты
+        shell: pwsh
+        run: |
+          $ort = Get-ChildItem "$env:LOCALAPPDATA\Pub\Cache\hosted\pub.dev" -Recurse -Filter onnxruntime.dll |
+            Where-Object { $_.FullName -like '*sherpa_onnx_windows*' } | Select-Object -First 1
+          Invoke-WebRequest https://ultralytics.com/images/bus.jpg -OutFile bus.jpg
+          $env:ORT_LIB = $ort.FullName
+          $env:OBJECTS_PHOTO = "$PWD\bus.jpg"
+          $env:OBJECTS_EXPECT = 'bus'
+          $env:PATH = "$PWD\windows\tesseract;$env:PATH"
+          flutter test `
+            --dart-define=NURNOVA_TESSERACT=$PWD\windows\tesseract\libtesseract-5.dll `
+            --dart-define=NURNOVA_DESKTOP_DATA=$PWD\desktop
+
+      - name: Сборка
+        run: flutter build windows --release
+
+      # Программе нужны библиотеки C++ от Microsoft. На многих компьютерах
+      # они уже есть, но кладём рядом, чтобы запускалось везде.
+      - name: Библиотеки C++ и архив
+        shell: pwsh
+        run: |
+          $release = "build\windows\x64\runner\Release"
+          foreach ($dll in 'msvcp140.dll', 'vcruntime140.dll', 'vcruntime140_1.dll') {
+            Copy-Item "C:\Windows\System32\$dll" $release
+          }
+          Compress-Archive -Path "$release\*" -DestinationPath NurNovaAI-windows.zip
+          "Архив: $([math]::Round((Get-Item NurNovaAI-windows.zip).Length / 1MB, 1)) МБ"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NurNovaAI-windows
+          path: NurNovaAI-windows.zip
+          retention-days: 14

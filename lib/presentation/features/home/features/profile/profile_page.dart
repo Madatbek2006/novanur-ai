@@ -16,12 +16,12 @@ import 'package:nurnova_ai/presentation/widgets/card/custom_card.dart';
 import 'package:nurnova_ai/presentation/widgets/divider/custom_divider.dart';
 import 'package:nurnova_ai/presentation/widgets/profile/profile_item_widget.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import 'profile_cubit.dart';
+import 'package:nurnova_ai/core/platform/app_platform.dart';
 
 @RoutePage()
 class ProfilePage extends BasePage<ProfileCubit, ProfileState, ProfileEvent> {
@@ -70,7 +70,7 @@ class ProfilePage extends BasePage<ProfileCubit, ProfileState, ProfileEvent> {
           child: Center(
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                maxWidth: kIsWeb ? 720 : double.infinity,
+                maxWidth: usesWebLayout ? 720 : double.infinity,
               ),
               child: Column(
                 children: [
@@ -306,7 +306,7 @@ class ProfilePage extends BasePage<ProfileCubit, ProfileState, ProfileEvent> {
   /// The bottom navigation bar is replaced by a side rail in wide browser
   /// windows, where a centered dialog also fits better than a bottom sheet.
   bool _isWideWeb(BuildContext context) =>
-      kIsWeb && WebBreakpoints.isWide(context);
+      usesWebLayout && WebBreakpoints.isWide(context);
 
   void _showGlassSheet(
     BuildContext context, {

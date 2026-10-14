@@ -12,6 +12,7 @@ import 'package:nurnova_ai/presentation/features/web/dashboard/web_dashboard_pag
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:nurnova_ai/core/platform/app_platform.dart';
 
 part 'app_router.gr.dart';
 
@@ -32,8 +33,9 @@ class AppRouter extends _$AppRouter {
               page: TakePhotoRoute.page,
               path: 'take_photo',
             ),
-            // ML Kit doesn't run in browsers; the web build has its own dashboard.
-            if (kIsWeb)
+            // ML Kit doesn't run in browsers or on a computer; those get the
+            // site's own dashboard.
+            if (usesWebLayout)
               AutoRoute(
                 page: WebDashboardRoute.page,
                 path: 'dashboard',

@@ -42,6 +42,12 @@ class BrowserVision {
 
   static void clearDropHandler() {}
 
+  /// Только десктопу: туда перетаскивание приходит не из браузера, а из
+  /// `DesktopDropZone`.
+  static void handleDrop(PickedFileData? file) {}
+
+  static void handleDragChange(bool dragging) {}
+
   static Future<String> recognizeText(
     Uint8List bytes,
     String languages,

@@ -4,7 +4,9 @@ import 'package:nurnova_ai/core/extensions/text_extensions.dart';
 import 'package:nurnova_ai/core/gen/assets/assets.gen.dart';
 import 'package:nurnova_ai/core/gen/localization/strings.dart';
 import 'package:nurnova_ai/domain/models/dashboard/dashboard_button_data.dart';
+import 'package:nurnova_ai/core/platform/app_platform.dart';
 import 'package:nurnova_ai/presentation/features/web/widgets/browser_camera_view.dart';
+import 'package:nurnova_ai/presentation/features/web/widgets/desktop_drop_zone.dart';
 import 'package:nurnova_ai/presentation/features/web/widgets/image_source_panel.dart';
 import 'package:nurnova_ai/presentation/features/web/widgets/mode_selector.dart';
 import 'package:nurnova_ai/presentation/features/web/widgets/results/barcode_result_panel.dart';
@@ -113,15 +115,17 @@ class _WebDashboardPageState extends BaseStatefulPageState<WebDashboardPage,
 
   @override
   Widget onWidgetBuild(BuildContext context, WebDashboardState state) {
+    final body = SafeArea(
+      child: LayoutBuilder(
+        builder: (context, constraints) => constraints.maxWidth >= WebBreakpoints.wide
+            ? _buildWide(context, state, constraints)
+            : _buildNarrow(context, state, constraints),
+      ),
+    );
     return Scaffold(
       backgroundColor: context.backgroundGreyColor,
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) => constraints.maxWidth >= WebBreakpoints.wide
-              ? _buildWide(context, state, constraints)
-              : _buildNarrow(context, state, constraints),
-        ),
-      ),
+      // В браузере перетаскивание и вставку ловит сам сайт.
+      body: isDesktop ? DesktopDropZone(child: body) : body,
     );
   }
 

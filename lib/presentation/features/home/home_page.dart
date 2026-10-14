@@ -13,10 +13,10 @@ import 'package:nurnova_ai/presentation/widgets/button/bottom_nav_bar.dart';
 import 'package:nurnova_ai/presentation/widgets/button/bottom_nav_item.dart';
 import 'package:nurnova_ai/presentation/features/web/widgets/web_ui.dart';
 import 'package:nurnova_ai/utils/extension/image.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'home_cubit.dart';
+import 'package:nurnova_ai/core/platform/app_platform.dart';
 
 @RoutePage()
 class HomePage extends BasePage<HomeCubit, HomeState, HomeEvent> {
@@ -36,7 +36,7 @@ class HomePage extends BasePage<HomeCubit, HomeState, HomeEvent> {
   Widget onWidgetBuild(BuildContext context, HomeState state) {
     return AutoTabsRouter(
       routes: [
-        if (kIsWeb) WebDashboardRoute() else DashboardRoute(),
+        if (usesWebLayout) WebDashboardRoute() else DashboardRoute(),
         ProfileRoute()
       ],
       transitionBuilder: (context, child, animation) => FadeTransition(
@@ -45,7 +45,7 @@ class HomePage extends BasePage<HomeCubit, HomeState, HomeEvent> {
       ),
       builder: (context, child) {
         final tabsRouter = AutoTabsRouter.of(context);
-        if (kIsWeb && WebBreakpoints.isWide(context)) {
+        if (usesWebLayout && WebBreakpoints.isWide(context)) {
           return _buildWebLayout(context, tabsRouter, child);
         }
         return Stack(

@@ -9,6 +9,7 @@ import 'package:nurnova_ai/presentation/support/extensions/color_extension.dart'
 import 'package:nurnova_ai/presentation/support/theme/app_glass.dart';
 import 'package:nurnova_ai/presentation/widgets/dialog/speech_to_text_dialog.dart';
 import 'package:nurnova_ai/core/gen/localization/strings.dart';
+import 'package:nurnova_ai/core/platform/app_platform.dart';
 
 /// Height of the input pill and the send button. Everything else in the
 /// composer is derived from it, so the bar stays compact.
@@ -57,9 +58,9 @@ class _CustomInputFieldState extends State<CustomInputField> {
     HapticFeedback.lightImpact();
     widget.onSend(PartialText(text: text));
     _controller.clear();
-    // Phones hide the keyboard after sending; in a browser the field stays
-    // ready for the next question.
-    if (!kIsWeb && focusNode.hasFocus) FocusScope.of(context).unfocus();
+    // Phones hide the keyboard after sending; in a browser or on a computer
+    // the field stays ready for the next question.
+    if (!usesWebLayout && focusNode.hasFocus) FocusScope.of(context).unfocus();
   }
 
   void _dictate() {
@@ -102,7 +103,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
                 // On a keyboard, Enter sends and Shift+Enter adds a line.
                 child: CallbackShortcuts(
                   bindings: {
-                    if (kIsWeb)
+                    if (usesWebLayout)
                       const SingleActivator(LogicalKeyboardKey.enter): _send,
                   },
                   child: TextField(

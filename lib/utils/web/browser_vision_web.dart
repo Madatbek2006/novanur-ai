@@ -107,6 +107,12 @@ class BrowserVision {
     return text.toDart;
   }
 
+  /// Только десктопу: туда перетаскивание приходит не из браузера, а из
+  /// `DesktopDropZone`.
+  static void handleDrop(PickedFileData? file) {}
+
+  static void handleDragChange(bool dragging) {}
+
   static Future<VisionBarcode?> decodeBarcodeFromImage(Uint8List bytes) async =>
       _barcode(await _call<JSString?>('decodeBarcodeFromImage', [bytes.toJS]));
 

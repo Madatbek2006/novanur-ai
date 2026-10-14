@@ -7,7 +7,10 @@ class CocoLabels {
 
   const CocoLabels._(this._names);
 
-  /// As the detector reports them.
+  /// As the detector reports them — MediaPipe on the site and YOLO in the
+  /// desktop app use the same COCO names in the same order.
+  static const List<String> classNames = _english;
+
   static const List<String> _english = [
     'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck',
     'boat', 'traffic light', 'fire hydrant', 'stop sign', 'parking meter', 'bench',
